@@ -1,0 +1,347 @@
+= Tractive: migrating from Trac to GitHub
+
+== Purpose
+
+Tractive is a tool that helps you migrate Trac instances to modern Git
+management platforms like GitHub and GitLab.
+
+Specifically, it converts http://trac.edgewall.org[Trac] tickets into
+GitHub Issues by accessing the Trac database's issues and posts the change
+history of each ticket as comments.
+
+Tractive is written using re-tooled code based on the
+https://github.com/mavatractive[trac-hub] migration tool which is excellent.
+
+NOTE: This tool was created in order to perform Trac-to-GitHub migration
+for the IETF.
+
+== Installation
+
+Install it via:
+
+[source,sh]
+----
+$ gem install tractive
+----
+
+== Usage
+
+=== Executables
+
+The following executables are provided on install.
+
+* `tractive`: the main Tractive executable, run `tractive -h` for detailed
+  usage
+
+The following executables are temporary (to be removed):
+
+* `tractive-get-mysql-attachments`: shell script that copies out attachments
+from a Trac database via mysql
+
+* `tractive-get-sqlite3-attachments`: shell script that copies out attachments
+from a Trac database via sqlite
+
+* `tractive-info`: shell script that provides basic information about a Trac
+database
+
+=== Getting started
+
+Copy the link:config.example.yaml[example YAML configuration] and adapt it
+as needed:
+
+    cp config.example.yaml config.yaml
+    vim config.yaml
+
+Thereafter just invoke `tractive`:
+
+    tractive
+
+If this fails with an error, make sure to have a look at the
+[Dependencies](#dependencies) section.
+
+By default, `tractive` assumes the file `config.yaml` in the same
+directory as the script. You can also specify the configuration file on
+the command line:
+
+    tractive -c foo.yaml
+
+Add the `-v` flag for more verbose output:
+
+    tractive -v
+
+Add the `-o` flag to only import the tickets that are not in a `closed`
+status:
+
+    tractive -o
+
+To resume the migration at a given Trac ticket ID, use `-s`:
+
+    tractive -s 42
+
+If you want all Trac comments/changes to be compiled into a single post
+on the github issue:
+
+    tractive -S
+
+If you migrate to a bare github, you might want want to ensure that the
+ticket ids do not change. In this case you can create dummy tickets
+for IDs missing in Trac (because they were deleted). The process might
+interrupt, so you can still specify the first number to transfer.
+
+    tractive -M -s 601
+
+NOTE: When converting your Trac setup to github, it is prudent to
+first try the migration into a test repository which you can delete
+afterwards. If this worked out fine and delivered the expected results,
+one can still aim the script at the real repository.
+
+=== Issue numbers
+
+By default, tractive will verify that the created issue numbers match
+the ticket IDs of the corresponding trac ticket and error-exit if the
+number is off.
+
+If you need this behaviour, you should also disable user interactions by
+setting **Limit to repository collaborators** under your repository
+settings. Alternatively, when migrating issues to a new repository,
+import the issues on a test-repository and rename the repository to the
+final name when the import went satisfactory.
+
+You can disable this check by using the *fast* option:
+
+    tractive -F
+
+This will also make your import much faster (but after the script has
+finished, it can still take some time until the issues are created on
+github).
+
+Using this option is obligatory, if you know that the ticket IDs will
+not match, e.g. because non-Trac tickets already exist. In this case,
+you must also specify the ID of the first ticket to be migrated (even if
+it is 1):
+
+    tractive -F -s 1
+
+If you start to import in a fresh github project, tractive can create
+dummy tickets issue numbers not available in trac. This even works if
+you want to run it multiple times. In this case you need to provide -s
+for the first id not available in Github.
+
+    tractive -M
+
+== Details
+
+=== Technology
+
+It uses uses GitHub's new
+https://gist.github.com/jonmagic/5282384165e0f86ef105[Issue import API]
+to create Issues:
+
+* without hitting abuse detection warnings and getting blocked
+* without sending email notifications
+* without increasing your contribution count to ridiculous heights
+* much faster than with the https://developer.github.com/v3/issues[normal issues API]
+* with correct creation/closed date set
+* atomically without users being able to interfere in the creation of
+  a single issue
+
+=== Configuration
+
+The YAML configuration file contains four sections. The section `trac`
+includes all Trac-related configuration options. The database URL
+follows the scheme described
+http://sequel.jeremyevans.net/rdoc/classes/Sequel.html#method-c-connect[here].
+
+In order to use databases other than sqlite, you may have to add them to
+the `Gemfile`. For mysql databases, you should use the mysql2 adapter.
+
+The section `github` includes the repository to migrate as well an API
+token which can be generated under
+https://github.com/settings/tokens[Settings > Personal Access Tokens].
+
+The section `labels` allows for custom label mappings. Since github's
+issue tracker does not have a first-class notion of ticket priority,
+type, and version information, tractive supports expressing these in the
+form of labels.
+
+The section `users` contains a one-to-one mapping between trac usernames
+or email addresses and github usernames for users for which no github
+credentials are known or can't be used and are thus not stored in the
+`github` section. As soon as you have the login credentials for a user
+please use the `github` `logins` section in the config instead.
+
+The section `milestones` contains a mapping of milestones as it is
+generated by trac-hub -i
+
+The section `attachments` specifies how you want to grab attachments. In
+particular the `attachment_uri` supports the case that the `imagename` is
+embedded in the uri:
+
+The imagename is built of ticket_id and image filename. `exportfolder`
+ist the folder where the images will be downloaded to on the trac
+system.
+
+``` {.yaml}
+attachments:
+  attachment_uri: https://gitlab.com/mynamespace/myrepo/raw/master/from_trac/#imagename#?inline=false
+  export_folder: ./attachments
+  export_script: attachments.sh
+```
+
+You can use
+
+    tractive -i
+
+to produce a yaml file with labels, users, milestones etc. You can copy
+this into the config file and adapt it as required.
+
+it also produces a shell script which in invokes trac-admin to download
+the attachments from trac.
+
+
+== TODO: information from the trac-hub README to be migrated
+
+Major changes are:
+
+1.  use docker to run the dependencies (in particular ruby, mysql)
+2.  tweak the layout of the ticets according to our taste
+3.  transfer some information to labels and some to the ticket body
+    (called badges in the script)
+4.  maintain the ticket id even of they are not consecutive in trac. For
+    this we create dummy tickets
+5.  handle milestones
+6.  handle attachments
+7.  drive it all by config file. Rename the config file to
+    `tractive.config.yaml`; search the config file in the parent folder
+    and in the current folder.
+
+=== Getting started
+
+==== Prerequisites
+
+1.  docker
+2.  access to the trac-environment. This script needs direct access to
+    the svn repository as well as the trac-env. It does not use trac
+    api.
+3.  git
+4.  a github account
+
+==== how to use it
+
+1.  install docker
+2.  create a working folder structure like this
+
+        trac-to-github
+          +- trac-env           # this is the trac-environment from the source
+          +- trac-hub           # created by git clone of this project
+          +- foobar-git         # the corresponding git repository
+                                # created by `git-svn clone <svn-url>/trunk foobar-git`
+
+3.  clone this project
+4.  cd to this project
+5.  start mysql by
+
+    'docker-compose up mysql'
+
+    you can then access the database server under `localhost:3306`
+
+6.  import the trac to a new database on this server, e.g. `foobar`
+
+    ensure the database collation
+
+    `ALTER DATABASE`foobar`CHARACTER SET utf8 COLLATE utf8_bin;`
+
+7.  copy the trac environment to a sibling of this project. This will be
+    needed to extract the attachments.
+
+8.  create parts for the config file
+
+    `docker-compose run --rm trac-hub -i > x.txt`
+
+9.  create trac-hub.config.yaml`based on`trac-hub.config.yaml.example\`
+
+10. adjust settings in `trac-hub.config.yaml`. Thereby use parts of
+    `x.txt`
+
+11. convert the svn to git
+
+    `git-svn clone <svn-url>/trunk foobar-git`
+
+12. create the project on github and push foobar-git by following the
+    instructions from github
+
+    ``` {.bash}
+    git remote add origin https://github.com/bwl21/foobar.git
+    git push -u origin master
+    ```
+
+13. create an app key in `https://github.com/settings/apps/new` enter
+    the key to `trac-hub.config.yaml`
+
+14. create the revmap by
+
+    `git svn log --show-commit --oneline` foobar-git \> revmap.txt
+
+15. create the attachment exporter
+
+    `docker-compose run --rm trac-hub -A`\
+    you will see a message about the crated file
+
+16. now run the converter
+
+    `docker-compose run --rm trac-hub --M -s 0`
+
+17. If something goes wrong, restart the the converter
+
+    `docker-compose run --rm trac-hub --M -s <next free id>`
+
+==== Bonus :-)
+
+You can run a trac-instance - without svn - but to inspect details by
+
+    `docker-compose up tracd`
+
+you can run a gitlab-instance
+
+    'docker-compose up gitlab`
+
+I managed to import the converted github project in to this local
+instance for testing purposes.
+
+==== future
+
+May be we can add direct gitlab support to trac-hub
+
+
+== Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run
+`rake spec` to run the tests. You can also run `bin/console` for an interactive
+prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`. To
+release a new version, update the version number in `version.rb`, and then run
+`bundle exec rake release`, which will create a git tag for the version, push
+git commits and the created tag, and push the `.gem` file to
+https://rubygems.org[rubygems.org].
+
+== Contributing
+
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/ietf-ribose/tractive. This project is intended to be a safe,
+welcoming space for collaboration, and contributors are expected to adhere to
+the
+https://github.com/ietf-ribose/tractive/blob/master/CODE_OF_CONDUCT.md[code of conduct].
+
+== Code of Conduct
+
+Everyone interacting in the Tractive project's codebases, issue trackers, chat
+rooms and mailing lists is expected to follow the
+https://github.com/ietf-ribose/tractive/blob/master/CODE_OF_CONDUCT.md[code of conduct].
+
+== License
+
+Tractive and its supporting code (from trac-hub) are licensed under a
+link:LICENSE.md[BSD-style licence].
+
+Tractive is funded and developed by Ribose Inc.

@@ -60,7 +60,7 @@ module Tractive
     end
 
     def load_milestone_map
-      read_milestones_from_gitub
+      read_milestones_from_github
 
       newmilestonekeys = @milestonesfromtrac.keys - @milestonemap.keys
 
@@ -83,7 +83,7 @@ module Tractive
              "Accept"        => "application/vnd.github.golden-comet-preview+json"}))
       end
 
-      read_milestones_from_gitub
+      read_milestones_from_github
 
       $logger.info("Last created issue on GitHub is '#{@last_created_issue}'")
       nil
@@ -109,7 +109,7 @@ module Tractive
 
     private
 
-    def read_milestones_from_gitub
+    def read_milestones_from_github
       milestonesongithub = JSON.parse(RestClient.get(
           "https://api.github.com/repos/#{@repo}/milestones?per_page=100",
           {"Authorization" => "token #{@token}",
@@ -495,9 +495,9 @@ module Tractive
         text += "changed #{kind} which not transferred by trac-hub"
       end
 
-      return {
-          "body"       => text,
-          "created_at" => format_time(meta[:time]),
+      {
+        "body"       => text,
+        "created_at" => format_time(meta[:time]),
       }
     end
 

@@ -127,7 +127,7 @@ module Tractive
     def trac_mail(author)
       return @trac_mails_cache[author] if @trac_mails_cache.has_key?(author)
       # tries to retrieve the email from trac db
-      data = @trac.sessions.select(:value).where('name = "email" AND sid = ?', author)
+      data = @trac.sessions.select(:value).where(Sequel.lit('name = "email" AND sid = ?', author))
       return (@trac_mails_cache[author] = data.first[:value]) if data.count == 1
       return (@trac_mails_cache[author] = author) # not found
     end

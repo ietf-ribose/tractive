@@ -110,7 +110,7 @@ if __FILE__ == $0
     end
   end
 
-  trac = Trac.new(db)
+  trac = Tractive::Trac.new(db)
 
   if opts[:info]
     trac.info
@@ -133,6 +133,6 @@ if __FILE__ == $0
   #     trac, cfg['github'], cfg['users'], cfg['labels'], revmap,
   #     opts[:attachurl], opts[:singlepost], (not opts[:fast]), opts[:mockdeleted])
 
-  migrator = Migrator.new(trac: trac, opts: opts, cfg: cfg, revmap: revmap)
+  migrator = Tractive::Migrator.new(trac: trac, opts: opts, cfg: cfg, revmap: revmap)
   migrator.migrate(opts[:start], opts[:openedonly])
 end

@@ -73,6 +73,22 @@ class Options < Hash
   end
 end
 
+def setup_db(db_url)
+  return unless db_url
+
+  db = Sequel.connect(db_url)
+
+  if not db
+    $logger.error('could not connect to trac databse')
+    exit 1
+  end
+
+  Dir.glob('lib/tractive/model/*.rb') do |file|
+    require_relative "../#{file}"
+  end
+  db
+end
+
 if __FILE__ == $0
   opts = Options.new(ARGV)
   cfg  = YAML.load_file(opts[:config])
@@ -86,14 +102,7 @@ if __FILE__ == $0
   end
 
   # Setup database.
-  db = nil
-  if db_url = cfg['trac']['database']
-    db = Sequel.connect(db_url)
-  end
-  if not db
-    $logger.error('could not connect to trac databse')
-    exit 1
-  end
+  db = setup_db(cfg['trac']['database'])
 
   # load revision mapping file and convert it to a hash.
   # This revmap file allows to map between SVN revisions (rXXXX)

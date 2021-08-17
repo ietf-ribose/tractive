@@ -5,11 +5,11 @@ module Tractive
     def initialize(db)
       $logger.info('loading tickets')
       @db          = db
-      @tickets     = @db[:ticket]
-      @subtickets  = @db[:subtickets]
-      @changes     = @db[:ticket_change]
-      @sessions    = @db[:session_attribute]
-      @attachments = @db[:attachment]
+      @tickets     = Tractive::Model::Ticket
+      @subtickets  = Tractive::Model::Subticket
+      @changes     = Tractive::Model::Change
+      @sessions    = Tractive::Model::Session
+      @attachments = Tractive::Model::Attachment
     end
 
     # produce an shell script to be invoked

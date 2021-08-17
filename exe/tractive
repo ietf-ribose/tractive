@@ -74,9 +74,7 @@ class Options < Hash
 end
 
 def setup_db(db_url)
-  return unless db_url
-
-  db = Sequel.connect(db_url)
+  db = Sequel.connect(db_url) if db_url
 
   if not db
     $logger.error('could not connect to trac databse')

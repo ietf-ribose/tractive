@@ -2,144 +2,43 @@
 
 require_relative '../lib/tractive'
 
-class Options < Hash
-  def initialize(argv)
-    super()
-    opts = OptionParser.new do |opts|
-      opts.banner = "#{$0}, available options:"
-      opts.on('-c config', '--config', 'set the configuration file') do |c|
-        self[:config] = c
-      end
-      opts.on_tail('-h', '--help', 'display this help and exit') do |help|
-        puts(opts)
-        exit
-      end
-      opts.on('-s', '--start-at ID', 'start migration from ticket with number <ID>') do |id|
-        self[:start] = id
-      end
-      opts.on('-r', '--rev-map-file FILE',
-              'allows to specify a commit revision mapping FILE') do |file|
-        self[:revmapfile] = file
-      end
-      opts.on('-a', '--attachment-url URL',
-              'if attachment files are reachable via a URL we reference this here') do |url|
-        self[:attachurl] = url
-      end
-      opts.on('-S', '--single-post',
-              'Put all issue comments in the first message.') do |single|
-        self[:singlepost] = single
-      end
-      opts.on('-F', '--fast-import',
-              'Import without safety-checking issue numbers.') do |fast|
-        self[:fast] = fast
-      end
-      opts.on('-M', '--mockup',
-              'Import from 0 and mocking tickets deleted on trac') do |mockdeleted|
-        self[:mockdeleted] = mockdeleted
-      end
+class TractiveCommand < Thor
+  default_command :default
+  class_option 'config', type: :string, default: 'trac-hub.config.yaml', banner: '<PATH>', aliases: '-c', desc: 'Set the configuration file'
+  class_option 'start', type: :numeric, default: -1, aliases: ['-s', '--start-at'], banner: '<ID>', desc: 'Start migration from ticket with number <ID>'
+  class_option 'info', type: :boolean, aliases: ['-i', '--info'], desc: 'Reports existing labels and users in the database'
+  class_option 'revmapfile', type: :string, aliases: ['-r', '--rev-map-file'], banner: '<PATH>', desc: 'Allows to specify a commit revision mapping FILE'
+  class_option 'attachurl', type: :string, aliases: ['-a', '--attachment-url'], banner: '<URL>', desc: 'If attachment files are reachable via a URL we reference this here'
+  class_option 'singlepost', type: :boolean, aliases: ['-S', '--single-post'], desc: 'Put all issue comments in the first message.'
+  class_option 'fast', type: :boolean, aliases: ['-F', '--fast-import'], desc: 'Import without safety-checking issue numbers.'
+  class_option 'mockdeleted', type: :boolean, aliases: ['-M', '--mockup'], desc: 'Import from 0 and mocking tickets deleted on trac'
+  class_option 'attachmentexporter', type: :string, aliases: ['-A', '--attachment-exporter'], desc: 'Generate an attachment exporter script according to config.yaml'
+  class_option 'openedonly', type: :boolean, aliases: ['-o', '--opened-only'], desc: 'Skips the import of closed tickets'
+  class_option 'verbose', type: :boolean, aliases: ['-v', '--verbose'], desc: 'Verbose mode'
 
-      opts.on('-A', '--attachment-exporter',
-              'Generate an attachment exporter script according to config.yaml') do |attachmentexporter|
-        self[:attachmentexporter] = attachmentexporter
-      end
-
-      opts.on('-o', '--opened-only', 'Skips the import of closed tickets') do |o|
-        self[:openedonly] = o
-      end
-      opts.on('-v', '--verbose', 'verbose mode') do |v|
-        self[:verbose] = v
-      end
-      opts.on('-i', '--info', 'Reports existing labels and users in the database') do |i|
-        self[:info] = i
-      end
-
-      begin
-        opts.parse!(argv)
-        if not self[:config]
-          configfiles = ['../trac-hub.config.yaml', 'trac-hub.config.yaml']
-          default = configfiles.map do |f|
-            File.join(File.dirname(__FILE__), f)
-          end.select{|f|File.exists?(f)}.first
-          raise "missing configuration file (one of #{configfiles})" unless default
-          self[:config] = default
-        end
-        self[:start] = -1 unless self[:start]
-      rescue => e
-        STDERR.puts(e)
-        STDERR.puts('run with -h to see available options')
-        exit 1
-      end
-    end
+  def self.exit_on_failure?
+    true
   end
-end
 
-def setup_db(db_url)
-  db = Sequel.connect(db_url) if db_url
+  desc "<OPTIONS>", "Migrate Trac instances to modern Git management platforms like GitHub and GitLab"
+  def default
+    verify_config_options!
+    Tractive::Main.run(options)
+  end
 
-  if not db
-    $logger.error('could not connect to trac databse')
+  def method_missing(*args)
+    STDERR.puts "No method found named: #{args[0]}"
+    STDERR.puts "Run with `--help` or `-h` to see available options"
     exit 1
   end
 
-  Dir.glob('lib/tractive/model/*.rb') do |file|
-    require_relative "../#{file}"
-  end
-  db
-end
+  no_commands do
+    def verify_config_options!
+      return if File.exist?(options[:config])
 
-if __FILE__ == $0
-  opts = Options.new(ARGV)
-  cfg  = YAML.load_file(opts[:config])
-
-  # Setup logger.
-  $logger           = Logger.new(STDERR)
-  $logger.level     = opts[:verbose] ? Logger::DEBUG : Logger::INFO
-  $logger.formatter = proc do |severity, datetime, progname, msg|
-    time = datetime.strftime('%Y-%m-%d %H:%M:%S')
-    "[#{time}] #{severity}#{' ' * (5 - severity.size + 1)}| #{msg}\n"
-  end
-
-  # Setup database.
-  db = setup_db(cfg['trac']['database'])
-
-  # load revision mapping file and convert it to a hash.
-  # This revmap file allows to map between SVN revisions (rXXXX)
-  # and git commit sha1 hashes.
-  revmap     = nil
-  revmapfile = opts[:revmapfile] || cfg['revmapfile']
-  if revmapfile
-    File.open(revmapfile, "r:UTF-8") do |f|
-      $logger.info("loading revision map #{revmapfile}")
-      revmap = Hash[f.each_line
-                        .map { |line| line.split(/\s+\|\s+/) }
-                        .map { |rev, sha| [rev.gsub(/^r/, ''), sha] } # remove leading "r" if present
-      ]
+      raise "missing configuration file (#{configfiles})"
     end
   end
-
-  trac = Tractive::Trac.new(db)
-
-  if opts[:info]
-    trac.info
-    exit(0)
-  end
-
-  if opts[:attachmentexporter]
-    begin
-      trac.generate_attachment_exporter(cfg)
-    rescue StandardError => e
-      $logger.error(e.message)
-      exit(1)
-    end
-    exit(0)
-  end
-
-  #            trac: trac, opts: opts, cfg: cfg, revmap: revmap
-
-  # migrator = Migrator.new(
-  #     trac, cfg['github'], cfg['users'], cfg['labels'], revmap,
-  #     opts[:attachurl], opts[:singlepost], (not opts[:fast]), opts[:mockdeleted])
-
-  migrator = Tractive::Migrator.new(trac: trac, opts: opts, cfg: cfg, revmap: revmap)
-  migrator.migrate(opts[:start], opts[:openedonly])
 end
+
+TractiveCommand.start(ARGV)

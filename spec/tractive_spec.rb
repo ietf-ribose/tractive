@@ -6,6 +6,7 @@ RSpec.describe Tractive do
   end
 
   it "does something useful" do
+    pending("Need to fix this")
     expect(false).to eq(true)
   end
 end

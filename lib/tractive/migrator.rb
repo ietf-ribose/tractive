@@ -2,19 +2,21 @@ module Tractive
   class Migrator
     def initialize(args)
       #def initialize(trac, github, users, labels, revmap, attachurl, singlepost, safetychecks, mockdeleted = false)
-      trac              = args[:trac]
+      db                = args[:db]
       github            = args[:cfg]['github']
       users             = args[:cfg]['users']
       labels            = args[:cfg]['labels']
       milestones        = args[:cfg]['milestones']
-      revmap            = args[:revmap]
       attachurl         = args[:opts][:attachurl] || args[:cfg].dig("attachments", "url")
       singlepost        = args[:opts][:singlepost]
       safetychecks      = (not args[:opts][:fast])
       mockdeleted       = args[:opts][:mockdeleted]
       tracticketbaseurl = args[:cfg]['trac']['ticketbaseurl']
+      start_ticket      = args[:opts][:start]
+      filter_closed     = args[:opts][:openedonly]
 
-      @trac  = trac
+
+      @trac  = Tractive::Trac.new(db)
       @repo  = github['repo']
       @token = github["token"]
 
@@ -48,10 +50,12 @@ module Tractive
 
       load_subtickets
 
-      @revmap       = revmap
-      @attachurl    = attachurl
-      @singlepost   = singlepost
-      @safetychecks = safetychecks
+      @revmap        = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]['revmapfile'])
+      @attachurl     = attachurl
+      @singlepost    = singlepost
+      @safetychecks  = safetychecks
+      @start_ticket  = (start_ticket || @last_created_issue + 1).to_i
+      @filter_closed = filter_closed
     end
 
     def load_subtickets
@@ -98,13 +102,11 @@ module Tractive
       @users[user]
     end
 
-    def migrate(start_ticket = -1, filterout_closed = false)
-      start_ticket = start_ticket.to_i
-      if start_ticket == -1
-        start_ticket = @last_created_issue + 1
-      end
+    def migrate
       GracefulQuit.enable
-      migrate_tickets(start_ticket, filterout_closed)
+      migrate_tickets(@start_ticket, @filter_closed)
+    rescue RuntimeError => e
+      $logger.error e.message
     end
 
     private
@@ -296,7 +298,7 @@ module Tractive
         del = @labels_cfg.fetch(x[:field], Hash[])[x[:oldvalue]]
         add = @labels_cfg.fetch(x[:field], Hash[])[x[:newvalue]]
         labels.delete(del) if del
-  #      labels.add(add) if add
+        # labels.add(add) if add
         if x[:field] == "status" and x[:newvalue] == "closed"
           closed = x[:time]
         end
@@ -550,6 +552,23 @@ module Tractive
       #str = "> #{str}"
       str
     end
-  end
 
+    def load_revmap_file(revmapfile)
+      # load revision mapping file and convert it to a hash.
+      # This revmap file allows to map between SVN revisions (rXXXX)
+      # and git commit sha1 hashes.
+      revmap = nil
+      if revmapfile
+        File.open(revmapfile, "r:UTF-8") do |f|
+          $logger.info("loading revision map #{revmapfile}")
+          revmap = Hash[f.each_line
+                            .map { |line| line.split(/\s+\|\s+/) }
+                            .map { |rev, sha| [rev.gsub(/^r/, ''), sha] } # remove leading "r" if present
+          ]
+        end
+      end
+
+      revmap
+    end
+  end
 end

@@ -2,7 +2,7 @@ module Tractive
   class Migrator
     def initialize(args)
       #def initialize(trac, github, users, labels, revmap, attachurl, singlepost, safetychecks, mockdeleted = false)
-      trac              = args[:trac]
+      db                = args[:db]
       github            = args[:cfg]['github']
       users             = args[:cfg]['users']
       labels            = args[:cfg]['labels']
@@ -16,7 +16,7 @@ module Tractive
       filter_closed     = args[:opts][:openedonly]
 
 
-      @trac  = trac
+      @trac  = Tractive::Trac.new(db)
       @repo  = github['repo']
       @token = github["token"]
 

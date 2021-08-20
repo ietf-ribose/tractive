@@ -194,7 +194,7 @@ module Tractive
 
         next if filterout_closed and ticket[:status] == "closed"
         GracefulQuit.check("quitting after processing ticket ##{@last_created_issue}") do
-          file.puts "]"
+          @output_file.puts "]"
         end
 
         if @safetychecks;

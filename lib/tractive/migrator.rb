@@ -50,12 +50,17 @@ module Tractive
 
       load_subtickets
 
-      @revmap        = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]['revmapfile'])
-      @attachurl     = attachurl
-      @singlepost    = singlepost
-      @safetychecks  = safetychecks
-      @start_ticket  = (start_ticket || @last_created_issue + 1).to_i
-      @filter_closed = filter_closed
+      dry_run_output_file = args[:cfg][:dry_run_output_file] || "#{Dir.pwd}/dryrun_out.json"
+
+      @dry_run          = args[:opts][:dryrun]
+      @output_file      = file = File.new(dry_run_output_file, 'w+')
+      @delimiter        = ''
+      @revmap           = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]['revmapfile'])
+      @attachurl        = attachurl
+      @singlepost       = singlepost
+      @safetychecks     = safetychecks
+      @start_ticket     = (start_ticket || @last_created_issue + 1).to_i
+      @filter_closed    = filter_closed
     end
 
     def load_subtickets
@@ -188,7 +193,9 @@ module Tractive
         raise ("tickets out of sync #{ticket_id} - #{ticket[:id]}") if ticket[:id] != ticket_id
 
         next if filterout_closed and ticket[:status] == "closed"
-        GracefulQuit.check("quitting after processing ticket ##{@last_created_issue}")
+        GracefulQuit.check("quitting after processing ticket ##{@last_created_issue}") do
+          file.puts "]"
+        end
 
         if @safetychecks;
           begin
@@ -206,19 +213,27 @@ module Tractive
           $logger.info(%Q{creating issue for trac #{ticket[:id]} "#{ticket[:summary]}" (#{ticket[:reporter]})})
           # API details: https://gist.github.com/jonmagic/5282384165e0f86ef105
           request  = compose_issue(ticket)
-          response = JSON.parse(
-            RestClient.post(
-              "https://api.github.com/repos/#{@repo}/import/issues",
-              request.to_json,
-              {
-                "Authorization" => "token #{@token}",
-                "Content-Type"  => "application/json",
-                "Accept"        => "application/vnd.github.golden-comet-preview+json"
-              }
-            )
-          )
-        end
 
+          if @dry_run
+            @output_file.puts '[' if @delimiter == ''
+            @output_file.puts @delimiter
+            @output_file.puts request.to_json
+            @delimiter = ',' if @delimiter == ''
+            response = { 'status' => 'added to file', 'issue_url' => "/#{ticket[:id]}" }
+          else
+            response = JSON.parse(
+              RestClient.post(
+                "https://api.github.com/repos/#{@repo}/import/issues",
+                request.to_json,
+                {
+                  "Authorization" => "token #{@token}",
+                  "Content-Type"  => "application/json",
+                  "Accept"        => "application/vnd.github.golden-comet-preview+json"
+                }
+              )
+            )
+          end
+        end
 
         if true #@safetychecks  - it is not really faster if we do not wait for the processing
           while response["status"] == "pending"
@@ -252,6 +267,8 @@ module Tractive
         end
         @last_created_issue = ticket[:id]
       end
+
+      @output_file.puts "]"
     end
 
     def compose_issue(ticket)

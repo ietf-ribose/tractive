@@ -20,7 +20,7 @@ module Tractive
     def self.check(message = "Quitting")
       if self.instance.breaker
         yield if block_given?
-        $log.info message
+        $logger.info message
         exit
       end
     end

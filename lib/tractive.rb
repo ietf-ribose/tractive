@@ -3,8 +3,10 @@
 require_relative "tractive/graceful_quit"
 require_relative "tractive/migrator"
 require_relative "tractive/trac"
+require_relative "tractive/info"
 require_relative "tractive/version"
 require_relative "tractive/main"
+require_relative "tractive/utilities"
 require 'json'
 require 'logger'
 require 'yaml'

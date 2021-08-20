@@ -14,7 +14,7 @@ module Tractive
       raise("mising attachements/export_script entry in configuration") unless outfile
       raise("mising attachements/export_folder entry in configuration") unless outfolder
 
-      attachments   = @db['select id, filename from attachment where type="ticket"']
+      attachments   = @db[:attachment].select(:id, :filename).where(type: 'ticket')
       exportcommads = attachments.map do |attachment|
         %Q{mkdir -p #{outfolder}/#{attachment[:id]}
         trac-admin /trac attachment export ticket:#{attachment[:id]} '#{attachment[:filename]}' > '#{outfolder}/#{attachment[:id]}/#{attachment[:filename]}'}

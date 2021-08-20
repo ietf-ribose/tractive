@@ -6,22 +6,23 @@ module Tractive
 
     def print
       users = [
-          @db['select distinct reporter from ticket'].map { |r| r[:reporter] },
-          @db['select distinct owner from ticket'].map { |r| r[:owner] },
-          @db['select distinct author from ticket_change'].map { |r| r[:author] },
-          @db["select distinct newvalue from ticket_change where field=\'reporter\'"].map { |r| r[:reporter] },
-          @db['select distinct author   from revision'].map { |r| r[:author] },
-          @db['select distinct author   from report'].map { |r| r[:author] },
-          @db['select distinct author   from attachment'].map { |r| r[:author] }
+          @db[:ticket].distinct(:reporter).select_map(:reporter),
+          @db[:ticket].distinct(:owner).select_map(:owner),
+          @db[:ticket_change].distinct(:author).select_map(:author),
+          @db[:ticket_change].distinct(:newvalue).where(field: 'reporter').select_map(:newvalue),
+          @db[:revision].distinct(:author).select_map(:author),
+          @db[:report].distinct(:author).select_map(:author),
+          @db[:attachment].distinct(:author).select_map(:author)
       ].flatten.uniq.compact
 
-      milestones  = @db['select name, name, due, completed, description  from milestone'].all.map { |i| [i[:name], i] }
-      types       = @db['select distinct type        from ticket'].map { |r| r[:type] }.compact
-      components  = @db['select distinct component   from ticket'].map { |r| r[:component] }.compact
-      resolutions = @db['select distinct resolution  from ticket'].map { |r| r[:resolution] }.compact
-      severity    = @db['select distinct severity    from ticket'].map { |r| r[:severity] }.compact
-      priorities  = @db['select distinct priority    from ticket'].map { |r| r[:priority] }.compact
-      tracstates  = @db['select distinct status      from ticket'].map { |r| r[:status] }.compact
+      milestones  = @db[:milestone].select(:name, :due, :completed, :description).all.map { |i| [i[:name], i] }
+
+      types       = @db[:ticket].distinct(:type).select_map(:type).compact
+      components  = @db[:ticket].distinct(:component).select_map(:component).compact
+      resolutions = @db[:ticket].distinct(:resolution).select_map(:resolution).compact
+      severity    = @db[:ticket].distinct(:severity).select_map(:severity).compact
+      priorities  = @db[:ticket].distinct(:priority).select_map(:priority).compact
+      tracstates  = @db[:ticket].distinct(:status).select_map(:status).compact
 
       result = {
         "users"      => Tractive::Utilities.make_hash("", users),

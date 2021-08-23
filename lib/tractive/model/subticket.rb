@@ -1,6 +1,4 @@
 module Tractive
-  module Model
-    class Subticket < Sequel::Model(:subtickets)
-    end
+  class Subticket < Sequel::Model(:subtickets)
   end
 end

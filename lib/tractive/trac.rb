@@ -5,11 +5,11 @@ module Tractive
     def initialize(db)
       $logger.info('loading tickets')
       @db          = db
-      @tickets     = Tractive::Model::Ticket
-      @subtickets  = Tractive::Model::Subticket
-      @changes     = Tractive::Model::Change
-      @sessions    = Tractive::Model::Session
-      @attachments = Tractive::Model::Attachment
+      @tickets     = Ticket
+      @subtickets  = Subticket
+      @changes     = Change
+      @sessions    = Session
+      @attachments = Attachment
     end
   end
 end

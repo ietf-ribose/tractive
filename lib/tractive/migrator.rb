@@ -54,7 +54,7 @@ module Tractive
 
       @dry_run          = args[:opts][:dryrun]
       @output_file      = file = File.new(dry_run_output_file, 'w+')
-      @delimiter        = ''
+      @delimiter        = '['
       @revmap           = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]['revmapfile'])
       @attachurl        = attachurl
       @singlepost       = singlepost
@@ -215,10 +215,9 @@ module Tractive
           request  = compose_issue(ticket)
 
           if @dry_run
-            @output_file.puts '[' if @delimiter == ''
             @output_file.puts @delimiter
             @output_file.puts request.to_json
-            @delimiter = ',' if @delimiter == ''
+            @delimiter = ',' if @delimiter == '['
             response = { 'status' => 'added to file', 'issue_url' => "/#{ticket[:id]}" }
           else
             response = JSON.parse(

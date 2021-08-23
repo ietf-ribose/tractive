@@ -16,6 +16,8 @@ module Tractive
       if @opts[:info]
         info
       elsif @opts[:attachmentexporter]
+        create_attachment_exporter_script
+      elsif @opts[:exportattachments]
         export_attachments
       else
         migrate
@@ -31,7 +33,11 @@ module Tractive
     end
 
     def export_attachments
-      Tractive::AttachmentExporter.new(@cfg, @db).generate
+      Tractive::AttachmentExporter.new(@cfg, @db).export
+    end
+
+    def create_attachment_exporter_script
+      Tractive::AttachmentExporter.new(@cfg, @db).generate_script
     end
   end
 end

@@ -1,6 +1,9 @@
 module Tractive
-  module Model
-    class Attachment < Sequel::Model(:attachment)
+  class Attachment < Sequel::Model(:attachment)
+    dataset_module do
+      def tickets_attachments
+        filter(type: 'ticket')
+      end
     end
   end
 end

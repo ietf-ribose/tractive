@@ -16,3 +16,5 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+Tractive::Utilities.setup_db!("mysql2://root:password@127.0.0.1:3306/test_db")

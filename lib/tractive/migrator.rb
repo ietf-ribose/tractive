@@ -15,7 +15,6 @@ module Tractive
       start_ticket      = args[:opts][:start]
       filter_closed     = args[:opts][:openedonly]
 
-
       @trac  = Tractive::Trac.new(db)
       @repo  = github['repo']
       @token = github["token"]
@@ -61,6 +60,7 @@ module Tractive
       @safetychecks     = safetychecks
       @start_ticket     = (start_ticket || @last_created_issue + 1).to_i
       @filter_closed    = filter_closed
+      @uri_parser = URI::Parser.new
     end
 
     def load_subtickets
@@ -488,7 +488,7 @@ module Tractive
         name = meta[:filename]
         body = meta[:description]
         if @attachurl
-          url  = URI.escape("#{@attachurl}/#{meta[:id]}/#{name}")
+          url  = @uri_parser.escape("#{@attachurl}/#{meta[:id]}/#{name}")
           text += "[`#{name}`](#{url})"
           if [".png", ".jpg", ".gif"].include? File.extname(name).downcase
             body += "\n![#{name}](#{url})"

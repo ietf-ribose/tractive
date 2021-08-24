@@ -1,0 +1,61 @@
+trac:
+  # database: sqlite://db/trac.db
+  # database: mysql2://user:password@host:port/database
+  database: mysql2://root:root@127.0.0.1:3306/test_db
+  # ticketbaseurl: https://foo.bar/trac/foobar/ticket
+
+github:
+  repo: 'test_repo'
+  token: 'test_token'
+
+revmapfile: "spec/files/revmap_spec.txt"
+
+# make sure not to typo the GitHub username as the issue will fail to create if a ticket's owner (assignee) has a valid mapping below
+users:
+  user: user
+
+milestones:
+  milestone1:
+    :name: milestone1
+    :due: 0
+    :completed: 0
+    :description:
+  milestone2:
+    :name: milestone2
+    :due: 0
+    :completed: 0
+    :description:
+  milestone3:
+    :name: milestone3
+    :due: 0
+    :completed: 0
+    :description:
+  milestone4:
+    :name: milestone4
+    :due: 0
+    :completed: 0
+    :description:
+labels:
+  type:
+    defect: type_defect
+  component:
+    component1: component_component1
+  resolution:
+    invalid: resolution_invalid
+  severity:
+    blocker:            '#high'
+    critical:           '#critical'
+    major:              '#major'
+    minor:              '#minor'
+    trivial:            '#trivial'
+  priority:
+    critical: priority_critical
+    major: priority_major
+  tracstate:
+    new: tracstate_new
+    closed: tracstate_closed
+attachments:
+  url: "http://localhost:81/raw-attachment/ticket"
+  # export-folder is relative to export-script
+  export_folder: "./attachments"
+  export_script: .//attachments.sh

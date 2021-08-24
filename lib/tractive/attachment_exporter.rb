@@ -17,7 +17,7 @@ module Tractive
       raise("mising attachements/export_script entry in configuration") unless outfile
       raise("mising attachements/export_folder entry in configuration") unless outfolder
 
-      attachments   = Attachment.tickets_attachments.select(:id, :filename)
+      attachments   = Attachment.tickets_attachments.for_export
       exportcommads = attachments.map do |attachment|
         %Q{mkdir -p #{outfolder}/#{attachment[:id]}
         trac-admin /trac attachment export ticket:#{attachment[:id]} '#{attachment[:filename]}' > '#{outfolder}/#{attachment[:id]}/#{attachment[:filename]}'}
@@ -42,7 +42,7 @@ module Tractive
       raise("attachments url is required in config.yaml to export attachments.") unless trac_url
 
       FileUtils.mkdir_p output_dir
-      attachments = Attachment.tickets_attachments.select(:id, :filename)
+      attachments = Attachment.tickets_attachments.for_export
 
       # using URI::Parser.new because URI.encode raise warning: URI.escape is obsolete
       uri_parser = URI::Parser.new

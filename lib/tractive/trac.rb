@@ -7,7 +7,7 @@ module Tractive
       @db          = db
       @tickets     = Ticket
       @subtickets  = Subticket
-      @changes     = Change
+      @changes     = TicketChange
       @sessions    = Session
       @attachments = Attachment
     end

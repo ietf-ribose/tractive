@@ -10,7 +10,7 @@ module Tractive
 
         raise('could not connect to trac databse') if !db
 
-        Dir.glob('lib/tractive/model/*.rb') do |file|
+        Dir.glob('lib/tractive/models/*.rb') do |file|
           require_relative "../../#{file}"
         end
 

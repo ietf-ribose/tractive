@@ -23,9 +23,9 @@ module Tractive
 
       @milestonesfromtrac = milestones
 
-      @users = Hash[users]
+      @users = users.to_h
 
-      @labels_cfg        = labels.transform_values { |rx| Hash[rx] }
+      @labels_cfg        = labels.transform_values(&:to_h)
       @ticket_to_issue   = {}
       @trac_mails_cache  = {}
       @mockdeleted       = mockdeleted
@@ -127,7 +127,7 @@ module Tractive
                                             direction: "desc"
                                           } }
                                       ))
-      @milestonemap = Hash[milestonesongithub.map { |i| [i["title"], i["number"]] }]
+      @milestonemap = milestonesongithub.map { |i| [i["title"], i["number"]] }.to_h
       nil
     end
 
@@ -312,8 +312,8 @@ module Tractive
 
       labels = Set[]
       changes.each do |x|
-        del = @labels_cfg.fetch(x[:field], Hash[])[x[:oldvalue]]
-        add = @labels_cfg.fetch(x[:field], Hash[])[x[:newvalue]]
+        del = @labels_cfg.fetch(x[:field], {})[x[:oldvalue]]
+        add = @labels_cfg.fetch(x[:field], {})[x[:newvalue]]
         labels.delete(del) if del
         # labels.add(add) if add
         closed = x[:time] if (x[:field] == "status") && (x[:newvalue] == "closed")
@@ -325,22 +325,22 @@ module Tractive
 
       badges = Set[]
 
-      badges.add(@labels_cfg.fetch("component", Hash[])[ticket[:component]])
-      badges.add(@labels_cfg.fetch("type", Hash[])[ticket[:type]])
-      badges.add(@labels_cfg.fetch("resolution", Hash[])[ticket[:resolution]])
-      badges.add(@labels_cfg.fetch("version", Hash[])[ticket[:version]])
+      badges.add(@labels_cfg.fetch("component", {})[ticket[:component]])
+      badges.add(@labels_cfg.fetch("type", {})[ticket[:type]])
+      badges.add(@labels_cfg.fetch("resolution", {})[ticket[:resolution]])
+      badges.add(@labels_cfg.fetch("version", {})[ticket[:version]])
 
-      labels.add(@labels_cfg.fetch("severity", Hash[])[ticket[:severity]])
-      labels.add(@labels_cfg.fetch("priority", Hash[])[ticket[:priority]])
-      labels.add(@labels_cfg.fetch("tracstate", Hash[])[ticket[:status]])
+      labels.add(@labels_cfg.fetch("severity", {})[ticket[:severity]])
+      labels.add(@labels_cfg.fetch("priority", {})[ticket[:priority]])
+      labels.add(@labels_cfg.fetch("tracstate", {})[ticket[:status]])
       labels.delete(nil)
 
       keywords = ticket[:keywords]
       if keywords
         if ticket[:keywords].downcase === "discuss"
-          labels.add(@labels_cfg.fetch("keywords", Hash[])[ticket[:keywords].downcase])
+          labels.add(@labels_cfg.fetch("keywords", {})[ticket[:keywords].downcase])
         else
-          badges.add(@labels_cfg.fetch("keywords", Hash[])[ticket[:keywords]])
+          badges.add(@labels_cfg.fetch("keywords", {})[ticket[:keywords]])
         end
       end
       # If the field is not set, it will be nil and generate an unprocessable json

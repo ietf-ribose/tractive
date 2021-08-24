@@ -4,7 +4,7 @@ module Tractive
   class Utilities
     class << self
       def make_hash(prefix, array)
-        Hash[array.map { |i| [i, "#{prefix}#{i}"] }]
+        array.map { |i| [i, "#{prefix}#{i}"] }.to_h
       end
 
       def setup_db!(db_url)

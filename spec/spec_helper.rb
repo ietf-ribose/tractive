@@ -17,4 +17,4 @@ RSpec.configure do |config|
   end
 end
 
-Tractive::Utilities.setup_db!("mysql2://root:password@127.0.0.1:3306/test_db")
+Tractive::Utilities.setup_db!("mysql2://root:root@127.0.0.1:3306/test_db")

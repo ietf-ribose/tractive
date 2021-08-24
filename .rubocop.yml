@@ -10,4 +10,55 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 Layout/LineLength:
-  Max: 120
+  Max: 200
+
+Metrics/ClassLength:
+  Max: 500
+
+Metrics/BlockLength:
+  Max: 100
+
+Style/Documentation:
+  Enabled: false
+
+Style/GlobalVars:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Security/Open:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Lint/SuppressedException:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false
+
+Style/CaseEquality:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Enabled: false
+
+Lint/LiteralAsCondition:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false

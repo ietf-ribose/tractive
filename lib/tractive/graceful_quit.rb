@@ -1,4 +1,6 @@
-require 'singleton'
+# frozen_string_literal: true
+
+require "singleton"
 
 module Tractive
   class GracefulQuit
@@ -11,19 +13,18 @@ module Tractive
     end
 
     def self.enable
-      trap('INT') {
+      trap("INT") do
         yield if block_given?
-        self.instance.breaker = true
-      }
+        instance.breaker = true
+      end
     end
 
     def self.check(message = "Quitting")
-      if self.instance.breaker
+      if instance.breaker
         yield if block_given?
         $logger.info message
         exit
       end
     end
-
   end
 end

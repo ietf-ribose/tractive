@@ -40,25 +40,7 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Style/MultilineBlockChain:
-  Enabled: false
-
 Lint/SuppressedException:
-  Enabled: false
-
-Style/StringConcatenation:
-  Enabled: false
-
-Style/CaseEquality:
-  Enabled: false
-
-Lint/UselessAssignment:
-  Enabled: false
-
-Lint/LiteralAsCondition:
-  Enabled: false
-
-Style/GuardClause:
   Enabled: false
 
 Gemspec/RequiredRubyVersion:

@@ -53,7 +53,7 @@ module Tractive
       dry_run_output_file = args[:cfg][:dry_run_output_file] || "#{Dir.pwd}/dryrun_out.json"
 
       @dry_run          = args[:opts][:dryrun]
-      @output_file      = file = File.new(dry_run_output_file, "w+")
+      @output_file      = File.new(dry_run_output_file, "w+")
       @delimiter        = "["
       @revmap           = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]["revmapfile"])
       @attachurl        = attachurl
@@ -85,13 +85,13 @@ module Tractive
         milestone["due_on"] = Time.at(due / 1_000_000).strftime("%Y-%m-%dT%H:%M:%SZ") if due
 
         $logger.info "creating #{milestone}"
-        response = JSON.parse(RestClient.post(
-                                "https://api.github.com/repos/#{@repo}/milestones",
-                                milestone.to_json,
-                                { "Authorization" => "token #{@token}",
-                                  "Content-Type" => "application/json",
-                                  "Accept" => "application/vnd.github.golden-comet-preview+json" }
-                              ))
+        JSON.parse(RestClient.post(
+                     "https://api.github.com/repos/#{@repo}/milestones",
+                     milestone.to_json,
+                     { "Authorization" => "token #{@token}",
+                       "Content-Type" => "application/json",
+                       "Accept" => "application/vnd.github.golden-comet-preview+json" }
+                   ))
       end
 
       read_milestones_from_github
@@ -179,17 +179,15 @@ module Tractive
         @current_ticket_id = ticket_id # used to build filename for attachments
 
         if ticket.nil?
-          if @mockdeleted
-            ticket = {
-              id: ticket_id,
-              summary: "DELETED in trac #{ticket_id}",
-              time: Time.now.to_i,
-              status: "closed",
-              reporter: "trac-hub"
-            }
-          else
-            next
-          end
+          next unless @mockdeleted
+
+          ticket = {
+            id: ticket_id,
+            summary: "DELETED in trac #{ticket_id}",
+            time: Time.now.to_i,
+            status: "closed",
+            reporter: "trac-hub"
+          }
         end
 
         raise("tickets out of sync #{ticket_id} - #{ticket[:id]}") if ticket[:id] != ticket_id
@@ -203,10 +201,10 @@ module Tractive
         if @safetychecks
           begin
             # issue exists already:
-            issue = JSON.parse(RestClient.get(
-                                 "https://api.github.com/repos/#{@repo}/issues/#{ticket[:id]}",
-                                 { "Authorization" => "token #{@token}" }
-                               ))
+            JSON.parse(RestClient.get(
+                         "https://api.github.com/repos/#{@repo}/issues/#{ticket[:id]}",
+                         { "Authorization" => "token #{@token}" }
+                       ))
             $logger.info("found ticket #{ticket[:id]}")
             next
           rescue StandardError
@@ -236,7 +234,7 @@ module Tractive
           )
         end
 
-        if true # @safetychecks  - it is not really faster if we do not wait for the processing
+        if @safetychecks # - it is not really faster if we do not wait for the processing
           while response["status"] == "pending"
             sleep 1
             $logger.info("Checking import status: #{response["id"]}")
@@ -278,12 +276,10 @@ module Tractive
       closed = nil
 
       # summary line:
-      if false
-        body += %i[id component priority resolution].map do |cat|
-          ticket[cat] and !ticket[cat].to_s.lstrip.empty? and
-            "**#{cat}:** #{ticket[cat]}"
-        end.select { |x| x }.join(" | ")
-      end
+      # body += %i[id component priority resolution].map do |cat|
+      #   ticket[cat] and !ticket[cat].to_s.lstrip.empty? and
+      #     "**#{cat}:** #{ticket[cat]}"
+      # end.select { |x| x }.join(" | ")
 
       # Initial report
       # TODO: respect ticket[:changetime]
@@ -313,7 +309,8 @@ module Tractive
       labels = Set[]
       changes.each do |x|
         del = @labels_cfg.fetch(x[:field], {})[x[:oldvalue]]
-        add = @labels_cfg.fetch(x[:field], {})[x[:newvalue]]
+        # add = @labels_cfg.fetch(x[:field], {})[x[:newvalue]]
+        @labels_cfg.fetch(x[:field], {})[x[:newvalue]]
         labels.delete(del) if del
         # labels.add(add) if add
         closed = x[:time] if (x[:field] == "status") && (x[:newvalue] == "closed")
@@ -337,7 +334,7 @@ module Tractive
 
       keywords = ticket[:keywords]
       if keywords
-        if ticket[:keywords].downcase === "discuss"
+        if ticket[:keywords].downcase == "discuss"
           labels.add(@labels_cfg.fetch("keywords", {})[ticket[:keywords].downcase])
         else
           badges.add(@labels_cfg.fetch("keywords", {})[ticket[:keywords]])
@@ -367,14 +364,10 @@ module Tractive
       # compute subtickets
 
       parenttickets = @parenttickets[ticket[:id]]
-      if parenttickets
-        badgetable += "\n\n**Parenttickets**: " + parenttickets.map do |i|
-                                                    "##{i[:parent]}"
-                                                  end.join(", ")
-      end
+      badgetable += "\n\n**Parenttickets**: #{parenttickets.map { |i| "##{i[:parent]}" }.join(", ")}" if parenttickets
 
       subtickets = @subtickets[ticket[:id]]
-      badgetable += "\n\n**Subtickets**: " + subtickets.map { |i| "##{i[:child]}" }.join(", ") if subtickets
+      badgetable += "\n\n**Subtickets**: #{subtickets.map { |i| "##{i[:child]}" }.join(", ")}" if subtickets
 
       # compose body
       body = [badgetable, body, footer].join("\n\n___\n")
@@ -418,15 +411,15 @@ module Tractive
     def ticket_change(append, meta)
       # kind
       kind = if meta[:ticket]
-               meta[:field]
+               meta[:field].to_s
              else
                "attachment"
              end
       kind = "title" if kind == "summary"
 
       # time
-      time = meta[:time]
-      time = Time.at(time / 1e6, time % 1e6)
+      # time = meta[:time]
+      # time = Time.at(time / 1e6, time % 1e6)
 
       # author
       author = meta[:author]
@@ -435,7 +428,7 @@ module Tractive
 
       text = ""
 
-      unless kind === :initial
+      unless kind == "initial"
         # text += "\n___\n" if false # append
         text += "#{author} "
       end
@@ -474,12 +467,12 @@ module Tractive
       when "comment"
         body      = meta[:newvalue]
         changeset = body.match(/In \[changeset:"(\d+)/).to_a[1]
-        if changeset
-          changesethash = @revmap[changeset]
-          text += "committed #{map_changeset(changeset)}"
-        else
-          text += "commented\n\n"
-        end
+        text += if changeset
+                  # changesethash = @revmap[changeset]
+                  "committed #{map_changeset(changeset)}"
+                else
+                  "commented\n\n"
+                end
 
         text += "\n___\n" unless append
         text += markdownify(body) if body
@@ -579,6 +572,7 @@ module Tractive
           $logger.info("loading revision map #{revmapfile}")
           revmap = f.each_line
                     .map { |line| line.split(/\s+\|\s+/) }
+                    .to_h
                     .transform_keys { |rev| rev.gsub(/^r/, "") } # remove leading "r" if present
         end
       end

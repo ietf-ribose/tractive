@@ -20,11 +20,11 @@ module Tractive
     end
 
     def self.check(message = "Quitting")
-      if instance.breaker
-        yield if block_given?
-        $logger.info message
-        exit
-      end
+      return unless instance.breaker
+
+      yield if block_given?
+      $logger.info message
+      exit
     end
   end
 end

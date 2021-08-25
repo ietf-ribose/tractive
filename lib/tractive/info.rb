@@ -2,10 +2,6 @@
 
 module Tractive
   class Info
-    def initialize(db)
-      @db = db
-    end
-
     def print
       $logger.info result_hash.to_yaml
     end

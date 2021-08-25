@@ -6,7 +6,7 @@ RSpec.describe Tractive do
   end
 
   it "has working info command" do
-    expect(Tractive::Info.new(@db).send(:result_hash)).to eq(db_result_hash)
+    expect(Tractive::Info.new.send(:result_hash)).to eq(db_result_hash)
   end
 
   it "compose correct issue" do

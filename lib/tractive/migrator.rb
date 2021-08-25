@@ -417,10 +417,6 @@ module Tractive
              end
       kind = "title" if kind == "summary"
 
-      # time
-      # time = meta[:time]
-      # time = Time.at(time / 1e6, time % 1e6)
-
       # author
       author = meta[:author]
       author = trac_mail(author)

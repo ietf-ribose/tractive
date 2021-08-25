@@ -30,7 +30,7 @@ module Tractive
     end
 
     def info
-      Tractive::Info.new(@db).print
+      Tractive::Info.new.print
     end
 
     def export_attachments

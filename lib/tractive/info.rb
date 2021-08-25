@@ -7,6 +7,12 @@ module Tractive
     end
 
     def print
+      $logger.info result_hash.to_yaml
+    end
+
+    private
+
+    def result_hash
       users = [
         Ticket.distinct(:reporter).select_map(:reporter),
         Ticket.distinct(:owner).select_map(:owner),
@@ -27,7 +33,7 @@ module Tractive
       priorities  = Ticket.distinct(:priority).select_map(:priority).compact
       tracstates  = Ticket.distinct(:status).select_map(:status).compact
 
-      result = {
+      {
         "users" => Utilities.make_hash("", users),
         "milestones" => milestones,
         "labels" => {
@@ -39,8 +45,6 @@ module Tractive
           "tracstate" => Utilities.make_hash("tracstate_", tracstates)
         }
       }
-
-      $logger.info result.to_yaml
     end
   end
 end

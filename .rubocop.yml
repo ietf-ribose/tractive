@@ -11,7 +11,7 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 Layout/LineLength:
-  Max: 200
+  Max: 210
 
 Metrics/ClassLength:
   Max: 500

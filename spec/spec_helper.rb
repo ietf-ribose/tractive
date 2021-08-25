@@ -12,9 +12,15 @@ RSpec.configure do |config|
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
 
+  config.before(:suite) do
+    puts "--- Setting up database ---"
+    @db = Tractive::Utilities.setup_db!("mysql2://root:root@127.0.0.1:3306/test_db")
+    puts "--- Database setup complete ---"
+
+    Tractive::Utilities.setup_logger(output_stream: $stderr, verbose: false)
+  end
+
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
 end
-
-Tractive::Utilities.setup_db!("mysql2://root:root@127.0.0.1:3306/test_db")

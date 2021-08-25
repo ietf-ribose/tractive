@@ -76,30 +76,12 @@ RSpec.describe Tractive do
   end
 
   def stub_issues_request
-    stub_request(:get, "https://api.github.com/repos/hassanakbar4/foobar/issues?direction=desc&filter=all&sort=created&state=all")
-      .with(
-        headers: {
-          "Accept" => "*/*",
-          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-          "Authorization" => "token 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",
-          "Host" => "api.github.com",
-          "User-Agent" => "rest-client/2.1.0 (darwin20.3.0 x86_64) ruby/2.7.0p0"
-        }
-      )
+    stub_request(:get, %r{https://api.github.com/repos/hassanakbar4/foobar/issues\?*})
       .to_return(status: 200, body: "[]", headers: {})
   end
 
   def stub_milestone_map_request
-    stub_request(:get, "https://api.github.com/repos/hassanakbar4/foobar/milestones?direction=desc&per_page=100&sort=due_on&state=all")
-      .with(
-        headers: {
-          "Accept" => "*/*",
-          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-          "Authorization" => "token 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",
-          "Host" => "api.github.com",
-          "User-Agent" => "rest-client/2.1.0 (darwin20.3.0 x86_64) ruby/2.7.0p0"
-        }
-      )
+    stub_request(:get, %r{https://api.github.com/repos/hassanakbar4/foobar/milestones\?*})
       .to_return(status: 200,
                  body: "[{ \"title\": \"milestone4\", \"number\": 4 }, { \"title\": \"milestone3\", \"number\": 3 },{ \"title\": \"milestone2\", \"number\": 2 },{ \"title\": \"milestone1\", \"number\": 1 } ]",
                  headers: {})

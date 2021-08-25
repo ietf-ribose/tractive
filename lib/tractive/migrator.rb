@@ -570,10 +570,10 @@ module Tractive
       if revmapfile
         File.open(revmapfile, "r:UTF-8") do |f|
           $logger.info("loading revision map #{revmapfile}")
+
           revmap = f.each_line
                     .map { |line| line.split(/\s+\|\s+/) }
-                    .to_h
-                    .transform_keys { |rev| rev.gsub(/^r/, "") } # remove leading "r" if present
+                    .map { |rev, sha, _| [rev.gsub(/^r/, ""), sha] }.to_h # remove leading "r" if present
         end
       end
 

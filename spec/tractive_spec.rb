@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe Tractive do
+  before :all do
+    @cfg = YAML.load_file("spec/files/test.config.yaml")
+    @db = Tractive::Utilities.setup_db!(@cfg["trac"]["database"])
+  end
+
   it "has a version number" do
     expect(Tractive::VERSION).not_to be nil
   end
@@ -35,19 +40,7 @@ RSpec.describe Tractive do
   def options_for_migrator
     {
       opts: { "config" => "trac-hub.config.yaml", "dryrun" => true },
-      cfg: { "trac" => { "database" => "mysql2://root:password@127.0.0.1:3306/foobar" },
-             "github" => { "repo" => "hassanakbar4/foobar", "token" => "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" },
-             "revmapfile" => "./foobar-revmap.txt",
-             "users" => { "hassanakbar4" => "hassanakbar4" },
-             "milestones" => milestones_hash,
-             "labels" =>
-          { "type" => { "defect" => "type_defect" },
-            "component" => { "component1" => "component_component1" },
-            "resolution" => { "invalid" => "resolution_invalid" },
-            "severity" => { "blocker" => "#high", "critical" => "#critical", "major" => "#major", "minor" => "#minor", "trivial" => "#trivial" },
-            "priority" => { "critical" => "priority_critical", "major" => "priority_major" },
-            "tracstate" => { "new" => "tracstate_new", "closed" => "tracstate_closed" } },
-             "attachments" => { "url" => "http://localhost:81/raw-attachment/ticket", "export_folder" => "./attachments", "export_script" => ".//attachments.sh" } },
+      cfg: @cfg,
       db: @db
     }
   end
@@ -76,12 +69,12 @@ RSpec.describe Tractive do
   end
 
   def stub_issues_request
-    stub_request(:get, %r{https://api.github.com/repos/hassanakbar4/foobar/issues\?*})
+    stub_request(:get, %r{https://api.github.com/repos/test/repo/issues\?*})
       .to_return(status: 200, body: "[]", headers: {})
   end
 
   def stub_milestone_map_request
-    stub_request(:get, %r{https://api.github.com/repos/hassanakbar4/foobar/milestones\?*})
+    stub_request(:get, %r{https://api.github.com/repos/test/repo/milestones\?*})
       .to_return(status: 200,
                  body: "[{ \"title\": \"milestone4\", \"number\": 4 }, { \"title\": \"milestone3\", \"number\": 3 },{ \"title\": \"milestone2\", \"number\": 2 },{ \"title\": \"milestone1\", \"number\": 1 } ]",
                  headers: {})

@@ -5,7 +5,7 @@ trac:
   # ticketbaseurl: https://foo.bar/trac/foobar/ticket
 
 github:
-  repo: 'test_repo'
+  repo: 'test/repo'
   token: 'test_token'
 
 revmapfile: "spec/files/revmap_spec.txt"

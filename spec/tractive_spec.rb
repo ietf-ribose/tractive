@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe Tractive do
-  before :all do
-    @cfg = YAML.load_file("spec/files/test.config.yaml")
-    @db = Tractive::Utilities.setup_db!(@cfg["trac"]["database"])
-  end
-
   it "has a version number" do
     expect(Tractive::VERSION).not_to be nil
   end
@@ -40,7 +35,7 @@ RSpec.describe Tractive do
   def options_for_migrator
     {
       opts: { "config" => "trac-hub.config.yaml", "dryrun" => true },
-      cfg: @cfg,
+      cfg: CONFIG,
       db: @db
     }
   end

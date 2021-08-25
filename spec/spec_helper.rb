@@ -4,6 +4,7 @@ require "tractive"
 require "webmock/rspec"
 
 WebMock.disable_net_connect!(allow_localhost: true)
+CONFIG = YAML.load_file("spec/files/test.config.yaml")
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -14,6 +15,7 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     Tractive::Utilities.setup_logger(output_stream: $stderr, verbose: false)
+    Tractive::Utilities.setup_db!(CONFIG["trac"]["database"])
   end
 
   config.expect_with :rspec do |c|

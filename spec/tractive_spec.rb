@@ -5,8 +5,79 @@ RSpec.describe Tractive do
     expect(Tractive::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    pending("Need to fix this")
-    expect(false).to eq(true)
+  it "has working info command" do
+    expect(Tractive::Info.new.send(:result_hash)).to eq(db_result_hash)
+  end
+
+  it "compose correct issue" do
+    stub_issues_request
+    stub_milestone_map_request
+    ticket = Tractive::Ticket.find(id: 1)
+
+    expect(Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)).to eq(ticket_compose_hash(ticket))
+  end
+
+  def db_result_hash
+    {
+      "users" => { "user" => "user", "somebody" => "somebody" },
+      "milestones" => milestones_hash,
+      "labels" => {
+        "type" => { "defect" => "type_defect", "enhancement" => "type_enhancement" },
+        "component" => { "component1" => "component_component1", "component2" => "component_component2" },
+        "resolution" => {},
+        "severity" => {},
+        "priority" => { "major" => "priority_major", "minor" => "priority_minor" },
+        "tracstate" => { "assigned" => "tracstate_assigned", "new" => "tracstate_new" }
+      }
+    }
+  end
+
+  def options_for_migrator
+    {
+      opts: { "config" => "trac-hub.config.yaml", "dryrun" => true },
+      cfg: CONFIG,
+      db: @db
+    }
+  end
+
+  def milestones_hash
+    {
+      "milestone1" => { name: "milestone1", due: 0, completed: 0, description: nil },
+      "milestone2" => { name: "milestone2", due: 0, completed: 0, description: nil },
+      "milestone3" => { name: "milestone3", due: 0, completed: 0, description: nil },
+      "milestone4" => { name: "milestone4", due: 0, completed: 0, description: nil }
+    }
+  end
+
+  def ticket_compose_hash(ticket)
+    {
+      "comments" => [],
+      "issue" => {
+        "body" => "`component_component1` `type_defect`deleted Ticket\n\n___\n\n\nchanged initial which not transferred by trac-hub\n\n___\nIssue migrated from trac:1 at #{Time.now}",
+        "labels" => ["priority_major", "tracstate_new", "owner:"],
+        "milestone" => nil,
+        "title" => "Ticket 1",
+        "closed" => false,
+        "created_at" => format_time(ticket[:time])
+      }
+    }
+  end
+
+  def stub_issues_request
+    stub_request(:get, %r{https://api.github.com/repos/test/repo/issues\?*})
+      .to_return(status: 200, body: "[]", headers: {})
+  end
+
+  def stub_milestone_map_request
+    stub_request(:get, %r{https://api.github.com/repos/test/repo/milestones\?*})
+      .to_return(status: 200,
+                 body: "[{ \"title\": \"milestone4\", \"number\": 4 }, { \"title\": \"milestone3\", \"number\": 3 },{ \"title\": \"milestone2\", \"number\": 2 },{ \"title\": \"milestone1\", \"number\": 1 } ]",
+                 headers: {})
+  end
+
+  # TODO: Need to remove this when refactoring migrator class
+  def format_time(time)
+    time = Time.at(time / 1e6, time % 1e6)
+    time.strftime("%FT%TZ")
   end
 end

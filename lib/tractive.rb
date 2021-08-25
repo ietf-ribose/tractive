@@ -8,18 +8,17 @@ require_relative "tractive/info"
 require_relative "tractive/version"
 require_relative "tractive/main"
 require_relative "tractive/utilities"
-require 'json'
-require 'logger'
-require 'yaml'
-require 'rest-client'
-require 'optparse'
-require 'sequel'
-require 'yaml'
-require 'set'
-require 'singleton'
-require 'uri'
-require 'pry'
-require 'thor'
+require "json"
+require "logger"
+require "yaml"
+require "rest-client"
+require "optparse"
+require "sequel"
+require "set"
+require "singleton"
+require "uri"
+require "pry"
+require "thor"
 
 module Tractive
   class Error < StandardError; end

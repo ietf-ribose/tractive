@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["open.source@ribose.com"]
 
   spec.summary       = "Exporting tool for Trac"
-  #spec.description   = "TODO: Write a longer description or delete this line."
+  # spec.description   = "TODO: Write a longer description or delete this line."
   spec.homepage      = "https://github.com/ietf-ribose/tractive"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
 
@@ -26,10 +26,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "pry"
-  spec.add_dependency "sequel"
-  spec.add_dependency "rest-client"
-  spec.add_dependency "sqlite3"
   spec.add_dependency "mysql2"
+  spec.add_dependency "pry"
+  spec.add_dependency "rest-client"
+  spec.add_dependency "sequel"
+  spec.add_dependency "sqlite3"
   spec.add_dependency "thor"
 end

@@ -48,8 +48,6 @@ module Tractive
 
       load_milestone_map
 
-      load_subtickets
-
       dry_run_output_file = args[:cfg][:dry_run_output_file] || "#{Dir.pwd}/dryrun_out.json"
 
       @dry_run          = args[:opts][:dryrun]
@@ -62,11 +60,6 @@ module Tractive
       @start_ticket     = (start_ticket || @last_created_issue + 1).to_i
       @filter_closed    = filter_closed
       @uri_parser = URI::Parser.new
-    end
-
-    def load_subtickets
-      @subtickets    = @trac.subtickets.all.group_by { |i| i[:parent] }
-      @parenttickets = @trac.subtickets.all.group_by { |i| i[:child] }
     end
 
     def load_milestone_map
@@ -293,7 +286,6 @@ module Tractive
                               oldvalue: nil,
                               newvalue: ticket[:description]
                             })["body"]
-
       # combine the changes and attachment table results and sort them by date
       changes = @trac.changes.where(ticket: ticket[:id]).collect.to_a
       changes += @trac.attachments.where(type: "ticket", id: ticket[:id]).collect.to_a
@@ -345,7 +337,7 @@ module Tractive
       milestone = @milestonemap[ticket[:milestone]]
 
       # compute footer
-      footer = "Issue migrated from trac:#{ticket[:id]} at #{Time.now}"
+      footer = "_Issue migrated from trac:#{ticket[:id]} at #{Time.now}_"
 
       # compute badgetabe
       #
@@ -360,14 +352,6 @@ module Tractive
         "deleted Ticket"
       end
       # badgetable += "   |   **->#{ticket[:owner]}**"  # note that from github to gitlab we loose the assigne
-
-      # compute subtickets
-
-      parenttickets = @parenttickets[ticket[:id]]
-      badgetable += "\n\n**Parenttickets**: #{parenttickets.map { |i| "##{i[:parent]}" }.join(", ")}" if parenttickets
-
-      subtickets = @subtickets[ticket[:id]]
-      badgetable += "\n\n**Subtickets**: #{subtickets.map { |i| "##{i[:child]}" }.join(", ")}" if subtickets
 
       # compose body
       body = [badgetable, body, footer].join("\n\n___\n")
@@ -424,9 +408,9 @@ module Tractive
 
       text = ""
 
-      unless kind == "initial"
-        # text += "\n___\n" if false # append
-        text += "#{author} "
+      if kind != "initial"
+        text += "\n___\n" if append
+        text += "_#{author}_ " if author
       end
 
       case kind
@@ -434,25 +418,14 @@ module Tractive
         old = meta[:oldvalue]
         new = meta[:newvalue]
         if old && new
-          text += "changed #{kind} from `#{old}` to `#{new}`"
+          text += "_changed #{kind} from `#{old}` to `#{new}`_"
         elsif old
-          text += "removed #{kind} (was `#{old}`)"
+          text += "_removed #{kind} (was `#{old}`)_"
         elsif new
-          text += "set #{kind} to `#{new}`"
+          text += "_set #{kind} to `#{new}`_"
         end
 
-      when "parents"
-        old = meta[:oldvalue]
-        new = meta[:newvalue]
-        if old && new
-          text += "changed #{kind} from `#{old}` to ##{new}"
-        elsif old
-          text += "removed #{kind} (was `#{old}`)"
-        elsif new
-          text += "set #{kind} to ##{new}"
-        end
-
-      when :initial
+      when :initial, "initial"
         body = meta[:newvalue]
         # text += "created the issue\n\n"
         if body && !body.lstrip.empty?
@@ -465,9 +438,9 @@ module Tractive
         changeset = body.match(/In \[changeset:"(\d+)/).to_a[1]
         text += if changeset
                   # changesethash = @revmap[changeset]
-                  "committed #{map_changeset(changeset)}"
+                  "_committed #{map_changeset(changeset)}_"
                 else
-                  "commented\n\n"
+                  "_commented_\n\n"
                 end
 
         text += "\n___\n" unless append
@@ -475,7 +448,7 @@ module Tractive
         return nil if body.nil? || body.lstrip.empty?
 
       when "attachment"
-        text += "uploaded file "
+        text += "_uploaded file "
         name = meta[:filename]
         body = meta[:description]
         if @attachurl
@@ -485,13 +458,13 @@ module Tractive
         else
           text += "`#{name}`"
         end
-        text += " (#{(meta[:size] / 1024.0).round(1)} KiB)"
+        text += " (#{(meta[:size] / 1024.0).round(1)} KiB)_"
         text += "\n\n#{body}"
 
       when "description"
         # (ticket[:description] already contains the new value,
         # so there is no need to update)
-        text += "edited the issue description"
+        text += "_edited the issue description_"
 
       when "keywords", "cc", "reporter", "version"
         # don't care

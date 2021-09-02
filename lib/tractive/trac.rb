@@ -8,7 +8,6 @@ module Tractive
       $logger.info("loading tickets")
       @db          = db
       @tickets     = Ticket
-      @subtickets  = Subticket
       @changes     = TicketChange
       @sessions    = Session
       @attachments = Attachment

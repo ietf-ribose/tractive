@@ -53,8 +53,9 @@ RSpec.describe Tractive do
     {
       "comments" => [],
       "issue" => {
-        "body" => "`component_component1` `type_defect`deleted Ticket\n\n___\n\n\nchanged initial which not transferred by trac-hub\n\n___\nIssue migrated from trac:1 at #{Time.now}",
-        "labels" => ["priority_major", "tracstate_new", "owner:"],
+        "assignee" => "somebody",
+        "body" => "`component_component1` `type_defect`   |    by user\n\n___\n\n\nckldjfadjfklajd;skf\n\n___\n_Issue migrated from trac:1 at #{Time.now}_",
+        "labels" => ["priority_major", "tracstate_new", "owner:somebody"],
         "milestone" => nil,
         "title" => "Ticket 1",
         "closed" => false,

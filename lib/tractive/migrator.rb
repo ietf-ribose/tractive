@@ -347,7 +347,7 @@ module Tractive
       badges     = badges.to_a.compact.sort
       badgetable = badges.map { |i| %(`#{i}`) }.join(" ")
       badgetable += begin
-        "   |    by #{trac_mail(changes.first[:author])}"
+        "   |    by #{trac_mail(ticket[:reporter])}"
       rescue StandardError
         "deleted Ticket"
       end

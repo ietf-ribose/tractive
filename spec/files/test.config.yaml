@@ -13,6 +13,7 @@ revmapfile: "spec/files/revmap_spec.txt"
 # make sure not to typo the GitHub username as the issue will fail to create if a ticket's owner (assignee) has a valid mapping below
 users:
   user: user
+  somebody: somebody
 
 milestones:
   milestone1:

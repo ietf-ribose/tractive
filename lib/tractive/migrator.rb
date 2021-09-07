@@ -256,10 +256,8 @@ module Tractive
                               oldvalue: nil,
                               newvalue: ticket[:description]
                             })["body"]
-      # combine the changes and attachment table results and sort them by date
-      changes = @trac.changes.where(ticket: ticket[:id]).collect.to_a
-      changes += @trac.attachments.where(type: "ticket", id: ticket[:id]).collect.to_a
-      changes = changes.sort_by { |x| x[:time] }
+
+      changes = ticket.all_changes
 
       # replay all changes in chronological order:
       comments = changes.map { |x| ticket_change(@singlepost, x) }.select { |x| x }.to_a
@@ -371,6 +369,9 @@ module Tractive
              end
       kind = "title" if kind == "summary"
 
+      # don't care
+      return unless interested_in_change?(kind, meta[:newvalue])
+
       # author
       author = meta[:author]
       author = trac_mail(author)
@@ -415,7 +416,6 @@ module Tractive
 
         text += "\n___\n" unless append
         text += markdownify(body) if body
-        return nil if body.nil? || body.lstrip.empty?
 
       when "attachment"
         text += "_uploaded file "
@@ -435,10 +435,6 @@ module Tractive
         # (ticket[:description] already contains the new value,
         # so there is no need to update)
         text += "_edited the issue description_"
-
-      when "keywords", "cc", "reporter", "version"
-        # don't care
-        return nil
 
       else
         # this should not happen
@@ -517,6 +513,11 @@ module Tractive
       end
 
       revmap
+    end
+
+    def interested_in_change?(kind, newvalue)
+      !(%w[keywords cc reporter version].include?(kind) ||
+        (kind == "comment" && (newvalue.nil? || newvalue.lstrip.empty?)))
     end
   end
 end

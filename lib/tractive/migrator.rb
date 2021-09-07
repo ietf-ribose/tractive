@@ -20,6 +20,7 @@ module Tractive
       @trac  = Tractive::Trac.new(db)
       @repo  = github["repo"]
       @token = github["token"]
+      @client = GithubApi::Client.new(access_token: @token)
 
       @milestonesfromtrac = milestones
 
@@ -32,16 +33,11 @@ module Tractive
       @tracticketbaseurl = tracticketbaseurl
 
       $logger.debug("Get highest in #{@repo}")
-      issues = JSON.parse(RestClient.get(
-                            "https://api.github.com/repos/#{@repo}/issues",
-                            { "Authorization" => "token #{@token}",
-                              params: {
-                                filter: "all",
-                                state: "all",
-                                sort: "created",
-                                direction: "desc"
-                              } }
-                          ))
+      issues = @client.issues(@repo, { filter: "all",
+                                       state: "all",
+                                       sort: "created",
+                                       direction: "desc" })
+
       @last_created_issue = issues.empty? ? 0 : issues[0]["number"].to_i
 
       $logger.info("created issue on GitHub is '#{@last_created_issue}' #{issues.count}")
@@ -78,13 +74,8 @@ module Tractive
         milestone["due_on"] = Time.at(due / 1_000_000).strftime("%Y-%m-%dT%H:%M:%SZ") if due
 
         $logger.info "creating #{milestone}"
-        JSON.parse(RestClient.post(
-                     "https://api.github.com/repos/#{@repo}/milestones",
-                     milestone.to_json,
-                     { "Authorization" => "token #{@token}",
-                       "Content-Type" => "application/json",
-                       "Accept" => "application/vnd.github.golden-comet-preview+json" }
-                   ))
+
+        @client.create_milestone(@repo, milestone)
       end
 
       read_milestones_from_github
@@ -111,15 +102,9 @@ module Tractive
     private
 
     def read_milestones_from_github
-      milestonesongithub = JSON.parse(RestClient.get(
-                                        "https://api.github.com/repos/#{@repo}/milestones?per_page=100",
-                                        { "Authorization" => "token #{@token}",
-                                          params: {
-                                            state: "all",
-                                            sort: "due_on",
-                                            direction: "desc"
-                                          } }
-                                      ))
+      milestonesongithub = @client.milestones(@repo, { state: "all",
+                                                       sort: "due_on",
+                                                       direction: "desc" })
       @milestonemap = milestonesongithub.map { |i| [i["title"], i["number"]] }.to_h
       nil
     end
@@ -194,10 +179,7 @@ module Tractive
         if @safetychecks
           begin
             # issue exists already:
-            JSON.parse(RestClient.get(
-                         "https://api.github.com/repos/#{@repo}/issues/#{ticket[:id]}",
-                         { "Authorization" => "token #{@token}" }
-                       ))
+            @client.issue(@repo, ticket[:id])
             $logger.info("found ticket #{ticket[:id]}")
             next
           rescue StandardError
@@ -214,17 +196,7 @@ module Tractive
           @delimiter = "," if @delimiter == "["
           response = { "status" => "added to file", "issue_url" => "/#{ticket[:id]}" }
         else
-          response = JSON.parse(
-            RestClient.post(
-              "https://api.github.com/repos/#{@repo}/import/issues",
-              request.to_json,
-              {
-                "Authorization" => "token #{@token}",
-                "Content-Type" => "application/json",
-                "Accept" => "application/vnd.github.golden-comet-preview+json"
-              }
-            )
-          )
+          response = @client.create_issue(@repo, request)
         end
 
         if @safetychecks # - it is not really faster if we do not wait for the processing
@@ -232,10 +204,7 @@ module Tractive
             sleep 1
             $logger.info("Checking import status: #{response["id"]}")
             $logger.info("you can manually check: #{response["url"]}")
-            response = JSON.parse(RestClient.get(response["url"], {
-                                                   "Authorization" => "token #{@token}",
-                                                   "Accept" => "application/vnd.github.golden-comet-preview+json"
-                                                 }))
+            response = @client.issue_import_status(@repo, response["id"])
           end
 
           $logger.info("Status: #{response["status"]}")
@@ -258,6 +227,7 @@ module Tractive
           # to allow manual verification:
           $logger.info(response["url"])
         end
+
         @last_created_issue = ticket[:id]
       end
 

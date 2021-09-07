@@ -2,7 +2,7 @@
 
 module Tractive
   class Trac
-    attr_reader :tickets, :changes, :sessions, :attachments, :subtickets
+    attr_reader :tickets, :changes, :sessions, :attachments
 
     def initialize(db)
       $logger.info("loading tickets")

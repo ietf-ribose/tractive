@@ -357,28 +357,6 @@ INSERT INTO `session_attribute` VALUES ('user',1,'query_constraints','[{u\'statu
 UNLOCK TABLES;
 
 --
--- Table structure for table `subtickets`
---
-
-DROP TABLE IF EXISTS `subtickets`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `subtickets` (
-  `parent` varchar(256) COLLATE utf8_bin DEFAULT NULL,
-  `child` varchar(256) COLLATE utf8_bin DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `subtickets`
---
-
-LOCK TABLES `subtickets` WRITE;
-/*!40000 ALTER TABLE `subtickets` DISABLE KEYS */;
-/*!40000 ALTER TABLE `subtickets` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `system`
 --
 

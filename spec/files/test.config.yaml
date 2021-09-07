@@ -1,7 +1,7 @@
 trac:
-  # database: sqlite://db/trac.db
+  database: sqlite://db/trac-test.db
   # database: mysql2://user:password@host:port/database
-  database: mysql2://root:root@127.0.0.1:3306/test_db
+  # database: mysql2://root:password@127.0.0.1:3306/foobar
   # ticketbaseurl: https://foo.bar/trac/foobar/ticket
 
 github:
@@ -12,51 +12,191 @@ revmapfile: "spec/files/revmap_spec.txt"
 
 # make sure not to typo the GitHub username as the issue will fail to create if a ticket's owner (assignee) has a valid mapping below
 users:
-  user: user
-  somebody: somebody
-
+  henrik@levkowetz.com: henrik@levkowetz.com
+  fenner@research.att.com: fenner@research.att.com
+  barbara.fuller@neustar.biz: barbara.fuller@neustar.biz
+  presnick@qualcomm.com: presnick@qualcomm.com
+  smccammon@amsl.com: smccammon@amsl.com
+  presnick@qti.qualcomm.com: presnick@qti.qualcomm.com
+  martin.thomson@gmail.com: martin.thomson@gmail.com
+  rcross@amsl.com: rcross@amsl.com
+  cmorgan@amsl.com: cmorgan@amsl.com
+  valery@smyslov.net: valery@smyslov.net
+  rjsparks@nostrum.com: rjsparks@nostrum.com
+  michael.lee@neustar.biz: michael.lee@neustar.biz
+  '': ''
+  jennifer@painless-security.com: jennifer@painless-security.com
+  pasi.eronen@nokia.com: pasi.eronen@nokia.com
+  adam@nostrum.com: adam@nostrum.com
+  mcr@sandelman.ca: mcr@sandelman.ca
+  jmh@joelhalpern.com: jmh@joelhalpern.com
+  mark@painless-security.com: mark@painless-security.com
+  vidyut.luther@neustar.biz: vidyut.luther@neustar.biz
+  comimom@gmail.com: comimom@gmail.com
+  nathan@resolutehosting.com: nathan@resolutehosting.com
+  spikeekips@gmail.com: spikeekips@gmail.com
+  ekr@rtfm.com: ekr@rtfm.com
+  fluffy@cisco.com: fluffy@cisco.com
+  rjs@nostrum.com: rjs@nostrum.com
+  lars.eggert@nokia.com: lars.eggert@nokia.com
+  fenner@fenron.com: fenner@fenron.com
+  chris.newman@sun.com: chris.newman@sun.com
+  cabo@tzi.org: cabo@tzi.org
+  jelte@nlnetlabs.nl: jelte@nlnetlabs.nl
+  arifumi@nttv6.net: arifumi@nttv6.net
+  ben@nostrum.com: ben@nostrum.com
+  tony@att.com: tony@att.com
+  kivinen@iki.fi: kivinen@iki.fi
+  suresh.krishnan@ericsson.com: suresh.krishnan@ericsson.com
+  matthijs@nlnetlabs.nl: matthijs@nlnetlabs.nl
+  olau@iola.dk: olau@iola.dk
+  esanchez@yaco.es: esanchez@yaco.es
+  wiggins@concentricsky.com: wiggins@concentricsky.com
+  peter.musgrave@magorcorp.com: peter.musgrave@magorcorp.com
+  fenner@fenron.net: fenner@fenron.net
+  azarubin@yaco.es: azarubin@yaco.es
+  jtarragon@yaco.es: jtarragon@yaco.es
+  bmheight@gmail.com: bmheight@gmail.com
+  shane@time-travellers.org: shane@time-travellers.org
+  martin@iola.dk: martin@iola.dk
+  york@isoc.org: york@isoc.org
+  housley@vigilsec.com: housley@vigilsec.com
+  rbarnes@bbn.com: rbarnes@bbn.com
+  ejimenez@yaco.es: ejimenez@yaco.es
+  ietf@augustcellars.com: ietf@augustcellars.com
+  lars@netapp.com: lars@netapp.com
+  markus.stenberg@iki.fi: markus.stenberg@iki.fi
+  tterriberry@mozilla.com: tterriberry@mozilla.com
+  bartosz.balazinski@interdigital.com: bartosz.balazinski@interdigital.com
+  liudapeng@chinamobile.com: liudapeng@chinamobile.com
+  fanpeng@chinamobile.com: fanpeng@chinamobile.com
+  gnocuil@gmail.com: gnocuil@gmail.com
+  denghui@chinamobile.com: denghui@chinamobile.com
+  sunqi.csnet.thu@gmail.com: sunqi.csnet.thu@gmail.com
+  phdgang@gmail.com: phdgang@gmail.com
+  harald@alvestrand.no: harald@alvestrand.no
+  denglingli@chinamobile.com: denglingli@chinamobile.com
+  buildbot@tools.ietf.org: buildbot@tools.ietf.org
+  willem@nlnetlabs.nl: willem@nlnetlabs.nl
+  tjw.ietf@gmail.com: tjw.ietf@gmail.com
+  stephen.farrell@cs.tcd.ie: stephen.farrell@cs.tcd.ie
+  mdouglass@sphericalcowgroup.com: mdouglass@sphericalcowgroup.com
+  anurag_nc@yahoo.com: anurag_nc@yahoo.com
+  mahoney@nostrum.com: mahoney@nostrum.com
+  peter@akayla.com: peter@akayla.com
+  sbirkholz@amsl.com: sbirkholz@amsl.com
+  david.i.allan@ericsson.com: david.i.allan@ericsson.com
+  alireza.mohammadi@icann.org: alireza.mohammadi@icann.org
+  suresh@kaloom.com: suresh@kaloom.com
+  ford@isoc.org: ford@isoc.org
+  fenton@bluepopcorn.net: fenton@bluepopcorn.net
+  johnl@taugh.com: johnl@taugh.com
+  magnus.westerlund@ericsson.com: magnus.westerlund@ericsson.com
+  pusateri@bangj.com: pusateri@bangj.com
+  sasha@dashcare.nl: sasha@dashcare.nl
+  mrcullen42@gmail.com: mrcullen42@gmail.com
+  rcross: rcross
+  henrik: henrik
+  krathnayake@ietf.org: krathnayake@ietf.org
+  lars@eggert.org: lars@eggert.org
+  paul.higgs@ericsson.com: paul.higgs@ericsson.com
+  bclaise@cisco.com: bclaise@cisco.com
+  randy@psg.com: randy@psg.com
+  bortzmeyer+ietf@nic.fr: bortzmeyer+ietf@nic.fr
+  stbryant@cisco.com: stbryant@cisco.com
+  worley@alum.mit.edu: worley@alum.mit.edu
+  daniele.ceccarelli@ericsson.com: daniele.ceccarelli@ericsson.com
+  acmorton@att.com: acmorton@att.com
+  julian.reschke@gmx.de: julian.reschke@gmx.de
+  paul.hoffman@vpnc.org: paul.hoffman@vpnc.org
+  brian@innovationslab.net: brian@innovationslab.net
+  mnot@pobox.com: mnot@pobox.com
+  davemgarrett@gmail.com: davemgarrett@gmail.com
+  turners@ieca.com: turners@ieca.com
+  chopps@rawdofmt.org: chopps@rawdofmt.org
+  jonathan@vidyo.com: jonathan@vidyo.com
+  cbowers@juniper.net: cbowers@juniper.net
+  lloyd.wood@yahoo.co.uk: lloyd.wood@yahoo.co.uk
+  adityachunar12345@gmail.com: adityachunar12345@gmail.com
+  adrian@olddog.co.uk: adrian@olddog.co.uk
+  paul@nohats.ca: paul@nohats.ca
+  vkg@bell-labs.com: vkg@bell-labs.com
+  jclarke@cisco.com: jclarke@cisco.com
+  mdb@juniper.net: mdb@juniper.net
+  nishida@sfc.wide.ad.jp: nishida@sfc.wide.ad.jp
+  jbui@amsl.com: jbui@amsl.com
+  serge.raes@orange.com: serge.raes@orange.com
+  johnl@iecc.com: johnl@iecc.com
+  rg+ietf@qti.qualcomm.com: rg+ietf@qti.qualcomm.com
+  watsonbladd@gmail.com: watsonbladd@gmail.com
+  gregimirsky@gmail.com: gregimirsky@gmail.com
+  jmagallanes@amsl.com: jmagallanes@amsl.com
+  dhruv.ietf@gmail.com: dhruv.ietf@gmail.com
+  ghwood@ietf.org: ghwood@ietf.org
+  lear@cisco.com: lear@cisco.com
+  spencerdawkins.ietf@gmail.com: spencerdawkins.ietf@gmail.com
+  dkg@fifthhorseman.net: dkg@fifthhorseman.net
 milestones:
-  milestone1:
-    :name: milestone1
+  Cleanup:
+    :name: Cleanup
     :due: 0
     :completed: 0
-    :description:
-  milestone2:
-    :name: milestone2
+    :description: ''
+  Soonish:
+    :name: Soonish
+    :due: 1214863200000000
+    :completed: 1214863200000000
+    :description: ''
+  Database Schema Conversion:
+    :name: Database Schema Conversion
+    :due: 0
+    :completed: 1394028718000000
+    :description: ''
+  Agenda - future:
+    :name: Agenda - future
     :due: 0
     :completed: 0
-    :description:
-  milestone3:
-    :name: milestone3
+    :description: ''
+  5.y.y:
+    :name: 5.y.y
+    :due: 0
+    :completed: 1428660000000000
+    :description: ''
+  "(None)":
+    :name: "(None)"
     :due: 0
     :completed: 0
-    :description:
-  milestone4:
-    :name: milestone4
-    :due: 0
-    :completed: 0
-    :description:
+    :description: ''
 labels:
   type:
+    task: type_task
+    cleanup: type_cleanup
     defect: type_defect
+    enhancement: type_enhancement
   component:
-    component1: component_component1
+    admin/: component_admin/
+    'Datatracker: Base templates': 'component_Datatracker: Base templates'
+    'Datatracker: Testing': 'component_Datatracker: Testing'
+    idtracker/: component_idtracker/
+    doc/: component_doc/
+    'Project: Agenda': 'component_Project: Agenda'
+    doc/charter-: component_doc/charter-
+    submit/: component_submit/
+    'MailArchive: User Interface': 'component_MailArchive: User Interface'
+    group/: component_group/
+    meeting/: component_meeting/
+    meeting/*/schedule/: component_meeting/*/schedule/
   resolution:
-    invalid: resolution_invalid
-  severity:
-    blocker:            '#high'
-    critical:           '#critical'
-    major:              '#major'
-    minor:              '#minor'
-    trivial:            '#trivial'
+    fixed: resolution_fixed
+    wontfix: resolution_wontfix
+    overtaken by events: resolution_overtaken by events
+    deployed: resolution_deployed
+  severity: {}
   priority:
-    critical: priority_critical
+    n/a: priority_n/a
+    medium: priority_medium
     major: priority_major
+    minor: priority_minor
   tracstate:
-    new: tracstate_new
+    accepted: tracstate_accepted
     closed: tracstate_closed
-attachments:
-  url: "http://localhost:81/raw-attachment/ticket"
-  # export-folder is relative to export-script
-  export_folder: "./attachments"
-  export_script: .//attachments.sh

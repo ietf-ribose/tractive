@@ -14,7 +14,7 @@ class TractiveCommand < Thor
   class_option "dryrun", type: :boolean, aliases: ["-d", "--dry-run"],
                          desc: "Write data to a file instead of pushing it to github"
   class_option "exportattachments", type: :string, aliases: ["-e", "--export-attachments"],
-                                    desc: "Export attachments from the databse according to config.yaml"
+                                    desc: "Export attachments from the database according to config.yaml"
   class_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
                        desc: "Import without safety-checking issue numbers."
   class_option "info", type: :boolean, aliases: ["-i", "--info"],

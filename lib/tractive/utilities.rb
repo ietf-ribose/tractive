@@ -10,7 +10,7 @@ module Tractive
       def setup_db!(db_url)
         db = Sequel.connect(db_url) if db_url
 
-        raise("could not connect to trac databse") unless db
+        raise("could not connect to tractive databse") unless db
 
         Dir.glob("lib/tractive/models/*.rb") do |file|
           require_relative "../../#{file}"

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Tractive do
+RSpec.describe Tractive::Trac do
   it "counts total attachments" do
-    expect(Tractive::Attachment.count).to eq(5)
+    expect(Tractive::Attachment.count).to eq(181)
   end
 
   it "should fileter attachments by type tickets" do

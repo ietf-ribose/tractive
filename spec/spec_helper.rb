@@ -14,7 +14,7 @@ RSpec.configure do |config|
   config.disable_monkey_patching!
 
   config.before(:suite) do
-    Tractive::Utilities.setup_logger(output_stream: $stderr, verbose: false)
+    Tractive::Utilities.setup_logger(verbose: false)
     Tractive::Utilities.setup_db!(CONFIG["trac"]["database"])
   end
 

@@ -15,7 +15,11 @@ RSpec.describe Tractive do
     stub_milestone_request
     ticket = Tractive::Ticket.find(id: 3)
 
-    expect(Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)).to eq(ticket_compose_hash3(ticket))
+    actual_ticket_hash = Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)
+    expected_ticket_hash = ticket_compose_hash3(ticket)
+
+    expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])
+    expect(actual_ticket_hash["comments"]).to match_array(expected_ticket_hash["comments"])
   end
 
   it "compose correct issue without assignee" do
@@ -24,7 +28,11 @@ RSpec.describe Tractive do
     stub_milestone_request
     ticket = Tractive::Ticket.find(id: 98)
 
-    expect(Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)).to eq(ticket_compose_hash98(ticket))
+    actual_ticket_hash = Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)
+    expected_ticket_hash = ticket_compose_hash98(ticket)
+
+    expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])
+    expect(actual_ticket_hash["comments"]).to match_array(expected_ticket_hash["comments"])
   end
 
   it "compose correct issue with all comments as single post" do
@@ -34,7 +42,11 @@ RSpec.describe Tractive do
 
     ticket = Tractive::Ticket.find(id: 170)
 
-    expect(Tractive::Migrator.new(options_for_migrator(singlepost: true)).send(:compose_issue, ticket)).to eq(ticket_compose_hash_with_singlepost(ticket))
+    actual_ticket_hash = Tractive::Migrator.new(options_for_migrator(singlepost: true)).send(:compose_issue, ticket)
+    expected_ticket_hash = ticket_compose_hash_with_singlepost(ticket)
+
+    expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])
+    expect(actual_ticket_hash["comments"]).to match_array(expected_ticket_hash["comments"])
   end
 
   def db_result_hash

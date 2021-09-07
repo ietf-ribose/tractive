@@ -11,13 +11,13 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 Layout/LineLength:
-  Max: 210
+  Max: 3000
 
 Metrics/ClassLength:
   Max: 500
 
 Metrics/BlockLength:
-  Max: 100
+  Max: 500
 
 Style/Documentation:
   Enabled: false

@@ -120,20 +120,6 @@ module Tractive
       (@trac_mails_cache[author] = author) # not found
     end
 
-    # returns the git commit hash for a specified revision (using revmap hash)
-    def map_changeset(str)
-      if @revmap&.key?(str)
-        "[r#{str}](../commit/#{@revmap[str]}) #{@revmap[str]}"
-      else
-        str
-      end
-    end
-
-    def map_image(str)
-      %{![#{str}](#{@attachurl}/#{@current_ticket_id}/#{str}) }
-      # %Q{>>**insert-missing-image: (#{str}**)}
-    end
-
     # Format time for github API
     def format_time(time)
       time = Time.at(time / 1e6, time % 1e6)
@@ -401,7 +387,7 @@ module Tractive
         # text += "created the issue\n\n"
         if body && !body.lstrip.empty?
           # text += "\n___\n" if not append
-          text += markdownify(body)
+          text += Tractive::MarkdownConverter.convert(body, @tracticketbaseurl, @attachurl, @current_ticket_id)
         end
 
       when "comment"
@@ -409,13 +395,13 @@ module Tractive
         changeset = body.match(/In \[changeset:"(\d+)/).to_a[1]
         text += if changeset
                   # changesethash = @revmap[changeset]
-                  "_committed #{map_changeset(changeset)}_"
+                  "_committed #{Tractive::Utilities.map_changeset(changeset)}_"
                 else
                   "_commented_\n\n"
                 end
 
         text += "\n___\n" unless append
-        text += markdownify(body) if body
+        text += Tractive::MarkdownConverter.convert(body, @tracticketbaseurl, @attachurl, @current_ticket_id) if body
 
       when "attachment"
         text += "_uploaded file "
@@ -445,56 +431,6 @@ module Tractive
         "body" => text,
         "created_at" => format_time(meta[:time])
       }
-    end
-
-    def markdownify(str)
-      # Line endings
-      str.gsub!("\r\n", "\n")
-      # CommitTicketReference
-      str.gsub!(/\{\{\{\n(#!CommitTicketReference .+?)\}\}\}/m, '\1')
-      str.gsub!(/#!CommitTicketReference .+\n/, "")
-      # Code
-      str.gsub!(/\{\{\{([^\n]+?)\}\}\}/, '`\1`')
-      str.gsub!(/\{\{\{(.+?)\}\}\}/m, '```\1```')
-      str.gsub!(/(?<=```)#!/m, "")
-      # Headings
-      str.gsub!(/====\s(.+?)\s====/, '#### \1')
-      str.gsub!(/===\s(.+?)\s===/, '### \1')
-      str.gsub!(/==\s(.+?)\s==/, '## \1')
-      str.gsub!(/=\s(.+?)\s=/, '# \1')
-      # Links
-      str.gsub!(/\[(http[^\s\[\]]+)\s([^\[\]]+)\]/, '[\2](\1)')
-      str.gsub!(/!(([A-Z][a-z0-9]+){2,})/, '\1')
-      # Font styles
-      str.gsub!(/'''(.+?)'''/, '**\1**')
-      str.gsub!(/''(.+?)''/, '*\1*')
-      str.gsub!(%r{[^:]//(.+?[^:])//}, '_\1_')
-      # Lists
-      str.gsub!(/(^\s+)\*/, '\1-')
-      str.gsub!(/(^\s+)(\d)\./, '\1\2.')
-      # Changeset
-      str.gsub!(%r{https?://svnweb.cern.ch/trac/madx/changeset/(\d+)/?}, '[changeset:\1]')
-      str.gsub!(/\[changeset:"r(\d+)".*\]/, '[changeset:\1]')
-      str.gsub!(/\[changeset:r(\d+)\]/, '[changeset:\1]')
-      str.gsub!(/\br(\d+)\b/) { map_changeset(Regexp.last_match[1]) }
-      str.gsub!(/\[changeset:"(\d+)".*\]/) { map_changeset(Regexp.last_match[1]) }
-      str.gsub!(/\[changeset:"(\d+).*\]/) { map_changeset(Regexp.last_match[1]) }
-
-      # image reference
-      str.gsub!(/\[\[Image\(([^)]+)\)\]\]/) { map_image(Regexp.last_match[1]) }
-
-      # replace a full ticket id with the github short refrence
-      if @tracticketbaseurl
-        baseurlpattern = @tracticketbaseurl.gsub("/", "\\/")
-        str.gsub!(%r{#{baseurlpattern}/(\d+)}) { "ticket:#{Regexp.last_match[1]}  " }
-      end
-
-      # Ticket
-      str.gsub!(/ticket:(\d+)/, '#\1')
-      # set the body as a comment
-      # str.gsub!("\n", "\n> ")
-      # str = "> #{str}"
-      str
     end
 
     def load_revmap_file(revmapfile)

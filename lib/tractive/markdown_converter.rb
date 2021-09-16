@@ -39,7 +39,7 @@ module Tractive
       # replace a full ticket id with the github short refrence
       if @ticketbaseurl
         baseurlpattern = @ticketbaseurl.gsub("/", "\\/")
-        str.gsub!(%r{#{baseurlpattern}/(\d+)}) { "ticket:#{Regexp.last_match[1]}  " }
+        str.gsub!(%r{#{baseurlpattern}/(\d+)}) { "ticket:#{Regexp.last_match[1]}" }
       end
 
       # Ticket

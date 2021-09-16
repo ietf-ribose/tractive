@@ -53,7 +53,7 @@ module Tractive
       @attachurl        = attachurl
       @singlepost       = singlepost
       @safetychecks     = safetychecks
-      @start_ticket     = (start_ticket || @last_created_issue + 1).to_i
+      @start_ticket     = (start_ticket || (@last_created_issue + 1)).to_i
       @filter_closed    = filter_closed
       @uri_parser = URI::Parser.new
     end

@@ -2,7 +2,7 @@
 
 module Tractive
   class Ticket < Sequel::Model(:ticket)
-    one_to_many :changes, class: TicketChange, key: :ticket
+    one_to_many :changes, class: Tractive::TicketChange, key: :ticket
     one_to_many :attachments, class: Attachment, key: :id, conditions: { type: "ticket" }
 
     def all_changes

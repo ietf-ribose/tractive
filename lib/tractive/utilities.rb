@@ -8,11 +8,20 @@ module Tractive
       end
 
       def setup_db!(db_url)
+        files_to_load = [
+          "lib/tractive/models/attachment.rb",
+          "lib/tractive/models/milestone.rb",
+          "lib/tractive/models/report.rb",
+          "lib/tractive/models/revision.rb",
+          "lib/tractive/models/session.rb",
+          "lib/tractive/models/ticket_change.rb",
+          "lib/tractive/models/ticket.rb"
+        ]
         db = Sequel.connect(db_url) if db_url
 
         raise("could not connect to tractive database") unless db
 
-        Dir.glob("lib/tractive/models/*.rb") do |file|
+        files_to_load.each do |file|
           require_relative "../../#{file}"
         end
 

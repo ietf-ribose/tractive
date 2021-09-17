@@ -46,6 +46,7 @@ module Tractive
 
       dry_run_output_file = args[:cfg][:dry_run_output_file] || "#{Dir.pwd}/dryrun_out.json"
 
+      @changeset_base_url = args[:cfg]["trac"]["changeset_base_url"]
       @dry_run          = args[:opts][:dryrun]
       @output_file      = File.new(dry_run_output_file, "w+")
       @delimiter        = "["
@@ -387,7 +388,7 @@ module Tractive
         # text += "created the issue\n\n"
         if body && !body.lstrip.empty?
           # text += "\n___\n" if not append
-          text += Tractive::MarkdownConverter.convert(body, @tracticketbaseurl, @attachurl, @current_ticket_id)
+          text += Tractive::MarkdownConverter.convert(body, @tracticketbaseurl, @attachurl, @current_ticket_id, @changeset_base_url)
         end
 
       when "comment"
@@ -401,7 +402,7 @@ module Tractive
                 end
 
         text += "\n___\n" unless append
-        text += Tractive::MarkdownConverter.convert(body, @tracticketbaseurl, @attachurl, @current_ticket_id) if body
+        text += Tractive::MarkdownConverter.convert(body, @tracticketbaseurl, @attachurl, @current_ticket_id, @changeset_base_url) if body
 
       when "attachment"
         text += "_uploaded file "

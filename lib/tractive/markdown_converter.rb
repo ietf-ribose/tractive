@@ -9,8 +9,8 @@ module Tractive
       @changeset_base_url = changeset_base_url
     end
 
-    def self.convert(str, base_url, attach_url, ticket_id)
-      new(base_url, attach_url, ticket_id).convert(str)
+    def self.convert(str, base_url, attach_url, ticket_id, changeset_base_url)
+      new(base_url, attach_url, ticket_id, changeset_base_url).convert(str)
     end
 
     def convert(str)

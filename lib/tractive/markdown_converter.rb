@@ -2,10 +2,11 @@
 
 module Tractive
   class MarkdownConverter
-    def initialize(base_url, attach_url, ticket_id)
+    def initialize(base_url, attach_url, ticket_id, changeset_base_url)
       @ticketbaseurl = base_url
       @attachurl = attach_url
       @current_ticket_id = ticket_id
+      @changeset_base_url = changeset_base_url
     end
 
     def self.convert(str, base_url, attach_url, ticket_id)
@@ -71,7 +72,7 @@ module Tractive
 
     # Changeset
     def convert_changeset(str)
-      str.gsub!(%r{https?://svnweb.cern.ch/trac/madx/changeset/(\d+)/?}, '[changeset:\1]')
+      str.gsub!(%r{#{Regexp.quote(@changeset_base_url)}/(\d+)/?}, '[changeset:\1]') if @changeset_base_url
       str.gsub!(/\[changeset:"r(\d+)".*\]/, '[changeset:\1]')
       str.gsub!(/\[changeset:r(\d+)\]/, '[changeset:\1]')
       str.gsub!(/\br(\d+)\b/) { Tractive::Utilities.map_changeset(Regexp.last_match[1]) }

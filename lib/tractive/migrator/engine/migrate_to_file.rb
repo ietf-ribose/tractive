@@ -48,16 +48,6 @@ module Migrator
             @output_file.puts "}"
           end
 
-          if @safetychecks
-            begin
-              # issue exists already:
-              @client.issue(@repo, ticket[:id])
-              $logger.info("found ticket #{ticket[:id]}")
-              next
-            rescue StandardError
-            end
-          end
-
           $logger.info(%{creating issue for trac #{ticket[:id]} "#{ticket[:summary]}" (#{ticket[:reporter]})})
           # API details: https://gist.github.com/jonmagic/5282384165e0f86ef105
           request = compose_issue(ticket)
@@ -67,34 +57,10 @@ module Migrator
           @delimiter = "," if @delimiter != ","
           response = { "status" => "added to file", "issue_url" => "/#{ticket[:id]}" }
 
-          if @safetychecks # - it is not really faster if we do not wait for the processing
-            while response["status"] == "pending"
-              sleep 1
-              $logger.info("Checking import status: #{response["id"]}")
-              $logger.info("you can manually check: #{response["url"]}")
-              response = @client.issue_import_status(@repo, response["id"])
-            end
+          $logger.info("Status: #{response["status"]}")
 
-            $logger.info("Status: #{response["status"]}")
-
-            if response["status"] == "failed"
-              $logger.error(response["errors"])
-              exit 1
-            end
-
-            issue_id = response["issue_url"].match(/\d+$/).to_s.to_i
-
-            $logger.info("created issue ##{issue_id} for trac ticket #{ticket[:id]}")
-
-            # assert correct issue number
-            if issue_id != ticket[:id]
-              $logger.warn("mismatch issue ##{issue_id} for ticket #{ticket[:id]}")
-              exit 1
-            end
-          else
-            # to allow manual verification:
-            $logger.info(response["url"])
-          end
+          issue_id = response["issue_url"].match(/\d+$/).to_s.to_i
+          $logger.info("created issue ##{issue_id} for trac ticket #{ticket[:id]}")
 
           @last_created_issue = ticket[:id]
         end

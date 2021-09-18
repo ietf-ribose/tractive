@@ -17,6 +17,8 @@ class TractiveCommand < Thor
                                     desc: "Export attachments from the database according to config.yaml"
   class_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
                        desc: "Import without safety-checking issue numbers."
+  class_option "importfromfile", type: :string, aliases: ["-f", "--import-from-file"],
+                                 desc: "Import issues from a json file"
   class_option "info", type: :boolean, aliases: ["-i", "--info"],
                        desc: "Reports existing labels and users in the database"
   class_option "mockdeleted", type: :boolean, aliases: ["-M", "--mockup"],

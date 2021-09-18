@@ -26,7 +26,7 @@ module Tractive
     end
 
     def migrate
-      Tractive::Migrator.new(opts: @opts, cfg: @cfg, db: @db).migrate
+      Migrator::Engine.new(opts: @opts, cfg: @cfg, db: @db).migrate
     end
 
     def info

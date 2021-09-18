@@ -3,7 +3,6 @@
 require_relative "tractive/graceful_quit"
 require_relative "tractive/attachment_exporter"
 require_relative "tractive/migrator"
-require_relative "tractive/markdown_converter"
 require_relative "tractive/trac"
 require_relative "tractive/info"
 require_relative "tractive/version"

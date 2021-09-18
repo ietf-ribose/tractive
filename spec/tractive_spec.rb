@@ -15,7 +15,7 @@ RSpec.describe Tractive do
     stub_milestone_request
     ticket = Tractive::Ticket.find(id: 3)
 
-    actual_ticket_hash = Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)
+    actual_ticket_hash = Migrator::Engine.new(options_for_migrator).send(:compose_issue, ticket)
     expected_ticket_hash = ticket_compose_hash3(ticket)
 
     expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])
@@ -28,7 +28,7 @@ RSpec.describe Tractive do
     stub_milestone_request
     ticket = Tractive::Ticket.find(id: 98)
 
-    actual_ticket_hash = Tractive::Migrator.new(options_for_migrator).send(:compose_issue, ticket)
+    actual_ticket_hash = Migrator::Engine.new(options_for_migrator).send(:compose_issue, ticket)
     expected_ticket_hash = ticket_compose_hash98(ticket)
 
     expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])
@@ -42,7 +42,7 @@ RSpec.describe Tractive do
 
     ticket = Tractive::Ticket.find(id: 170)
 
-    actual_ticket_hash = Tractive::Migrator.new(options_for_migrator(singlepost: true)).send(:compose_issue, ticket)
+    actual_ticket_hash = Migrator::Engine.new(options_for_migrator(singlepost: true)).send(:compose_issue, ticket)
     expected_ticket_hash = ticket_compose_hash_with_singlepost(ticket)
 
     expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])

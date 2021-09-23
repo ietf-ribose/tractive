@@ -11,7 +11,7 @@ module Tractive
                   .where { id >= start_ticket }
                   .filter_column(filter_options)
 
-        tickets = tickets.where { status != "closed" } if filterout_closed
+        tickets = tickets.exclude(status: "closed") if filterout_closed
 
         tickets
       end

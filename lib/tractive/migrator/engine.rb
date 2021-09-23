@@ -51,7 +51,7 @@ module Migrator
       @labels_cfg        = labels.transform_values(&:to_h)
       @ticket_to_issue   = {}
       @trac_mails_cache  = {}
-      @mockdeleted       = mockdeleted
+      @mockdeleted       = mockdeleted || @filter_applied
       @tracticketbaseurl = tracticketbaseurl
 
       $logger.debug("Get highest in #{@repo}")

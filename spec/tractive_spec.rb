@@ -49,6 +49,26 @@ RSpec.describe Tractive do
     expect(actual_ticket_hash["comments"]).to match_array(expected_ticket_hash["comments"])
   end
 
+  it "should compose correct mock ticket" do
+    stub_issues_request
+    stub_milestone_map_request
+    stub_milestone_request
+
+    mock_ticket = Migrator::Engine.new(options_for_migrator).send(:mock_ticket_details, 1)
+
+    expect(mock_ticket[:summary]).to eq("DELETED in trac 1")
+  end
+
+  it "should compose correct mock ticket when filtering" do
+    stub_issues_request
+    stub_milestone_map_request
+    stub_milestone_request
+
+    mock_ticket = Migrator::Engine.new(options_for_migrator(filter: true)).send(:mock_ticket_details, 1)
+
+    expect(mock_ticket[:summary]).to eq("Not available in trac 1")
+  end
+
   def db_result_hash
     CONFIG.slice("users", "milestones", "labels")
   end

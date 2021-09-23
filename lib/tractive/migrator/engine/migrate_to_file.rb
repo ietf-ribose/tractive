@@ -31,13 +31,7 @@ module Migrator
           if ticket.nil?
             next unless @mockdeleted
 
-            ticket = {
-              id: ticket_id,
-              summary: "DELETED in trac #{ticket_id}",
-              time: Time.now.to_i,
-              status: "closed",
-              reporter: "tractive"
-            }
+            ticket = mock_ticket_details(ticket_id)
           end
 
           raise("tickets out of sync #{ticket_id} - #{ticket[:id]}") if ticket[:id] != ticket_id

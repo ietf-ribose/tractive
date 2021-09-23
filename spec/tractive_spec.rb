@@ -69,6 +69,21 @@ RSpec.describe Tractive do
     expect(mock_ticket[:summary]).to eq("Not available in trac 1")
   end
 
+  it "should output composed tickets in file" do
+    stub_issues_request
+    stub_milestone_map_request
+    stub_milestone_request
+
+    buffer = StringIO.new
+    filename = "#{Dir.pwd}/dryrun_out.json"
+    allow(File).to receive(:new).with(filename, "w+").and_return(buffer)
+
+    migrator = Migrator::Engine.new(options_for_migrator(dryrun: true, filter: true, columnname: "id", operator: "<", columnvalue: "4"))
+    migrator.migrate
+
+    expect(buffer.string).to eq(file_expected_output(migrator))
+  end
+
   def db_result_hash
     CONFIG.slice("users", "milestones", "labels")
   end
@@ -115,6 +130,15 @@ RSpec.describe Tractive do
     end
 
     {
+      "issue" => {
+        "title" => "ipr.cgi",
+        "body" => "`component_admin/` `resolution_fixed` `type_task`   |    by henrik@levkowetz.com\n\n___\n\n\n\n\n___\n_Issue migrated from trac:3 at #{Time.now}_",
+        "labels" => ["priority_n/a", "tracstate_closed", "owner:henrik@levkowetz.com"],
+        "closed" => true,
+        "created_at" => format_time(ticket[:time]),
+        "milestone" => nil,
+        "assignee" => "henrik@levkowetz.com"
+      },
       "comments" => [
         { "body" => "_@henrik@levkowetz.com_ _changed status from `new` to `assigned`_", "created_at" => format_time(changes[0][:time]) },
         { "body" => "_@henrik@levkowetz.com_ _changed owner from `henrik` to `henrik@levkowetz.com`_", "created_at" => format_time(changes[1][:time]) },
@@ -142,16 +166,7 @@ RSpec.describe Tractive do
         { "body" => "_@henrik@levkowetz.com_ _changed component from `` to `admin/`_", "created_at" => format_time(changes[13][:time]) },
         { "body" => "_removed milestone (was `IPRTool`)_", "created_at" => format_time(changes[14][:time]) },
         { "body" => "_commented_\n\n\n___\nMilestone IPRTool deleted", "created_at" => format_time(changes[15][:time]) }
-      ],
-      "issue" => {
-        "assignee" => "henrik@levkowetz.com",
-        "body" => "`component_admin/` `resolution_fixed` `type_task`   |    by henrik@levkowetz.com\n\n___\n\n\n\n\n___\n_Issue migrated from trac:3 at #{Time.now}_",
-        "labels" => ["priority_n/a", "tracstate_closed", "owner:henrik@levkowetz.com"],
-        "milestone" => nil,
-        "title" => "ipr.cgi",
-        "closed" => true,
-        "created_at" => format_time(ticket[:time])
-      }
+      ]
     }
   end
 
@@ -190,6 +205,15 @@ RSpec.describe Tractive do
         "milestone" => nil
       }
     }
+  end
+
+  def file_expected_output(migrator)
+    ticket = Tractive::Ticket.find(id: 3)
+    "{" \
+      "\n\"1\":#{migrator.send(:compose_issue, migrator.send(:mock_ticket_details, 1)).to_json}\n," \
+      "\n\"2\":#{migrator.send(:compose_issue, migrator.send(:mock_ticket_details, 2)).to_json}\n," \
+      "\n\"3\":#{ticket_compose_hash3(ticket).to_json}" \
+      "\n}\n"
   end
 
   def stub_issues_request

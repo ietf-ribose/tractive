@@ -30,7 +30,7 @@ module Migrator
       input_file_name   = args[:opts][:importfromfile]
 
       @filter_applied   = args[:opts][:filter]
-      @filter_options   = { column_name: args[:opts]["columnname"], operator: args[:opts]["operator"], column_value: args[:opts]["columnvalue"] }
+      @filter_options   = { column_name: args[:opts][:columnname], operator: args[:opts][:operator], column_value: args[:opts][:columnvalue] }
 
       @trac  = Tractive::Trac.new(db)
       @repo  = github["repo"]

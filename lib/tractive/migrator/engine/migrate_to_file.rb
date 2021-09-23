@@ -16,7 +16,9 @@ module Migrator
       def migrate_tickets_to_file(start_ticket, filterout_closed)
         $logger.info("migrating issues")
         # We match the issue title to determine whether an issue exists already.
-        tractickets = @trac.tickets.order(:id).where { id >= start_ticket }.all
+        tractickets = @trac.tickets
+                           .for_migration(start_ticket, filterout_closed, @filter_options)
+                           .all
         begin
           lasttracid = tractickets.last[:id]
         rescue StandardError

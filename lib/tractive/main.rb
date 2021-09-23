@@ -3,6 +3,8 @@
 module Tractive
   class Main
     def initialize(opts)
+      verify_options!(opts)
+
       @opts = opts
       @cfg  = YAML.load_file(@opts[:config])
 
@@ -39,6 +41,39 @@ module Tractive
 
     def create_attachment_exporter_script
       Tractive::AttachmentExporter.new(@cfg, @db).generate_script
+    end
+
+    private
+
+    def verify_options!(options)
+      verify_config_options!(options)
+      verify_filter_options!(options)
+    end
+
+    def verify_config_options!(options)
+      return if File.exist?(options[:config])
+
+      warn_and_exit("missing configuration file (#{options[:config]})", 1)
+    end
+
+    def verify_filter_options!(options)
+      required_options = { columnname: "--column-name",
+                           operator: "--operator",
+                           columnvalue: "--column-value" }
+      missing_options = {}
+      required_options.each do |key, value|
+        missing_options[key] = value if !options[key] || options[key].strip.empty?
+      end
+
+      return if !options[:filter] || missing_options.empty?
+
+      warn_and_exit("missing filter options #{missing_options.values}", 1)
+    end
+
+    def warn_and_exit(message, exit_code)
+      warn message
+      warn "Run with `--help` or `-h` to see available options"
+      exit exit_code
     end
   end
 end

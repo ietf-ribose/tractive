@@ -47,45 +47,17 @@ class TractiveCommand < Thor
 
   desc "<OPTIONS>", "Migrate Trac instances to modern Git management platforms like GitHub and GitLab"
   def default
-    verify_config_options!
-    verify_filter_options!
     Tractive::Main.new(options).run
   end
 
   def method_missing(*args)
-    warn_and_exit("No method found named: #{args[0]}", 1)
+    warn "No method found named: #{args[0]}"
+    warn "Run with `--help` or `-h` to see available options"
+    exit 1
   end
 
   def respond_to_missing?
     true
-  end
-
-  no_commands do
-    def verify_config_options!
-      return if File.exist?(options[:config])
-
-      warn_and_exit("missing configuration file (#{options[:config]})", 1)
-    end
-
-    def verify_filter_options!
-      required_options = { "columnname" => "--column-name",
-                           "operator" => "--operator",
-                           "columnvalue" => "--column-value" }
-      missing_options = {}
-      required_options.each do |key, value|
-        missing_options[key] = value if !options[key] || options[key].strip.empty?
-      end
-
-      return if !options[:filter] || missing_options.empty?
-
-      warn_and_exit("missing filter options #{missing_options.values}", 1)
-    end
-
-    def warn_and_exit(message, exit_code)
-      warn message
-      warn "Run with `--help` or `-h` to see available options"
-      exit exit_code
-    end
   end
 end
 

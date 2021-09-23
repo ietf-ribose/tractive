@@ -29,6 +29,9 @@ module Migrator
       filter_closed     = args[:opts][:openedonly]
       input_file_name   = args[:opts][:importfromfile]
 
+      @filter_applied   = args[:opts][:filter]
+      @filter_options   = { column_name: args[:opts]["columnname"], operator: args[:opts]["operator"], column_value: args[:opts]["columnvalue"] }
+
       @trac  = Tractive::Trac.new(db)
       @repo  = github["repo"]
       @token = github["token"]
@@ -172,7 +175,11 @@ module Migrator
                               newvalue: ticket[:description]
                             })["body"]
 
-      changes = ticket.all_changes
+      changes = if ticket.is_a? Hash
+                  []
+                else
+                  ticket.all_changes
+                end
 
       # replay all changes in chronological order:
       comments = changes.map { |x| ticket_change(@singlepost, x) }.select { |x| x }.to_a
@@ -383,6 +390,21 @@ module Migrator
     def interested_in_change?(kind, newvalue)
       !(%w[keywords cc reporter version].include?(kind) ||
         (kind == "comment" && (newvalue.nil? || newvalue.lstrip.empty?)))
+    end
+
+    def mock_ticket_details(ticket_id)
+      summary = if @filter_applied
+                  "Not available in trac #{ticket_id}"
+                else
+                  "DELETED in trac #{ticket_id}"
+                end
+      {
+        id: ticket_id,
+        summary: summary,
+        time: Time.now.to_i,
+        status: "closed",
+        reporter: "tractive"
+      }
     end
   end
 end

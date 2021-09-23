@@ -9,7 +9,7 @@ class TractiveCommand < Thor
                                      desc: "Generate an attachment exporter script according to config.yaml"
   class_option "attachurl", type: :string, aliases: ["-a", "--attachment-url"], banner: "<URL>",
                             desc: "If attachment files are reachable via a URL we reference this here"
-  class_option "config", type: :string, default: "trac-hub.config.yaml", banner: "<PATH>", aliases: "-c",
+  class_option "config", type: :string, default: "tractive.config.yaml", banner: "<PATH>", aliases: "-c",
                          desc: "Set the configuration file"
   class_option "dryrun", type: :boolean, aliases: ["-d", "--dry-run"],
                          desc: "Write data to a file instead of pushing it to github"
@@ -17,7 +17,15 @@ class TractiveCommand < Thor
                                     desc: "Export attachments from the database according to config.yaml"
   class_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
                        desc: "Import without safety-checking issue numbers."
-  class_option "importfromfile", type: :string, aliases: ["-f", "--import-from-file"],
+  class_option "filter", type: :boolean, aliases: ["-f", "--filter"],
+                         desc: "Filter records that you want to import."
+  class_option "columnname", type: :string, aliases: ["--column-name"],
+                             desc: "Name of the column to filter."
+  class_option "operator", type: :string, aliases: ["--operator"],
+                           desc: "Operator for filter."
+  class_option "columnvalue", type: :string, aliases: ["--column-value"],
+                              desc: "Value of the column to filter."
+  class_option "importfromfile", type: :string, aliases: ["-I", "--import-from-file"],
                                  desc: "Import issues from a json file"
   class_option "info", type: :boolean, aliases: ["-i", "--info"],
                        desc: "Reports existing labels and users in the database"
@@ -40,13 +48,12 @@ class TractiveCommand < Thor
   desc "<OPTIONS>", "Migrate Trac instances to modern Git management platforms like GitHub and GitLab"
   def default
     verify_config_options!
+    verify_filter_options!
     Tractive::Main.new(options).run
   end
 
   def method_missing(*args)
-    warn "No method found named: #{args[0]}"
-    warn "Run with `--help` or `-h` to see available options"
-    exit 1
+    warn_and_exit("No method found named: #{args[0]}", 1)
   end
 
   def respond_to_missing?
@@ -57,7 +64,27 @@ class TractiveCommand < Thor
     def verify_config_options!
       return if File.exist?(options[:config])
 
-      raise "missing configuration file (#{configfiles})"
+      warn_and_exit("missing configuration file (#{options[:config]})", 1)
+    end
+
+    def verify_filter_options!
+      required_options = { "columnname" => "--column-name",
+                           "operator" => "--operator",
+                           "columnvalue" => "--column-value" }
+      missing_options = {}
+      required_options.each do |key, value|
+        missing_options[key] = value if !options[key] || options[key].strip.empty?
+      end
+
+      return if !options[:filter] || missing_options.empty?
+
+      warn_and_exit("missing filter options #{missing_options.values}", 1)
+    end
+
+    def warn_and_exit(message, exit_code)
+      warn message
+      warn "Run with `--help` or `-h` to see available options"
+      exit exit_code
     end
   end
 end

@@ -16,7 +16,10 @@ module Migrator
       def migrate_tickets_from_db(start_ticket, filterout_closed)
         $logger.info("migrating issues")
         # We match the issue title to determine whether an issue exists already.
-        tractickets = @trac.tickets.order(:id).where { id >= start_ticket }.all
+        tractickets = @trac.tickets
+                           .for_migration(start_ticket, filterout_closed, @filter_options)
+                           .all
+
         begin
           lasttracid = tractickets.last[:id]
         rescue StandardError
@@ -25,24 +28,15 @@ module Migrator
 
         (start_ticket.to_i..lasttracid).each do |ticket_id|
           ticket = tractickets.select { |i| i[:id] == ticket_id }.first
-
           @current_ticket_id = ticket_id # used to build filename for attachments
 
           if ticket.nil?
             next unless @mockdeleted
 
-            ticket = {
-              id: ticket_id,
-              summary: "DELETED in trac #{ticket_id}",
-              time: Time.now.to_i,
-              status: "closed",
-              reporter: "tractive"
-            }
+            ticket = mock_ticket_details(ticket_id)
           end
 
           raise("tickets out of sync #{ticket_id} - #{ticket[:id]}") if ticket[:id] != ticket_id
-
-          next if filterout_closed && (ticket[:status] == "closed")
 
           Tractive::GracefulQuit.check("quitting after processing ticket ##{@last_created_issue}")
 

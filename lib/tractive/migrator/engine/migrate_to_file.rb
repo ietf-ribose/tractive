@@ -46,7 +46,7 @@ module Migrator
 
           $logger.info(%{creating issue for trac #{ticket[:id]} "#{ticket[:summary]}" (#{ticket[:reporter]})})
           # API details: https://gist.github.com/jonmagic/5282384165e0f86ef105
-          request = compose_issue(ticket)
+          request = Migrator::Converter::TracToGithub.new(@config).compose(ticket)
 
           @output_file.puts @delimiter
           @output_file.puts({ @current_ticket_id => request }.to_json[1...-1])

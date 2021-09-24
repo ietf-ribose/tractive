@@ -14,7 +14,10 @@ RSpec.describe Migrator::Engine do
     migrator = Migrator::Engine.new(options_for_migrator(dryrun: true, filter: true, columnname: "id", operator: "<", columnvalue: "4"))
     migrator.migrate
 
-    expect(buffer.string).to eq(file_expected_output(migrator, converter))
+    actual_hash = JSON.parse(buffer.string)
+    expected_hash = JSON.parse(file_expected_output(migrator, converter))
+
+    expect(actual_hash).to eq(expected_hash)
   end
 
   it "should compose correct mock ticket" do

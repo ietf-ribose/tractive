@@ -17,7 +17,7 @@ module Tractive
       end
 
       def filter_column(options)
-        return self if options.nil? || options.empty?
+        return self if options.nil? || options.values.compact.empty?
 
         if options[:operator].downcase == "like"
           where { Sequel.like(options[:column_name].to_sym, options[:column_value]) }

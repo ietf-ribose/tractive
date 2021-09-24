@@ -1,18 +1,24 @@
 # frozen_string_literal: true
 
 module Migrator
-  class Engine
-    module MarkdownConverter
-      def rtf_to_markdown(str, base_url, attach_url, changeset_base_url)
+  module Converter
+    class RtfToMarkdown
+      def initialize(base_url, attach_url, changeset_base_url, wiki_attachments_url)
+        @base_url = base_url
+        @attach_url = attach_url
+        @changeset_base_url = changeset_base_url
+        @wiki_attachments_url = wiki_attachments_url
+      end
+
+      def convert(str)
         convert_newlines(str)
         convert_code_snippets(str)
         convert_headings(str)
         convert_links(str)
         convert_font_styles(str)
-        convert_lists(str)
-        convert_changeset(str, changeset_base_url)
-        convert_image(str, base_url, attach_url)
-        convert_ticket(str, base_url)
+        convert_changeset(str, @changeset_base_url)
+        convert_image(str, @base_url, @attach_url, @wiki_attachments_url)
+        convert_ticket(str, @base_url)
 
         str
       end
@@ -70,12 +76,6 @@ module Migrator
         str.gsub!(/\[changeset:"(\d+).*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1]) }
       end
 
-      # Lists
-      def convert_lists(str)
-        str.gsub!(/(^\s+)\*/, '\1-')
-        str.gsub!(/(^\s+)(\d)\./, '\1\2.')
-      end
-
       # Font styles
       def convert_font_styles(str)
         str.gsub!(/'''(.+?)'''/, '**\1**')
@@ -89,31 +89,35 @@ module Migrator
         str.gsub!(/!(([A-Z][a-z0-9]+){2,})/, '\1')
       end
 
-      def convert_image(str, base_url, attach_url)
+      def convert_image(str, base_url, attach_url, wiki_attachments_url)
         # https://trac.edgewall.org/wiki/WikiFormatting#Images
         # [[Image(picture.gif)]] Current page (Ticket, Wiki, Comment)
         # [[Image(wiki:WikiFormatting:picture.gif)]] (referring to attachment on another page)
         # [[Image(ticket:1:picture.gif)]] (file attached to a ticket)
 
-        d = /\[\[Image\((?:(?<module>(?:source|wiki)):)?(?<path>[^)]+)\)\]\]/.match(str)
+        image_regex = /\[\[Image\((?:(?<module>(?:source|wiki)):)?(?<path>[^)]+)\)\]\]/
+        d = image_regex.match(str)
         return if d.nil?
 
         path = d[:path]
         mod = d[:module]
 
-        if mod == "source"
-          "![](#{base_url}/#{path})"
-        elsif mod == "wiki"
-          d[:upload_path] = "/uploads/migrated/#{file}"
-          "![#{file}](#{d[:upload_path]})"
-        elsif path.start_with?("http")
-          # [[Image(http://example.org/s.jpg)]]
-          "![#{d[:path]}](#{d[:path]})"
-        else
-          _, id, file = path.split(":")
-          file_path = "#{attach_url}/#{id}/#{file}"
-          "![#{d[:path]}](#{file_path})"
-        end
+        image_path = if mod == "source"
+                       "![#{path.split("/").last}](#{base_url}#{path})"
+                     elsif mod == "wiki"
+                       _, file = path.split(":")
+                       upload_path = "#{wiki_attachments_url}/#{file}"
+                       "![#{file}](#{upload_path})"
+                     elsif path.start_with?("http")
+                       # [[Image(http://example.org/s.jpg)]]
+                       "![#{d[:path]}](#{d[:path]})"
+                     else
+                       _, id, file = path.split(":")
+                       file_path = "#{attach_url}/#{id}/#{file}"
+                       "![#{d[:path]}](#{file_path})"
+                     end
+
+        str.gsub!(image_regex, image_path)
       end
     end
   end

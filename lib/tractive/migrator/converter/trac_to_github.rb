@@ -18,7 +18,8 @@ module Migrator
 
         load_milestone_map
 
-        @rtf_to_markdown = Migrator::Converter::RtfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url)
+        @uri_parser = URI::Parser.new
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url)
       end
 
       def compose(ticket)
@@ -234,7 +235,7 @@ module Migrator
           # text += "created the issue\n\n"
           if body && !body.lstrip.empty?
             # text += "\n___\n" if not append
-            text += @rtf_to_markdown.convert(body)
+            text += @twf_to_markdown.convert(body)
           end
 
         when "comment"
@@ -248,7 +249,7 @@ module Migrator
                   end
 
           text += "\n___\n" unless append
-          text += @rtf_to_markdown.convert(body) if body
+          text += @twf_to_markdown.convert(body) if body
 
         when "attachment"
           text += "_uploaded file "
@@ -271,7 +272,7 @@ module Migrator
 
         else
           # this should not happen
-          text += "changed #{kind} which not transferred by trac-hub"
+          text += "changed #{kind} which not transferred by tractive"
         end
 
         {
@@ -289,15 +290,6 @@ module Migrator
         return (@trac_mails_cache[author] = data.first[:value]) if data.count == 1
 
         (@trac_mails_cache[author] = author) # not found
-      end
-
-      # returns the git commit hash for a specified revision (using revmap hash)
-      def map_changeset(str)
-        if @revmap&.key?(str)
-          "[r#{str}](../commit/#{@revmap[str]}) #{@revmap[str]}"
-        else
-          str
-        end
       end
 
       # Format time for github API

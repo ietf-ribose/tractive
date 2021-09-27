@@ -5,7 +5,7 @@ require_relative "engine/migrate_from_file"
 require_relative "engine/migrate_to_file"
 
 require_relative "converter/trac_to_github"
-require_relative "converter/rtf_to_markdown"
+require_relative "converter/twf_to_markdown"
 
 # Service to perform migrations
 module Migrator
@@ -62,7 +62,6 @@ module Migrator
       @safetychecks     = safetychecks
       @start_ticket     = (start_ticket || (@last_created_issue + 1)).to_i
       @filter_closed    = filter_closed
-      @uri_parser = URI::Parser.new
     end
 
     def migrate

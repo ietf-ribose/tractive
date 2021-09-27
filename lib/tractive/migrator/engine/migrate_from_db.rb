@@ -75,6 +75,8 @@ module Migrator
 
             $logger.info("created issue ##{issue_id} for trac ticket #{ticket[:id]}")
 
+            update_comment_ref(issue_id) if request.to_s.include?("Replying to [comment:")
+
             # assert correct issue number
             if issue_id != ticket[:id]
               $logger.warn("mismatch issue ##{issue_id} for ticket #{ticket[:id]}")
@@ -86,6 +88,19 @@ module Migrator
           end
 
           @last_created_issue = ticket[:id]
+        end
+      end
+
+      def update_comment_ref(issue_id)
+        comments = @client.issue_comments(@repo, issue_id)
+        comments.each do |comment|
+          next unless comment["body"].include?("Replying to [comment:")
+
+          body = comment["body"]
+          matcher = body.match(/Replying to \[comment:(?<comment_number>\d+).*\]/)
+          matched_comment = comments[matcher[:comment_number].to_i - 1]
+          body.gsub!(/Replying to \[comment:(\d+).*\]/, "Replying to [#{@repo}##{issue_id} (comment:\\1)](#{matched_comment["html_url"]})")
+          @client.update_issue_comment(@repo, comment["id"], body)
         end
       end
     end

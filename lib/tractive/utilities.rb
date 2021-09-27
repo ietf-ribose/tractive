@@ -36,6 +36,15 @@ module Tractive
           "[#{time}] #{severity}#{" " * (5 - severity.size + 1)}| #{msg}\n"
         end
       end
+
+      # returns the git commit hash for a specified revision (using revmap hash)
+      def map_changeset(str)
+        if @revmap&.key?(str)
+          "[r#{str}](../commit/#{@revmap[str]}) #{@revmap[str]}"
+        else
+          str
+        end
+      end
     end
   end
 end

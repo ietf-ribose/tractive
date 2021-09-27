@@ -2,7 +2,8 @@
 
 module Migrator
   module Converter
-    class RtfToMarkdown
+    # twf => Trac wiki format
+    class TwfToMarkdown
       def initialize(base_url, attach_url, changeset_base_url, wiki_attachments_url)
         @base_url = base_url
         @attach_url = attach_url

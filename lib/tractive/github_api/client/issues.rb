@@ -51,6 +51,28 @@ module GithubApi
           )
         )
       end
+
+      def issue_comments(repo, issue_id)
+        JSON.parse(
+          RestClient.get(
+            "https://api.github.com/repos/#{repo}/issues/#{issue_id}/comments",
+            {
+              "Authorization" => "token #{@token}",
+              "Accept" => "application/vnd.github.golden-comet-preview+json"
+            }
+          )
+        )
+      end
+
+      def update_issue_comment(repo, comment_id, comment_body)
+        JSON.parse(
+          RestClient.patch(
+            "https://api.github.com/repos/#{repo}/issues/comments/#{comment_id}",
+            { body: comment_body }.to_json,
+            { "Authorization" => "token #{@token}" }
+          )
+        )
+      end
     end
   end
 end

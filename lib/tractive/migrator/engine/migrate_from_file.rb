@@ -80,6 +80,8 @@ module Migrator
 
             $logger.info("created issue ##{issue_id} for trac ticket #{ticket[:id]}")
 
+            update_comment_ref(issue_id) if request.to_s.include?("Replying to [comment:")
+
             # assert correct issue number
             if issue_id != ticket[:id]
               $logger.warn("mismatch issue ##{issue_id} for ticket #{ticket[:id]}")

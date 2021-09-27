@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe Migrator::Engine do
-  it "should output composed tickets in file" do
+  before(:each) do
     stub_issues_request
     stub_milestone_map_request
     stub_milestone_request
+  end
 
+  it "should output composed tickets in file" do
     buffer = StringIO.new
     filename = "#{Dir.pwd}/dryrun_out.json"
     allow(File).to receive(:new).with(filename, "w+").and_return(buffer)
@@ -21,23 +23,21 @@ RSpec.describe Migrator::Engine do
   end
 
   it "should compose correct mock ticket" do
-    stub_issues_request
-    stub_milestone_map_request
-    stub_milestone_request
-
     mock_ticket = Migrator::Engine.new(options_for_migrator).send(:mock_ticket_details, 1)
 
     expect(mock_ticket[:summary]).to eq("DELETED in trac 1")
   end
 
   it "should compose correct mock ticket when filtering" do
-    stub_issues_request
-    stub_milestone_map_request
-    stub_milestone_request
-
     mock_ticket = Migrator::Engine.new(options_for_migrator(filter: true)).send(:mock_ticket_details, 1)
 
     expect(mock_ticket[:summary]).to eq("Not available in trac 1")
+  end
+
+  it "should generate correct comment body" do
+    comments = test_comments
+    response = Migrator::Engine.new(options_for_migrator).send(:create_update_comment_params, comments[3], comments, 1)
+    expect(response).to eq("_@hassanakbar4_ _commented_\n\n\n___\nReplying to [test/repo#1 (comment:1)](https://github.com/test/repo/issues/1#issuecomment-913628459):")
   end
 
   def file_expected_output(migrator, converter)

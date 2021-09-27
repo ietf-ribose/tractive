@@ -108,5 +108,24 @@ module Migrator
         reporter: "tractive"
       }
     end
+
+    def update_comment_ref(issue_id)
+      comments = @client.issue_comments(@repo, issue_id)
+      comments.each do |comment|
+        next unless comment["body"].include?("Replying to [comment:")
+
+        updated_comment_body = create_update_comment_params(comment, comments, issue_id)
+        @client.update_issue_comment(@repo, comment["id"], updated_comment_body)
+      end
+    end
+
+    def create_update_comment_params(comment, comments, issue_id)
+      body = comment["body"]
+      matcher = body.match(/Replying to \[comment:(?<comment_number>\d+).*\]/)
+      matched_comment = comments[matcher[:comment_number].to_i - 1]
+      body.gsub!(/Replying to \[comment:(\d+).*\]/, "Replying to [#{@repo}##{issue_id} (comment:\\1)](#{matched_comment["html_url"]})")
+
+      body
+    end
   end
 end

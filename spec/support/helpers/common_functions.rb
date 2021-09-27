@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 module Helpers
   module CommonFunctions
@@ -17,6 +17,31 @@ module Helpers
         changeset_base_url: options[:changeset_base_url] || "https://foo.bar/trac/changeset",
         wiki_attachments_url: options[:wiki_attachments_url] || "https://foo.bar/wiki/attachments"
       }
+    end
+
+    def test_comments
+      [
+        { "url" => "https://api.github.com/repos/test/repo/issues/comments/913628459",
+          "html_url" => "https://github.com/test/repo/issues/1#issuecomment-913628459",
+          "issue_url" => "https://api.github.com/repos/test/repo/issues/1",
+          "id" => 913_628_459,
+          "body" => "_@hassanakbar4_ _commented_\n\n\n___\n2.5 hours for proceedings model\n8 hours for iddb work\n2-3 hours for other model work over the weekend" },
+        { "url" => "https://api.github.com/repos/test/repo/issues/comments/913628463",
+          "html_url" => "https://github.com/test/repo/issues/1#issuecomment-913628463",
+          "issue_url" => "https://api.github.com/repos/test/repo/issues/1",
+          "id" => 913_628_463,
+          "body" => "_@hassanakbar4_ _changed status from `new` to `closed`_" },
+        { "url" => "https://api.github.com/repos/test/repo/issues/comments/913628465",
+          "html_url" => "https://github.com/test/repo/issues/1#issuecomment-913628465",
+          "issue_url" => "https://api.github.com/repos/test/repo/issues/1",
+          "id" => 913_628_465,
+          "body" => "_@hassanakbar4_ _changed resolution from `` to `fixed`_" },
+        { "url" => "https://api.github.com/repos/test/repo/issues/comments/913628467",
+          "html_url" => "https://github.com/test/repo/issues/1#issuecomment-913628467",
+          "issue_url" => "https://api.github.com/repos/test/repo/issues/1",
+          "id" => 913_628_467,
+          "body" => "_@hassanakbar4_ _commented_\n\n\n___\nReplying to [comment:1 abc@gmail.com]:" }
+      ]
     end
 
     # TODO: Need to remove this when refactoring migrator class

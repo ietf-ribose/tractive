@@ -26,6 +26,8 @@ class TractiveCommand < Thor
                               desc: "Local git repo path that should be used in revmap generation"
   class_option "revtimestampfile", type: :string, aliases: ["--rev-timestamp-file"],
                                    desc: "File containing svn revision and timestamps that should be used in revmap generation"
+  class_option "revoutfile", type: :string, aliases: ["--revmap-output-file"],
+                             desc: "File to output the generated revmap"
 
   class_option "filter", type: :boolean, aliases: ["-f", "--filter"],
                          desc: "Filter records that you want to import."

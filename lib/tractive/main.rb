@@ -52,7 +52,8 @@ module Tractive
       Tractive::RevmapGenerator.new(
         @opts["svnurl"] || @cfg["svn_url"],
         @opts["gitrepopath"] || @cfg["github"]["local_repo_path"],
-        @opts["revtimestampfile"] || @cfg["revtimestampfile"]
+        @opts["revtimestampfile"] || @cfg["revtimestampfile"],
+        @opts["revoutfile"] || @cfg["revmap_output_file"]
       ).generate
     end
 

@@ -2,7 +2,7 @@
 
 module Tractive
   class RevmapGenerator
-    def initialize(input_file, svn_url, git_repo_path)
+    def initialize(input_file, svn_url, git_repo_path, output_file)
       @input_file = input_file
       @git_repo_path = git_repo_path
       @svn_url = svn_url
@@ -10,7 +10,7 @@ module Tractive
       @duplicate_message_commits = {}
       @last_revision = nil
       @pinwheel = %w[| / - \\]
-      @output_file = "revmap.txt"
+      @output_file = output_file
     end
 
     def generate

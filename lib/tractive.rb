@@ -9,6 +9,7 @@ require_relative "tractive/version"
 require_relative "tractive/main"
 require_relative "tractive/utilities"
 require_relative "tractive/github_api"
+require_relative "tractive/revmap_generator"
 require "json"
 require "logger"
 require "yaml"
@@ -20,6 +21,7 @@ require "singleton"
 require "uri"
 require "pry"
 require "thor"
+require "ox"
 
 module Tractive
   class Error < StandardError; end

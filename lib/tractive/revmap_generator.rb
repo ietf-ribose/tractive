@@ -2,9 +2,9 @@
 
 module Tractive
   class RevmapGenerator
-    def initialize(input_file, svn_url, git_repo_path, output_file)
+    def initialize(input_file, svn_url, git_local_repo_path, output_file = "revmap.txt")
       @input_file = input_file
-      @git_repo_path = git_repo_path
+      @git_local_repo_path = git_local_repo_path
       @svn_url = svn_url
       @duplicate_commits = {}
       @duplicate_message_commits = {}
@@ -14,11 +14,11 @@ module Tractive
     end
 
     def generate
-      line_count = File.read("postfind.fo").scan(/\n/).count
+      line_count = File.read(@input_file).scan(/\n/).count
       i = 0
 
       File.open(@output_file, "w+") do |file|
-        File.foreach("postfind.fo") do |line|
+        File.foreach(@input_file) do |line|
           info = extract_info_from_line(line)
           next if @last_revision == info[:revision]
 
@@ -90,7 +90,7 @@ module Tractive
 
     def commits_from_git_repo(info)
       command = "git rev-list --after=#{info[:timestamp]} --until=#{info[:timestamp]} --committer=#{info[:author]} --all --format='%cd|%h~|~%s' --date=format:'%Y-%m-%dT%H:%M:%SZ'"
-      commits = Dir.chdir(@git_repo_path) do
+      commits = Dir.chdir(@git_local_repo_path) do
         `#{command}`
       end
 

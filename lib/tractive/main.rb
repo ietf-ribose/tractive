@@ -51,8 +51,8 @@ module Tractive
 
       Tractive::RevmapGenerator.new(
         @opts["svnurl"] || @cfg["svn_url"],
-        @opts["gitrepopath"] || @cfg["github"]["local_repo_path"],
-        @opts["revtimestampfile"] || @cfg["revtimestampfile"],
+        @opts["gitlocalrepopath"] || @cfg["github"]["local_repo_path"],
+        @opts["revtimestampfile"] || @cfg["rev_timestamp_file"],
         @opts["revoutfile"] || @cfg["revmap_output_file"]
       ).generate
     end
@@ -89,8 +89,8 @@ module Tractive
 
       required_options = {}
       required_options["--svn-url"] = options["svnurl"] || @cfg["svn_url"]
-      required_options["--git-repo-path"] = options["gitrepopath"] || @cfg["github"]["local_repo_path"]
-      required_options["--rev-timestamp-file"] = options["revtimestampfile"] || @cfg["revtimestampfile"]
+      required_options["--git-repo-path"] = options["gitlocalrepopath"] || @cfg["github"]["local_repo_path"]
+      required_options["--rev-timestamp-file"] = options["revtimestampfile"] || @cfg["rev_timestamp_file"]
 
       return if options.values.compact.empty?
 

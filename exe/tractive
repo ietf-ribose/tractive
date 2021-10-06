@@ -18,7 +18,7 @@ class TractiveCommand < Thor
   class_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
                        desc: "Import without safety-checking issue numbers."
 
-  class_option "generaterevmap", type: :string, aliases: ["-G", "--generate-revmap"],
+  class_option "generaterevmap", type: :boolean, aliases: ["-G", "--generate-revmap"],
                                  desc: "Generate a mapping from svn revision number to git sha hash."
   class_option "svnurl", type: :string, aliases: ["--svn-url"],
                          desc: "Svn url that should be used in revmap generation"

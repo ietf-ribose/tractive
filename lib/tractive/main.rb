@@ -22,6 +22,8 @@ module Tractive
         create_attachment_exporter_script
       elsif @opts[:exportattachments]
         export_attachments
+      elsif @opts[:generaterevmap]
+        generate_revmap_file
       else
         migrate
       end
@@ -41,6 +43,18 @@ module Tractive
 
     def create_attachment_exporter_script
       Tractive::AttachmentExporter.new(@cfg, @db).generate_script
+    end
+
+    def generate_revmap_file
+      # verfiry options and .fo file is present
+      verify_revmap_generator_options!(@opts)
+
+      Tractive::RevmapGenerator.new(
+        @opts["svnurl"] || @cfg["svn_url"],
+        @opts["gitlocalrepopath"] || @cfg["github"]["local_repo_path"],
+        @opts["revtimestampfile"] || @cfg["rev_timestamp_file"],
+        @opts["revoutfile"] || @cfg["revmap_output_file"]
+      ).generate
     end
 
     private
@@ -68,6 +82,19 @@ module Tractive
       return if !options[:filter] || missing_options.empty?
 
       warn_and_exit("missing filter options #{missing_options.values}", 1)
+    end
+
+    def verify_revmap_generator_options!(options)
+      return unless options[:generaterevmap]
+
+      required_options = {}
+      required_options["--svn-url"] = options["svnurl"] || @cfg["svn_url"]
+      required_options["--git-repo-path"] = options["gitlocalrepopath"] || @cfg["github"]["local_repo_path"]
+      required_options["--rev-timestamp-file"] = options["revtimestampfile"] || @cfg["rev_timestamp_file"]
+
+      return if options.values.compact.empty?
+
+      warn_and_exit("missing revmap generator options (--svn-url, --git-repo-path, --rev-timestamp-file).\nProvide these options here or in the config file.", 1)
     end
 
     def warn_and_exit(message, exit_code)

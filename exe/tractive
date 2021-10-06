@@ -17,6 +17,18 @@ class TractiveCommand < Thor
                                     desc: "Export attachments from the database according to config.yaml"
   class_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
                        desc: "Import without safety-checking issue numbers."
+
+  class_option "generaterevmap", type: :boolean, aliases: ["-G", "--generate-revmap"],
+                                 desc: "Generate a mapping from svn revision number to git sha hash."
+  class_option "svnurl", type: :string, aliases: ["--svn-url"],
+                         desc: "Svn url that should be used in revmap generation"
+  class_option "gitlocalrepopath", type: :string, aliases: ["--git-local-repo-path"],
+                                   desc: "Local git repo path that should be used in revmap generation"
+  class_option "revtimestampfile", type: :string, aliases: ["--rev-timestamp-file"],
+                                   desc: "File containing svn revision and timestamps that should be used in revmap generation"
+  class_option "revoutfile", type: :string, aliases: ["--revmap-output-file"],
+                             desc: "File to output the generated revmap"
+
   class_option "filter", type: :boolean, aliases: ["-f", "--filter"],
                          desc: "Filter records that you want to import."
   class_option "columnname", type: :string, aliases: ["--column-name"],
@@ -25,6 +37,7 @@ class TractiveCommand < Thor
                            desc: "Operator for filter."
   class_option "columnvalue", type: :string, aliases: ["--column-value"],
                               desc: "Value of the column to filter."
+
   class_option "importfromfile", type: :string, aliases: ["-I", "--import-from-file"],
                                  desc: "Import issues from a json file"
   class_option "info", type: :boolean, aliases: ["-i", "--info"],

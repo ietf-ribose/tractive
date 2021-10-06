@@ -45,6 +45,16 @@ module Tractive
           str
         end
       end
+
+      def svn_log(url, flags = {})
+        command = "svn log #{url}"
+        flags.each do |key, value|
+          command += " #{key}"
+          command += " #{value}" if value
+        end
+
+        `#{command}`
+      end
     end
   end
 end

@@ -60,7 +60,7 @@ module Migrator
             while response["status"] == "pending"
               sleep 1
               $logger.info("Checking import status: #{response["id"]}")
-              $logger.info("you can manually check: #{response["url"]}")
+              $logger.debug("you can manually check: #{response["url"]}")
               response = @client.issue_import_status(@repo, response["id"])
             end
 

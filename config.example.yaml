@@ -7,11 +7,16 @@ trac:
 github:
   repo: 'mavam/test'
   token: '49b1c8d34401abc06040cf64bf9a8bfed5f30ca9'
+  local_repo_path: '/Users/user/repo-git'
 
 revmapfile: ../foobar-revmap.txt
+rev_timestamp_file: ./revtimestamp.fo
+revmap_output_file: revmap.txt
 
-# make sure not to typo the GitHub username as the issue will fail to create if a ticket's owner (assignee) has a valid mapping below
+# make sure not to typo the GitHub username as the issue will fail to create if a ticket's
+# owner (assignee) has a valid mapping below and that user does not exist in github
 users:
+  # <email/username>: <username on github>
   matthias: mavam
   vallenti: mavam
 
@@ -56,5 +61,5 @@ attachments:
   url: "https://gitlab.com/foobar/foobar_attach/raw/develop/from_trac"
   # export-folder is relative to export-script
   export_folder: "./attachments"
-  export_script: .//attachments.sh
+  export_script: ./attachments.sh
 

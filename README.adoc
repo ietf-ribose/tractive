@@ -2,15 +2,14 @@
 
 == Purpose
 
-Tractive is a tool that helps you migrate Trac instances to modern Git
-management platforms like GitHub and GitLab.
+Tractive is a tool that helps you migrate Trac instances to GitHub.
 
 Specifically, it converts http://trac.edgewall.org[Trac] tickets into
 GitHub Issues by accessing the Trac database's issues and posts the change
 history of each ticket as comments.
 
 Tractive is written using re-tooled code based on the
-https://github.com/mavatractive[trac-hub] migration tool which is excellent.
+https://github.com/mavam/trac-hub[trac-hub] migration tool which is excellent.
 
 NOTE: This tool was created in order to perform Trac-to-GitHub migration
 for the IETF.
@@ -26,23 +25,52 @@ $ gem install tractive
 
 == Usage
 
-=== Executables
+==== Prerequisites
 
-The following executables are provided on install.
+2.  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git[git]
+3.  a github account
 
-* `tractive`: the main Tractive executable, run `tractive -h` for detailed
-  usage
+==== How to use it
 
-The following executables are temporary (to be removed):
+1.  Install `Tractive`
 
-* `tractive-get-mysql-attachments`: shell script that copies out attachments
-from a Trac database via mysql
+        gem install tractive
 
-* `tractive-get-sqlite3-attachments`: shell script that copies out attachments
-from a Trac database via sqlite
+2.  Validate the config file
+3.  Run Tractive
 
-* `tractive-info`: shell script that provides basic information about a Trac
-database
+        tractive
+
+=== Command Line Options
+
+|===
+|         **Option**          |   **Description**                                                                         |  **Type**
+|  -A, --attachment-exporter  |      Generate an attachment exporter script according to config.yaml                      |   String
+|  -a, --attachment-url       |      If attachment files are reachable via a URL we reference this here                   |   String
+|  -c                         |      Set the configuration file. Default: `tractive.config.yaml`                          |   String
+|  -d, --dry-run              |      Write data to a file instead of pushing it to github                                 |   Boolean
+|  -e, --export-attachments   |      Export attachments from the database according to config.yaml                        |   String
+|  -F, --fast-import          |      Import without safety-checking issue numbers.                                        |   Boolean
+|  -f, --filter               |      Filter records that you want to import.                                              |   Boolean
+|  --column-name              |      Name of the column to filter.                                                        |   String
+|  --operator                 |      Operator for filter.                                                                 |   String
+|  --column-value             |      Value of the column to filter.                                                       |   String
+|  -G, --generate-revmap      |      Generate a mapping from svn revision number to git sha hash.                         |   Boolean
+|  --svn-url                  |      Svn url that should be used in revmap generation                                     |   String
+|  --git-local-repo-path      |      Local git repo path that should be used in revmap generation                         |   String
+|  --rev-timestamp-file       |      File containing svn revision and timestamps that should be used in revmap generation |   String
+|  --revmap-output-file       |      File to output the generated revmap                                                  |   String
+|  -h, help                   |      Show help about tractive, or you can provide a command to know more about a single command |
+|  -I, --import-from-file     |      Import issues from a json file                                                       |   String
+|  -i, --info                 |      Reports existing labels and users in the database                                    |   Boolean
+|  -L, --log-file             |      Name of the logfile to output logs to.                                               |   String
+|  -M, --mockup               |      Import from 0 and mocking tickets deleted on trac                                    |   Boolean
+|  -o, --opened-only          |      Skips the import of closed tickets                                                   |   Boolean
+|  -r, --rev-map-file         |      Allows to specify a commit revision mapping FILE                                     |   String
+|  -S, --single-post          |      Put all issue comments in the first message.                                         |   Boolean
+|  -s, --start-at             |      Start migration from ticket with number <ID>                                         |   String
+|  -v, --verbose              |      Verbose mode                                                                         |   Boolean
+|===
 
 === Getting started
 
@@ -171,14 +199,14 @@ credentials are known or can't be used and are thus not stored in the
 please use the `github` `logins` section in the config instead.
 
 The section `milestones` contains a mapping of milestones as it is
-generated by trac-hub -i
+generated by tractive -i
 
 The section `attachments` specifies how you want to grab attachments. In
 particular the `attachment_uri` supports the case that the `imagename` is
 embedded in the uri:
 
 The imagename is built of ticket_id and image filename. `exportfolder`
-ist the folder where the images will be downloaded to on the trac
+is the folder where the images will be downloaded to on the trac
 system.
 
 ``` {.yaml}
@@ -197,121 +225,6 @@ this into the config file and adapt it as required.
 
 it also produces a shell script which in invokes trac-admin to download
 the attachments from trac.
-
-
-== TODO: information from the trac-hub README to be migrated
-
-Major changes are:
-
-1.  use docker to run the dependencies (in particular ruby, mysql)
-2.  tweak the layout of the ticets according to our taste
-3.  transfer some information to labels and some to the ticket body
-    (called badges in the script)
-4.  maintain the ticket id even of they are not consecutive in trac. For
-    this we create dummy tickets
-5.  handle milestones
-6.  handle attachments
-7.  drive it all by config file. Rename the config file to
-    `tractive.config.yaml`; search the config file in the parent folder
-    and in the current folder.
-
-=== Getting started
-
-==== Prerequisites
-
-1.  docker
-2.  access to the trac-environment. This script needs direct access to
-    the svn repository as well as the trac-env. It does not use trac
-    api.
-3.  git
-4.  a github account
-
-==== how to use it
-
-1.  install docker
-2.  create a working folder structure like this
-
-        trac-to-github
-          +- trac-env           # this is the trac-environment from the source
-          +- trac-hub           # created by git clone of this project
-          +- foobar-git         # the corresponding git repository
-                                # created by `git-svn clone <svn-url>/trunk foobar-git`
-
-3.  clone this project
-4.  cd to this project
-5.  start mysql by
-
-    'docker-compose up mysql'
-
-    you can then access the database server under `localhost:3306`
-
-6.  import the trac to a new database on this server, e.g. `foobar`
-
-    ensure the database collation
-
-    `ALTER DATABASE`foobar`CHARACTER SET utf8 COLLATE utf8_bin;`
-
-7.  copy the trac environment to a sibling of this project. This will be
-    needed to extract the attachments.
-
-8.  create parts for the config file
-
-    `docker-compose run --rm trac-hub -i > x.txt`
-
-9.  create trac-hub.config.yaml`based on`trac-hub.config.yaml.example\`
-
-10. adjust settings in `trac-hub.config.yaml`. Thereby use parts of
-    `x.txt`
-
-11. convert the svn to git
-
-    `git-svn clone <svn-url>/trunk foobar-git`
-
-12. create the project on github and push foobar-git by following the
-    instructions from github
-
-    ``` {.bash}
-    git remote add origin https://github.com/bwl21/foobar.git
-    git push -u origin master
-    ```
-
-13. create an app key in `https://github.com/settings/apps/new` enter
-    the key to `trac-hub.config.yaml`
-
-14. create the revmap by
-
-    `git svn log --show-commit --oneline` foobar-git \> revmap.txt
-
-15. create the attachment exporter
-
-    `docker-compose run --rm trac-hub -A`\
-    you will see a message about the crated file
-
-16. now run the converter
-
-    `docker-compose run --rm trac-hub --M -s 0`
-
-17. If something goes wrong, restart the the converter
-
-    `docker-compose run --rm trac-hub --M -s <next free id>`
-
-==== Bonus :-)
-
-You can run a trac-instance - without svn - but to inspect details by
-
-    `docker-compose up tracd`
-
-you can run a gitlab-instance
-
-    'docker-compose up gitlab`
-
-I managed to import the converted github project in to this local
-instance for testing purposes.
-
-==== future
-
-May be we can add direct gitlab support to trac-hub
-
 
 == Development
 

@@ -73,6 +73,7 @@ module Tractive
         if commits_hash[message]
           commits_hash[message] << sha
         else
+          $logger.warn("'#{sha}' has same timestamp, commiter and commit messgae as '#{commits_hash[message]}'") unless commits_hash[message].nil?
           commits_hash[message] = [sha]
         end
       end

@@ -42,6 +42,8 @@ class TractiveCommand < Thor
                                  desc: "Import issues from a json file"
   class_option "info", type: :boolean, aliases: ["-i", "--info"],
                        desc: "Reports existing labels and users in the database"
+  class_option "logfile", type: :string, aliases: ["-L", "--log-file"],
+                          desc: "Name of the logfile to output logs to."
   class_option "mockdeleted", type: :boolean, aliases: ["-M", "--mockup"],
                               desc: "Import from 0 and mocking tickets deleted on trac"
   class_option "openedonly", type: :boolean, aliases: ["-o", "--opened-only"],

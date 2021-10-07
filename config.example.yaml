@@ -5,7 +5,7 @@ trac:
   ticketbaseurl: https://foo.bar/trac/foobar/ticket
 
 github:
-  repo: 'mavam/test'
+  repo: 'tractive/test'
   token: '49b1c8d34401abc06040cf64bf9a8bfed5f30ca9'
   local_repo_path: '/Users/user/repo-git'
 
@@ -17,8 +17,8 @@ revmap_output_file: revmap.txt
 # owner (assignee) has a valid mapping below and that user does not exist in github
 users:
   # <email/username>: <username on github>
-  matthias: mavam
-  vallenti: mavam
+  matthias@tractive.com: matthias
+  vallenti: tractive
 
 labels:
   type:
@@ -58,7 +58,7 @@ milestones:
     :description: ''
 
 attachments:
-  url: "https://gitlab.com/foobar/foobar_attach/raw/develop/from_trac"
+  url: "https://github.com/foobar/raw/develop/from_tractive"
   # export-folder is relative to export-script
   export_folder: "./attachments"
   export_script: ./attachments.sh

@@ -33,18 +33,23 @@ $ gem install tractive
 ==== How to use it
 
 1.  Install `Tractive`:
-
-        gem install tractive
+[source,sh]
+----
+    $ gem install tractive
+----
 
 2.  Validate the config file.
 3.  Run Tractive:
-
-        tractive <options>
+[source,sh]
+----
+    $ tractive <options>
+----
 
 === Command Line Options
 
+[cols="3,5,2",options="header"]
 |===
-|         **Option**          |   **Description**                                                                         |  **Type**
+|           Option            |     Description                                                                           |    Type
 |  -A, --attachment-exporter  |      Generate an attachment exporter script according to config.yaml.                     |   String
 |  -a, --attachment-url       |      Add URL to Cloud Host where attachment files are available.                          |   String
 |  -c                         |      Set the configuration file. Default: `tractive.config.yaml`.                         |   String
@@ -77,47 +82,55 @@ $ gem install tractive
 Copy the link:config.example.yaml[example YAML configuration] and adapt it
 as needed:
 
+[source,sh]
+----
     cp config.example.yaml config.yaml
     vi config.yaml
+----
 
 Thereafter just invoke `tractive`:
-
+[source,sh]
+----
     tractive
-
-If this fails with an error, make sure to have a look at the
-[Dependencies](#dependencies) section.
+----
 
 By default, `tractive` assumes the file `config.yaml` in the same
 directory as the script. You can also specify the configuration file on
 the command line:
-
+[source,sh]
+----
     tractive -c foo.yaml
-
+----
 Add the `-v` flag for more verbose output:
-
+[source,sh]
+----
     tractive -v
-
+----
 Add the `-o` flag to only import the tickets that are not in a `closed`
 status:
-
+[source,sh]
+----
     tractive -o
-
+----
 To resume the migration at a given Trac ticket ID, use `-s`:
-
+[source,sh]
+----
     tractive -s 42
-
+----
 If you want all Trac comments/changes to be compiled into a single post
 on the github issue:
-
+[source,sh]
+----
     tractive -S
-
+----
 If you migrate to a bare github, you might want want to ensure that the
 ticket ids do not change. In this case you can create dummy tickets
 for IDs missing in Trac (because they were deleted). The process might
 interrupt, so you can still specify the first number to transfer.
-
+[source,sh]
+----
     tractive -M -s 601
-
+----
 NOTE: When converting your Trac setup to github, it is prudent to
 first try the migration into a test repository which you can delete
 afterwards. If this worked out fine and delivered the expected results,
@@ -136,9 +149,10 @@ import the issues on a test-repository and rename the repository to the
 final name when the import went satisfactory.
 
 You can disable this check by using the *fast* option:
-
+[source,sh]
+----
     tractive -F
-
+----
 This will also make your import much faster (but after the script has
 finished, it can still take some time until the issues are created on
 github).
@@ -147,16 +161,18 @@ Using this option is obligatory, if you know that the ticket IDs will
 not match, e.g. because non-Trac tickets already exist. In this case,
 you must also specify the ID of the first ticket to be migrated (even if
 it is 1):
-
+[source,sh]
+----
     tractive -F -s 1
-
+----
 If you start to import in a fresh github project, tractive can create
 dummy tickets issue numbers not available in trac. This even works if
 you want to run it multiple times. In this case you need to provide -s
 for the first id not available in Github.
-
+[source,sh]
+----
     tractive -M
-
+----
 == Details
 
 === Technology
@@ -214,26 +230,15 @@ attachments:
 ```
 
 You can use
-
+[source,sh]
+----
     tractive -i
-
+----
 to produce a yaml file with labels, users, milestones etc. You can copy
 this into the config file and adapt it as required.
 
 it also produces a shell script which in invokes `trac-admin` to download
 the attachments from trac.
-
-== Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run
-`rake spec` to run the tests. You can also run `bin/console` for an interactive
-prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To
-release a new version, update the version number in `version.rb`, and then run
-`bundle exec rake release`, which will create a git tag for the version, push
-git commits and the created tag, and push the `.gem` file to
-https://rubygems.org[rubygems.org].
 
 == Contributing
 

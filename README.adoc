@@ -5,14 +5,14 @@
 Tractive is a tool that helps you migrate Trac instances to GitHub.
 
 Specifically, it converts http://trac.edgewall.org[Trac] tickets into
-GitHub Issues by accessing the Trac database's issues and posts the change
+https://github.com/[GitHub] Issues by accessing the Trac database's issues and posts the change
 history of each ticket as comments.
 
 Tractive is written using re-tooled code based on the
 https://github.com/mavam/trac-hub[trac-hub] migration tool which is excellent.
 
 NOTE: This tool was created in order to perform Trac-to-GitHub migration
-for the IETF.
+for the https://www.ietf.org/[IETF].
 
 == Installation
 
@@ -27,49 +27,49 @@ $ gem install tractive
 
 ==== Prerequisites
 
-2.  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git[git]
-3.  a github account
+2.  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git[Git]
+3.  A https://github.com/[GitHub] Account
 
 ==== How to use it
 
-1.  Install `Tractive`
+1.  Install `Tractive`:
 
         gem install tractive
 
-2.  Validate the config file
-3.  Run Tractive
+2.  Validate the config file.
+3.  Run Tractive:
 
-        tractive
+        tractive <options>
 
 === Command Line Options
 
 |===
 |         **Option**          |   **Description**                                                                         |  **Type**
-|  -A, --attachment-exporter  |      Generate an attachment exporter script according to config.yaml                      |   String
-|  -a, --attachment-url       |      If attachment files are reachable via a URL we reference this here                   |   String
-|  -c                         |      Set the configuration file. Default: `tractive.config.yaml`                          |   String
-|  -d, --dry-run              |      Write data to a file instead of pushing it to github                                 |   Boolean
-|  -e, --export-attachments   |      Export attachments from the database according to config.yaml                        |   String
+|  -A, --attachment-exporter  |      Generate an attachment exporter script according to config.yaml.                     |   String
+|  -a, --attachment-url       |      Add URL to Cloud Host where attachment files are available.                          |   String
+|  -c                         |      Set the configuration file. Default: `tractive.config.yaml`.                         |   String
+|  -d, --dry-run              |      Write data to a file instead of pushing it to Github.                                |   Boolean
+|  -e, --export-attachments   |      Export attachments from the database according to config.yaml.                       |   String
 |  -F, --fast-import          |      Import without safety-checking issue numbers.                                        |   Boolean
-|  -f, --filter               |      Filter records that you want to import.                                              |   Boolean
+|  -f, --filter               |      Filter records that you want to import. Options of `column-name`, `operator` and `column-value` are required for filtering.|   Boolean
 |  --column-name              |      Name of the column to filter.                                                        |   String
-|  --operator                 |      Operator for filter.                                                                 |   String
+|  --operator                 |      Operator for filter. Example of operators include `LIKE` and `=`.                    |   String
 |  --column-value             |      Value of the column to filter.                                                       |   String
-|  -G, --generate-revmap      |      Generate a mapping from svn revision number to git sha hash.                         |   Boolean
-|  --svn-url                  |      Svn url that should be used in revmap generation                                     |   String
-|  --git-local-repo-path      |      Local git repo path that should be used in revmap generation                         |   String
-|  --rev-timestamp-file       |      File containing svn revision and timestamps that should be used in revmap generation |   String
-|  --revmap-output-file       |      File to output the generated revmap                                                  |   String
-|  -h, help                   |      Show help about tractive, or you can provide a command to know more about a single command |
-|  -I, --import-from-file     |      Import issues from a json file                                                       |   String
-|  -i, --info                 |      Reports existing labels and users in the database                                    |   Boolean
-|  -L, --log-file             |      Name of the logfile to output logs to.                                               |   String
-|  -M, --mockup               |      Import from 0 and mocking tickets deleted on trac                                    |   Boolean
-|  -o, --opened-only          |      Skips the import of closed tickets                                                   |   Boolean
-|  -r, --rev-map-file         |      Allows to specify a commit revision mapping FILE                                     |   String
+|  -G, --generate-revmap      |      Generate a mapping from svn revision number to git sha hash. The options of `svn-url`, `git-local-repo-path`, `rev-timestamp-file` and `revmap-output-file` are required with this option. |   Boolean
+|  --svn-url                  |      Svn url that should be used in revmap generation.                                    |   String
+|  --git-local-repo-path      |      Local git repo path that should be used in revmap generation.                        |   String
+|  --rev-timestamp-file       |      File containing svn revision and timestamps that should be used in revmap generation.|   String
+|  --revmap-output-file       |      File to output the generated revmap.                                                 |   String
+|  -h, help                   |      Show help about tractive, or you can provide a command to know more about a single command. | --
+|  -I, --import-from-file     |      Import issues from a json file.                                                      |   String
+|  -i, --info                 |      Reports existing labels and users in the database.                                   |   Boolean
+|  -L, --log-file             |      Name of the logfile to output logs.                                                  |   String
+|  -M, --mockup               |      Create mocked closed issues on Github for deleted tickets on trac.                   |   Boolean
+|  -o, --opened-only          |      Skips the import of closed tickets.                                                  |   Boolean
+|  -r, --rev-map-file         |      Allows to specify a commit revision mapping FILE.                                    |   String
 |  -S, --single-post          |      Put all issue comments in the first message.                                         |   Boolean
-|  -s, --start-at             |      Start migration from ticket with number <ID>                                         |   String
-|  -v, --verbose              |      Verbose mode                                                                         |   Boolean
+|  -s, --start-at             |      Start migration from ticket with number <ID>.                                        |   String
+|  -v, --verbose              |      Verbose mode.                                                                        |   Boolean
 |===
 
 === Getting started
@@ -78,7 +78,7 @@ Copy the link:config.example.yaml[example YAML configuration] and adapt it
 as needed:
 
     cp config.example.yaml config.yaml
-    vim config.yaml
+    vi config.yaml
 
 Thereafter just invoke `tractive`:
 
@@ -180,9 +180,6 @@ includes all Trac-related configuration options. The database URL
 follows the scheme described
 http://sequel.jeremyevans.net/rdoc/classes/Sequel.html#method-c-connect[here].
 
-In order to use databases other than sqlite, you may have to add them to
-the `Gemfile`. For mysql databases, you should use the mysql2 adapter.
-
 The section `github` includes the repository to migrate as well an API
 token which can be generated under
 https://github.com/settings/tokens[Settings > Personal Access Tokens].
@@ -211,7 +208,7 @@ system.
 
 ``` {.yaml}
 attachments:
-  attachment_uri: https://gitlab.com/mynamespace/myrepo/raw/master/from_trac/#imagename#?inline=false
+  url: https://abc.com/raw-attachment/ticket
   export_folder: ./attachments
   export_script: attachments.sh
 ```
@@ -223,7 +220,7 @@ You can use
 to produce a yaml file with labels, users, milestones etc. You can copy
 this into the config file and adapt it as required.
 
-it also produces a shell script which in invokes trac-admin to download
+it also produces a shell script which in invokes `trac-admin` to download
 the attachments from trac.
 
 == Development
@@ -244,17 +241,17 @@ Bug reports and pull requests are welcome on GitHub at
 https://github.com/ietf-ribose/tractive. This project is intended to be a safe,
 welcoming space for collaboration, and contributors are expected to adhere to
 the
-https://github.com/ietf-ribose/tractive/blob/master/CODE_OF_CONDUCT.md[code of conduct].
+https://github.com/ietf-ribose/tractive/blob/main/CODE_OF_CONDUCT.md[code of conduct].
 
 == Code of Conduct
 
 Everyone interacting in the Tractive project's codebases, issue trackers, chat
 rooms and mailing lists is expected to follow the
-https://github.com/ietf-ribose/tractive/blob/master/CODE_OF_CONDUCT.md[code of conduct].
+https://github.com/ietf-ribose/tractive/blob/main/CODE_OF_CONDUCT.md[code of conduct].
 
 == License
 
 Tractive and its supporting code (from trac-hub) are licensed under a
 link:LICENSE.md[BSD-style licence].
 
-Tractive is funded and developed by Ribose Inc.
+Tractive is funded and developed by https://github.com/riboseinc[Ribose Inc.]

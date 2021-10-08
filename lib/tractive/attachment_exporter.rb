@@ -10,24 +10,24 @@ module Tractive
       @db = db
     end
 
-    # produce an shell script to be invoked
-    # within the tracd container to export the attachmets
+    # Produce a shell script to export attachments, to be executed on the Trac
+    # instance
     def generate_script
       outfile   = @cfg.dig("attachments", "export_script")
       outfolder = @cfg.dig("attachments", "export_folder")
 
-      raise("mising attachements/export_script entry in configuration") unless outfile
-      raise("mising attachements/export_folder entry in configuration") unless outfolder
+      raise("missing attachments.export_script entry in configuration") unless outfile
+      raise("missing attachments.export_folder entry in configuration") unless outfolder
 
-      attachments   = Attachment.tickets_attachments.for_export
-      exportcommads = attachments.map do |attachment|
+      attachments     = Attachment.tickets_attachments.for_export
+      export_commands = attachments.map do |attachment|
         %(mkdir -p #{outfolder}/#{attachment[:id]}
         trac-admin /trac attachment export ticket:#{attachment[:id]} '#{attachment[:filename]}' > '#{outfolder}/#{attachment[:id]}/#{attachment[:filename]}')
       end
 
       File.open(outfile, "w") do |f|
         f.puts("mkdir -p #{outfolder}")
-        f.puts(exportcommads.join("\n"))
+        f.puts(export_commands.join("\n"))
       end
 
       $logger.info "created attachment exporter in #{outfile}"

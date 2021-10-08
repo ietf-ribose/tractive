@@ -1,25 +1,37 @@
+# Trac-specific information
 trac:
+  # Trac database location
   database: sqlite://db/trac.db
   # database: mysql2://user:password@host:port/database
   # database: mysql2://root:password@mysql:3306/foobar
-  ticketbaseurl: https://foo.bar/trac/foobar/ticket
 
+  # URL of the Trac "tickets" interface
+  ticketbaseurl: https://example.org/trac/foobar/ticket
+
+# GitHub-specific information
 github:
-  repo: 'tractive/test'
-  token: '49b1c8d34401abc06040cf64bf9a8bfed5f30ca9'
+  # Target GitHub organization and repo name
+  repo: 'example-org/target-repository'
+
+  # GitHub user Personal Access Token
+  token: 'ghp_fpsc4de1f0c46e01576810740c9242097cba4619486'
+
+  # Local path to migrated Git repository
   local_repo_path: '/Users/user/repo-git'
 
-revmapfile: ../foobar-revmap.txt
-rev_timestamp_file: ./revtimestamp.fo
-revmap_output_file: revmap.txt
+  # RevMap file to use for migration
+  revmap_path: ./example-revmap.txt
 
-# make sure not to typo the GitHub username as the issue will fail to create if a ticket's
-# owner (assignee) has a valid mapping below and that user does not exist in github
+# User map: Trac username to GitHub username
+# - Please ensure the GitHub usernames are correct and valid, otherwise
+#   the issue migration process will fail if the GitHub user specified as owner
+#   (assignee) does not exist.
 users:
-  # <email/username>: <username on github>
-  matthias@tractive.com: matthias
-  vallenti: tractive
+  # <Trac email or username>: <username on GitHub>
+  matthew@example.org: example-matt
+  valencia: example-vale
 
+# Label mapping from Trac ticket to GitHub label
 labels:
   type:
     Feature Request:    feature request
@@ -51,15 +63,14 @@ labels:
     '1.4':              v1.4
 
 milestones:
-  '2014_02':
-    :name: '2014_02'
-    :due: 1392595200000000
-    :completed: 1415959156000000
-    :description: ''
+  '2021_02':
+    name: '2021_02'
+    due: 1392595200000000
+    completed: 1415959156000000
+    description: ''
 
 attachments:
-  url: "https://github.com/foobar/raw/develop/from_tractive"
+  url: "https://github.com/example-org/raw/main/from_tractive"
   # export-folder is relative to export-script
   export_folder: "./attachments"
   export_script: ./attachments.sh
-

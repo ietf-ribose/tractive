@@ -33,8 +33,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Matthias Vallentin's BSD 3-Clause License
------------------------------------------
+Matthias Vallentin's BSD 3-Clause License for code imported from `trac-hub`
+---------------------------------------------------------------------------
 
 Copyright (c) Matthias Vallentin
 

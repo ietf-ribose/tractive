@@ -23,6 +23,7 @@ for the https://www.ietf.org/[IETF].
 . https://git-scm.com/book/en/v2/Getting-Started-Installing-Git[Git]
 . http://www.catb.org/~esr/reposurgeon/[`reposurgeon`], which works on Linux
   (manual compile recommended for the latest versions) and macOS (use Homebrew)
+. `trac-admin` must be installed in order to extract Trac attachments
 
 === Steps
 

@@ -19,7 +19,6 @@ require "sequel"
 require "set"
 require "singleton"
 require "uri"
-require "pry"
 require "thor"
 require "ox"
 

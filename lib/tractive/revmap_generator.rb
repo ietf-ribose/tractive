@@ -2,10 +2,11 @@
 
 module Tractive
   class RevmapGenerator
-    def initialize(input_file, svn_url, git_local_repo_path, output_file = "revmap.txt")
+    def initialize(input_file, svn_url, svn_local_path, git_local_repo_path, output_file = "revmap.txt")
       @input_file = input_file
       @git_local_repo_path = git_local_repo_path
       @svn_url = svn_url
+      @svn_local_path = svn_local_path
       @duplicate_commits = {}
       @duplicate_message_commits = {}
       @last_revision = nil
@@ -84,7 +85,7 @@ module Tractive
     end
 
     def commit_message_from_svn(revision)
-      svn_logs = Tractive::Utilities.svn_log(@svn_url, "-r": revision, "--xml": "")
+      svn_logs = Tractive::Utilities.svn_log(@svn_url, @svn_local_path, "-r": revision, "--xml": "")
       h = Ox.load(svn_logs, mode: :hash)
       h[:log][:logentry][3][:msg]
     end

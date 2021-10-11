@@ -53,6 +53,8 @@ class TractiveCommand < Thor
   desc "generate-revmap <OPTIONS>", "Generate a mapping from svn revision number to git sha hash."
   method_option "svnurl", type: :string, aliases: ["--svn-url"],
                           desc: "Svn url that should be used in revmap generation"
+  method_option "svnlocalpath", type: :string, aliases: ["--svn-local-path"],
+                                desc: "Local SVN repo path"
   method_option "gitlocalrepopath", type: :string, aliases: ["--git-local-repo-path"],
                                     desc: "Local git repo path that should be used in revmap generation"
   method_option "revtimestampfile", type: :string, aliases: ["--rev-timestamp-file"],
@@ -65,6 +67,7 @@ class TractiveCommand < Thor
     Tractive::RevmapGenerator.new(
       options["revtimestampfile"],
       options["svnurl"],
+      options["svnlocalpath"],
       options["gitlocalrepopath"],
       options["revoutputfile"]
     ).generate
@@ -87,7 +90,7 @@ class TractiveCommand < Thor
   no_commands do
     def verify_revmap_generator_options!(options)
       required_options = {}
-      required_options["--svn-url"] = options["svnurl"]
+      required_options["--svn-url OR --svn-local-path"] = options["svnurl"] || options["svnlocalpath"]
       required_options["--git-local-repo-path"] = options["gitlocalrepopath"]
       required_options["--rev-timestamp-file"] = options["revtimestampfile"]
       required_options["--revmap-output-file"] = options["revoutputfile"]

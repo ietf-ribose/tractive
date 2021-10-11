@@ -182,8 +182,6 @@ tractive generate-revmap \
   --revmap-output-file <output path of RevMap.txt>
 ----
 
-All these following options are required.
-
 The generated RevMap will be then used in a Tractive run so that the migrated
 issues and commits will replace references to SVN revisions with the
 corresponding Git commit SHA, enabling GitHub to expose those linkages in the
@@ -199,6 +197,12 @@ user interface.
 (required) SVN repository URL that should be used in RevMap generation.
 The URL must start with the `http://` or `https://` prefix (not the `svn://`
 prefix).
+| String
+
+| `--svn-local-path`
+| SVN local repository path that should be used in RevMap generation. You can clone
+the svn repo locally and provide its path if the svn url is not public. (`--svn-url` is
+required if this option is given).
 | String
 
 | `--rev-timestamp-file`

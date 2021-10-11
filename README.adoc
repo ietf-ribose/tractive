@@ -201,7 +201,7 @@ prefix).
 
 | `--svn-local-path`
 | SVN local repository path that should be used in RevMap generation. You can clone
-the svn repo locally and provide its path if the svn url is not public. (`--svn-url` is
+the svn repo locally and provide its local path if the svn repository is offline. (`--svn-url` is not
 required if this option is given).
 | String
 

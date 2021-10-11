@@ -49,12 +49,7 @@ module Tractive
       # verfiry options and .fo file is present
       verify_revmap_generator_options!(@opts)
 
-      Tractive::RevmapGenerator.new(
-        @opts["revtimestampfile"] || @cfg["rev_timestamp_file"],
-        @opts["svnurl"] || @cfg["svn_url"],
-        @opts["gitlocalrepopath"] || @cfg["github"]["local_repo_path"],
-        @opts["revoutputfile"] || @cfg["revmap_output_file"]
-      ).generate
+
     end
 
     private
@@ -82,24 +77,6 @@ module Tractive
       return if !options[:filter] || missing_options.empty?
 
       warn_and_exit("missing filter options #{missing_options.values}", 1)
-    end
-
-    def verify_revmap_generator_options!(options)
-      return unless options[:generaterevmap]
-
-      required_options = {}
-      required_options["--svn-url"] = options["svnurl"] || @cfg["svn_url"]
-      required_options["--git-repo-path"] = options["gitlocalrepopath"] || @cfg["github"]["local_repo_path"]
-      required_options["--rev-timestamp-file"] = options["revtimestampfile"] || @cfg["rev_timestamp_file"]
-
-      missing_options = {}
-      required_options.each do |key, value|
-        missing_options[key] = value if value.nil? || value.strip.empty?
-      end
-
-      return if missing_options.empty?
-
-      warn_and_exit("missing revmap generator options (#{missing_options.keys}).\nProvide these options here or in the config file.", 1)
     end
 
     def warn_and_exit(message, exit_code)

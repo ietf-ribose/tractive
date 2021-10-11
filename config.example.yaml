@@ -16,11 +16,8 @@ github:
   # GitHub user Personal Access Token
   token: 'ghp_fpsc4de1f0c46e01576810740c9242097cba4619486'
 
-  # Local path to migrated Git repository
-  local_repo_path: '/Users/user/repo-git'
-
-  # RevMap file to use for migration
-  revmap_path: ./example-revmap.txt
+# RevMap file to use for migration
+revmap_path: ./example-revmap.txt
 
 # User map: Trac username to GitHub username
 # - Please ensure the GitHub usernames are correct and valid, otherwise

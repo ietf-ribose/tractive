@@ -46,14 +46,22 @@ module Tractive
         end
       end
 
-      def svn_log(url, flags = {})
-        command = "svn log #{url}"
+      def svn_log(url, local_path, flags = {})
+        command = "svn log"
+        command += " #{url}" if url
+
         flags.each do |key, value|
           command += " #{key}"
           command += " #{value}" if value
         end
 
-        `#{command}`
+        if local_path
+          Dir.chdir(local_path) do
+            `#{command}`
+          end
+        else
+          `#{command}`
+        end
       end
     end
   end

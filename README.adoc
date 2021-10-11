@@ -175,20 +175,51 @@ With this information you can now build the RevMap with:
 
 [source,sh]
 ----
-tractive generate-revmap --svn-url <url of the svn> --rev-timestamp-file <{name-of-repo}.fo> --revmap-output-file <my_revmap.txt> --git-local-repo-path <path to {name-of-repo}-git>
+tractive generate-revmap \
+  --svn-url <url of the SVN repository> \
+  --rev-timestamp-file <reposurgeon timestamp map, e.g. {name-of-repo}.fo> \
+  --git-local-repo-path <path to converted Git repository, e.g. {name-of-repo}-git> \
+  --revmap-output-file <output path of RevMap.txt>
 ----
 
-All of the following options are required:
-
-* `svn-url`
-* `git-local-repo-path`
-* `rev-timestamp-file`
-* `revmap-output-file`
+All these following options are required.
 
 The generated RevMap will be then used in a Tractive run so that the migrated
 issues and commits will replace references to SVN revisions with the
 corresponding Git commit SHA, enabling GitHub to expose those linkages in the
 user interface.
+
+.Options for `tractive generate-revmap` command
+[cols="3a,5a,2a",options="header"]
+|===
+| Option | Description | Type
+
+| `--svn-url`
+|
+(required) SVN repository URL that should be used in RevMap generation.
+The URL must start with the `http://` or `https://` prefix (not the `svn://`
+prefix).
+| String
+
+| `--rev-timestamp-file`
+|
+(required) Specify the input file that contains SVN revision and timestamps that
+should be used in RevMap generation. The format of the file must follow the
+`reposurgeon` `.fo` format.
+
+| String
+
+| `--git-local-repo-path`
+|
+(required) Local Git repository path that should be used in RevMap generation.
+The path must be a Git repository with a `.git` folder within.
+| String
+
+| `--revmap-output-file`
+| (required) Output file path to save the generated RevMap.
+| String
+
+|===
 
 
 [[bootstrap-config]]

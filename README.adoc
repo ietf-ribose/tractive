@@ -194,15 +194,17 @@ user interface.
 
 | `--svn-url`
 |
-(required) SVN repository URL that should be used in RevMap generation.
-The URL must start with the `http://` or `https://` prefix (not the `svn://`
-prefix).
+(required unless `--svn-local-path` set)
+SVN repository URL that should be used in RevMap generation. The URL must start
+with the `http://` or `https://` prefix (not the `svn://` prefix).
 | String
 
 | `--svn-local-path`
-| SVN local repository path that should be used in RevMap generation. You can clone
-the svn repo locally and provide its local path if the svn repository is offline. (`--svn-url` is not
-required if this option is given).
+|
+(required unless `-svn-url` set)
+SVN local repository path that should be used in RevMap generation. You can
+clone the svn repo locally and provide its local path if the svn repository is
+offline.
 | String
 
 | `--rev-timestamp-file`

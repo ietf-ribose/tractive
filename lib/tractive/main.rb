@@ -45,13 +45,6 @@ module Tractive
       Tractive::AttachmentExporter.new(@cfg, @db).generate_script
     end
 
-    def generate_revmap_file
-      # verfiry options and .fo file is present
-      verify_revmap_generator_options!(@opts)
-
-
-    end
-
     private
 
     def verify_options!(options)

@@ -48,7 +48,9 @@ $ gem install tractive
 
 . Build the SVN Revision to Git Commit RevMap. (<<build-map>>)
 
-. Create and validate your Tractive config file. (<<create-config>>)
+. Bootstrap your Tractive config file. (<<bootstrap-config>>)
+
+. Configure mapping in your Tractive config file. (<<create-config>>)
 
 . Run Tractive (<<running-tractive>>)
 +
@@ -176,14 +178,15 @@ corresponding Git commit SHA, enabling GitHub to expose those linkages in the
 user interface.
 
 
-
-[[create-config]]
-=== Creating the Tractive configuration file
+[[bootstrap-config]]
+=== Boostrapping the Tractive configuration file
 
 ==== General
 
-Tractive depends on a YAML configuration file to export data from Trac
-and then import to GitHub.
+Tractive uses a YAML configuration file that contains configuration to export
+data from Trac and then import to GitHub.
+
+==== Setting up the configuration file
 
 Copy the link:config.example.yaml[example YAML configuration] and adapt it
 as necessary:
@@ -194,8 +197,37 @@ cp config.example.yaml config.yaml
 vi config.yaml
 ----
 
+Then, at a minimum, you need to setup the following sections for
+bootstrapping (the next step) to work:
+
+. Trac configuration (<<config-trac>>)
+
+. GitHub configuration (<<config-github>>)
+
+
+[[gather-info]]
+==== Bootstrapping the configuration file with information
+
+The Tractive configuration file is used to perform the actual migration actions,
+and therefore depends heavily on the contents of the content to be migrated.
+
+Tractive can read certain information from the Trac database to allow for
+easier mapping of users, labels and milestones.
+
+The following command provides that information.
+
+[source,sh]
+----
+tractive -i
+----
+
+
+[[create-config]]
+=== Working with the Tractive configuration file, and mapping
+
 The configuration file contains the following sections.
 
+[[config-trac]]
 ==== Trac configuration
 
 `trac:`:: (mandatory) Trac (data source) configuration options.
@@ -216,6 +248,7 @@ trac:
   ticketbaseurl: https://example.org/trac/foobar/ticket
 ----
 
+[[config-github]]
 ==== GitHub configuration
 
 `github:`:: (mandatory) GitHub (migration target) configuration options.
@@ -412,30 +445,6 @@ You can also specify the configuration file on the command line:
 tractive -c foo.yaml
 ----
 
-
-[[gather-info]]
-=== Gathering information
-
-Tractive can read certain information from the Trac database to allow for
-easier mapping of users, labels and milestones.
-
-The following command provides that information.
-
-[source,sh]
-----
-tractive -i
-----
-
-
-=== Verbose mode
-
-Verbose mode can be enabled for all commands.
-Add the `-v` flag for more verbose output:
-
-[source,sh]
-----
-tractive -v
-----
 
 === Filtering Trac tickets by status
 

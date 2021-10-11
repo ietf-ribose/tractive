@@ -4,65 +4,74 @@
 require_relative "../lib/tractive"
 
 class TractiveCommand < Thor
-  default_command :default
-  class_option "attachmentexporter", type: :string, aliases: ["-A", "--attachment-exporter"],
-                                     desc: "Generate an attachment exporter script according to config.yaml"
-  class_option "attachurl", type: :string, aliases: ["-a", "--attachment-url"], banner: "<URL>",
-                            desc: "If attachment files are reachable via a URL we reference this here"
-  class_option "config", type: :string, default: "tractive.config.yaml", banner: "<PATH>", aliases: "-c",
-                         desc: "Set the configuration file"
-  class_option "dryrun", type: :boolean, aliases: ["-d", "--dry-run"],
-                         desc: "Write data to a file instead of pushing it to github"
-  class_option "exportattachments", type: :string, aliases: ["-e", "--export-attachments"],
-                                    desc: "Export attachments from the database according to config.yaml"
-  class_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
-                       desc: "Import without safety-checking issue numbers."
+  default_command :migrate
 
-  class_option "generaterevmap", type: :boolean, aliases: ["-G", "--generate-revmap"],
-                                 desc: "Generate a mapping from svn revision number to git sha hash."
-  class_option "svnurl", type: :string, aliases: ["--svn-url"],
-                         desc: "Svn url that should be used in revmap generation"
-  class_option "gitlocalrepopath", type: :string, aliases: ["--git-local-repo-path"],
-                                   desc: "Local git repo path that should be used in revmap generation"
-  class_option "revtimestampfile", type: :string, aliases: ["--rev-timestamp-file"],
-                                   desc: "File containing svn revision and timestamps that should be used in revmap generation"
-  class_option "revoutfile", type: :string, aliases: ["--revmap-output-file"],
-                             desc: "File to output the generated revmap"
+  desc "<OPTIONS>", "Migrate Trac instances to modern Git management platforms like GitHub and GitLab"
+  method_option "attachmentexporter", type: :string, aliases: ["-A", "--attachment-exporter"],
+                                      desc: "Generate an attachment exporter script according to config.yaml"
+  method_option "attachurl", type: :string, aliases: ["-a", "--attachment-url"], banner: "<URL>",
+                             desc: "If attachment files are reachable via a URL we reference this here"
+  method_option "config", type: :string, default: "tractive.config.yaml", banner: "<PATH>", aliases: "-c",
+                          desc: "Set the configuration file"
+  method_option "dryrun", type: :boolean, aliases: ["-d", "--dry-run"],
+                          desc: "Write data to a file instead of pushing it to github"
+  method_option "exportattachments", type: :string, aliases: ["-e", "--export-attachments"],
+                                     desc: "Export attachments from the database according to config.yaml"
+  method_option "fast", type: :boolean, aliases: ["-F", "--fast-import"],
+                        desc: "Import without safety-checking issue numbers."
 
-  class_option "filter", type: :boolean, aliases: ["-f", "--filter"],
-                         desc: "Filter records that you want to import."
-  class_option "columnname", type: :string, aliases: ["--column-name"],
-                             desc: "Name of the column to filter."
-  class_option "operator", type: :string, aliases: ["--operator"],
-                           desc: "Operator for filter."
-  class_option "columnvalue", type: :string, aliases: ["--column-value"],
-                              desc: "Value of the column to filter."
+  method_option "filter", type: :boolean, aliases: ["-f", "--filter"],
+                          desc: "Filter records that you want to import."
+  method_option "columnname", type: :string, aliases: ["--column-name"],
+                              desc: "Name of the column to filter."
+  method_option "operator", type: :string, aliases: ["--operator"],
+                            desc: "Operator for filter."
+  method_option "columnvalue", type: :string, aliases: ["--column-value"],
+                               desc: "Value of the column to filter."
 
-  class_option "importfromfile", type: :string, aliases: ["-I", "--import-from-file"],
-                                 desc: "Import issues from a json file"
-  class_option "info", type: :boolean, aliases: ["-i", "--info"],
-                       desc: "Reports existing labels and users in the database"
-  class_option "logfile", type: :string, aliases: ["-L", "--log-file"],
-                          desc: "Name of the logfile to output logs to."
-  class_option "mockdeleted", type: :boolean, aliases: ["-M", "--mockup"],
-                              desc: "Import from 0 and mocking tickets deleted on trac"
-  class_option "openedonly", type: :boolean, aliases: ["-o", "--opened-only"],
-                             desc: "Skips the import of closed tickets"
-  class_option "revmapfile", type: :string, aliases: ["-r", "--rev-map-file"], banner: "<PATH>",
-                             desc: "Allows to specify a commit revision mapping FILE"
-  class_option "singlepost", type: :boolean, aliases: ["-S", "--single-post"],
-                             desc: "Put all issue comments in the first message."
-  class_option "start", type: :numeric, aliases: ["-s", "--start-at"], banner: "<ID>",
-                        desc: "Start migration from ticket with number <ID>"
-  class_option "verbose", type: :boolean, aliases: ["-v", "--verbose"], desc: "Verbose mode"
+  method_option "importfromfile", type: :string, aliases: ["-I", "--import-from-file"],
+                                  desc: "Import issues from a json file"
+  method_option "info", type: :boolean, aliases: ["-i", "--info"],
+                        desc: "Reports existing labels and users in the database"
+  method_option "logfile", type: :string, aliases: ["-L", "--log-file"],
+                           desc: "Name of the logfile to output logs to."
+  method_option "mockdeleted", type: :boolean, aliases: ["-M", "--mockup"],
+                               desc: "Import from 0 and mocking tickets deleted on trac"
+  method_option "openedonly", type: :boolean, aliases: ["-o", "--opened-only"],
+                              desc: "Skips the import of closed tickets"
+  method_option "revmapfile", type: :string, aliases: ["-r", "--rev-map-file"], banner: "<PATH>",
+                              desc: "Allows to specify a commit revision mapping FILE"
+  method_option "singlepost", type: :boolean, aliases: ["-S", "--single-post"],
+                              desc: "Put all issue comments in the first message."
+  method_option "start", type: :numeric, aliases: ["-s", "--start-at"], banner: "<ID>",
+                         desc: "Start migration from ticket with number <ID>"
+  method_option "verbose", type: :boolean, aliases: ["-v", "--verbose"], desc: "Verbose mode"
+  def migrate
+    Tractive::Main.new(options).run
+  end
+
+  desc "generate-revmap <OPTIONS>", "Generate a mapping from svn revision number to git sha hash."
+  method_option "svnurl", type: :string, aliases: ["--svn-url"],
+                          desc: "Svn url that should be used in revmap generation"
+  method_option "gitlocalrepopath", type: :string, aliases: ["--git-local-repo-path"],
+                                    desc: "Local git repo path that should be used in revmap generation"
+  method_option "revtimestampfile", type: :string, aliases: ["--rev-timestamp-file"],
+                                    desc: "File containing svn revision and timestamps that should be used in revmap generation"
+  method_option "revoutputfile", type: :string, aliases: ["--revmap-output-file"],
+                                 desc: "File to output the generated revmap"
+  def generate_revmap
+    verify_revmap_generator_options!(options)
+
+    Tractive::RevmapGenerator.new(
+      options["revtimestampfile"],
+      options["svnurl"],
+      options["gitlocalrepopath"],
+      options["revoutputfile"]
+    ).generate
+  end
 
   def self.exit_on_failure?
     true
-  end
-
-  desc "<OPTIONS>", "Migrate Trac instances to modern Git management platforms like GitHub and GitLab"
-  def default
-    Tractive::Main.new(options).run
   end
 
   def method_missing(*args)
@@ -73,6 +82,26 @@ class TractiveCommand < Thor
 
   def respond_to_missing?
     true
+  end
+
+  no_commands do
+    def verify_revmap_generator_options!(options)
+      required_options = {}
+      required_options["--svn-url"] = options["svnurl"]
+      required_options["--git-local-repo-path"] = options["gitlocalrepopath"]
+      required_options["--rev-timestamp-file"] = options["revtimestampfile"]
+      required_options["--revmap-output-file"] = options["revoutputfile"]
+
+      missing_options = {}
+      required_options.each do |key, value|
+        missing_options[key] = value if value.nil? || value.strip.empty?
+      end
+
+      return if missing_options.empty?
+
+      warn("missing revmap generator options (#{missing_options.keys}).\nRun with `--help` or `-h` to see available options")
+      exit 1
+    end
   end
 end
 

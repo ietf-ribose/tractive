@@ -11,6 +11,7 @@ module Tractive
       @duplicate_message_commits = {}
       @last_revision = nil
       @pinwheel = %w[| / - \\]
+      @skipped = []
       @output_file = output_file
     end
 
@@ -20,6 +21,7 @@ module Tractive
 
       File.open(@output_file, "w+") do |file|
         File.foreach(@input_file) do |line|
+          i += 1
           info = extract_info_from_line(line)
           next if @last_revision == info[:revision]
 
@@ -29,9 +31,10 @@ module Tractive
           percent = ((i.to_f / line_count) * 100).round(2)
           progress = "=" * (percent.to_i / 2) unless i < 2
           printf("\rProgress: [%<progress>-50s] %<percent>.2f%% %<spinner>s", progress: progress, percent: percent, spinner: @pinwheel.rotate!.first)
-          i += 1
         end
       end
+
+      $logger.info "\n\nFollowing revisions are skipped because they don't have a corresponding git commit. #{@skipped}"
     end
 
     private
@@ -52,11 +55,13 @@ module Tractive
       # get sha from git api
       commits = git_commits(info)
 
-      if commits.count == 1
-        file.puts "#{info[:revision]} | #{commits.values[0].join(",")}"
+      if commits.empty?
+        @skipped << info[:revision]
+      elsif commits.count == 1
+        file.puts "#{info[:revision]} | #{commits.values[0]&.join(",")}"
       else
         message = commit_message_from_svn(info[:revision])
-        file.puts "#{info[:revision]} | #{@duplicate_commits[info[:timestamp]][message].join(",")}"
+        file.puts "#{info[:revision]} | #{@duplicate_commits[info[:timestamp]][message]&.join(",")}"
       end
     end
 
@@ -91,16 +96,24 @@ module Tractive
     end
 
     def commits_from_git_repo(info)
-      command = "git rev-list --after=#{info[:timestamp]} --until=#{info[:timestamp]} --committer=#{info[:author]} --all --format='%cd|%h~|~%s' --date=format:'%Y-%m-%dT%H:%M:%SZ'"
-      commits = Dir.chdir(@git_local_repo_path) do
-        `#{command}`
+      shas_command = "git rev-list --after=#{info[:timestamp]} --until=#{info[:timestamp]} --committer=#{info[:author]} --all"
+      shas = Dir.chdir(@git_local_repo_path) do
+        `#{shas_command}`
       end
 
+      commits_command = "git rev-list --after=#{info[:timestamp]} --until=#{info[:timestamp]} --committer=#{info[:author]} --all --format='medium'"
+      commits = Dir.chdir(@git_local_repo_path) do
+        `#{commits_command}`
+      end
+
+      regex = /#{shas.split("\n").map { |sha| "(?=commit #{sha})" }.join "|"}/
+
       commits_arr = []
-      commits.split("\n").each_slice(2) do |sha_hash, commit_info|
+      commits.split(regex).each do |commit_info|
         commit_hash = {}
-        commit_hash[:sha] = sha_hash.split.last
-        commit_hash[:short_sha], commit_hash[:message] = commit_info.split("~|~")
+        info = commit_info.split("\n", 4)
+        commit_hash[:sha] = info[0].split.last
+        commit_hash[:message] = info.last.strip.gsub("\n", "").gsub(/\s+/, " ")
 
         commits_arr << commit_hash
       end

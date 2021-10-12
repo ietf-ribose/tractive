@@ -5,6 +5,8 @@ require_relative "../lib/tractive"
 
 class TractiveCommand < Thor
   default_command :migrate
+  class_option "logfile", type: :string, aliases: ["-L", "--log-file"],
+                          desc: "Name of the logfile to output logs to."
 
   desc "<OPTIONS>", "Migrate Trac instances to modern Git management platforms like GitHub and GitLab"
   method_option "attachmentexporter", type: :string, aliases: ["-A", "--attachment-exporter"],
@@ -33,8 +35,6 @@ class TractiveCommand < Thor
                                   desc: "Import issues from a json file"
   method_option "info", type: :boolean, aliases: ["-i", "--info"],
                         desc: "Reports existing labels and users in the database"
-  method_option "logfile", type: :string, aliases: ["-L", "--log-file"],
-                           desc: "Name of the logfile to output logs to."
   method_option "mockdeleted", type: :boolean, aliases: ["-M", "--mockup"],
                                desc: "Import from 0 and mocking tickets deleted on trac"
   method_option "openedonly", type: :boolean, aliases: ["-o", "--opened-only"],
@@ -64,6 +64,7 @@ class TractiveCommand < Thor
   def generate_revmap
     verify_revmap_generator_options!(options)
 
+    Tractive::Utilities.setup_logger(output_stream: options[:log_file] || $stderr, verbose: options[:verbose])
     Tractive::RevmapGenerator.new(
       options["revtimestampfile"],
       options["svnurl"],

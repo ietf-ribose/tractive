@@ -10,6 +10,8 @@ RSpec.describe Tractive do
   end
 
   def db_result_hash
-    CONFIG.slice("users", "milestones", "labels")
+    result_hash = CONFIG.slice("users", "milestones", "labels")
+    result_hash["users"] = Tractive::Utilities.make_each_hash(result_hash["users"].keys, %w[email name username])
+    result_hash
   end
 end

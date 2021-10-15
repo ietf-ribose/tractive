@@ -12,7 +12,7 @@ module Helpers
             "closed" => true,
             "created_at" => format_time(ticket[:time]),
             "milestone" => nil,
-            "assignee" => ""
+            "assignee" => nil
           },
           "comments" => []
         }

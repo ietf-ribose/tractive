@@ -7,6 +7,13 @@ module Tractive
         array.map { |i| [i, "#{prefix}#{i}"] }.to_h
       end
 
+      def make_each_hash(values, keys)
+        values.map do |value|
+          value = [value] unless value.is_a?(Array)
+          keys.zip(value).to_h
+        end
+      end
+
       def setup_db!(db_url)
         files_to_load = [
           "lib/tractive/models/attachment.rb",

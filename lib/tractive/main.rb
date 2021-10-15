@@ -8,6 +8,8 @@ module Tractive
       @opts = opts
       @cfg  = YAML.load_file(@opts[:config])
 
+      @cfg["users"] = @cfg["users"].map { |user| [user["email"], user["username"]] }.to_h
+
       Tractive::Utilities.setup_logger(output_stream: @opts[:log_file] || $stderr, verbose: @opts[:verbose])
       @db = Tractive::Utilities.setup_db!(@cfg["trac"]["database"])
     rescue Sequel::DatabaseConnectionError, Sequel::AdapterNotFound, URI::InvalidURIError, Sequel::DatabaseError => e

@@ -12,130 +12,502 @@ revmapfile: "spec/files/revmap_spec.txt"
 
 # make sure not to typo the GitHub username as the issue will fail to create if a ticket's owner (assignee) has a valid mapping below
 users:
-  henrik@levkowetz.com: henrik@levkowetz.com
-  fenner@research.att.com: fenner@research.att.com
-  barbara.fuller@neustar.biz: barbara.fuller@neustar.biz
-  presnick@qualcomm.com: presnick@qualcomm.com
-  smccammon@amsl.com: smccammon@amsl.com
-  presnick@qti.qualcomm.com: presnick@qti.qualcomm.com
-  martin.thomson@gmail.com: martin.thomson@gmail.com
-  rcross@amsl.com: rcross@amsl.com
-  cmorgan@amsl.com: cmorgan@amsl.com
-  valery@smyslov.net: valery@smyslov.net
-  rjsparks@nostrum.com: rjsparks@nostrum.com
-  michael.lee@neustar.biz: michael.lee@neustar.biz
-  '': ''
-  jennifer@painless-security.com: jennifer@painless-security.com
-  pasi.eronen@nokia.com: pasi.eronen@nokia.com
-  adam@nostrum.com: adam@nostrum.com
-  mcr@sandelman.ca: mcr@sandelman.ca
-  jmh@joelhalpern.com: jmh@joelhalpern.com
-  mark@painless-security.com: mark@painless-security.com
-  vidyut.luther@neustar.biz: vidyut.luther@neustar.biz
-  comimom@gmail.com: comimom@gmail.com
-  nathan@resolutehosting.com: nathan@resolutehosting.com
-  spikeekips@gmail.com: spikeekips@gmail.com
-  ekr@rtfm.com: ekr@rtfm.com
-  fluffy@cisco.com: fluffy@cisco.com
-  rjs@nostrum.com: rjs@nostrum.com
-  lars.eggert@nokia.com: lars.eggert@nokia.com
-  fenner@fenron.com: fenner@fenron.com
-  chris.newman@sun.com: chris.newman@sun.com
-  cabo@tzi.org: cabo@tzi.org
-  jelte@nlnetlabs.nl: jelte@nlnetlabs.nl
-  arifumi@nttv6.net: arifumi@nttv6.net
-  ben@nostrum.com: ben@nostrum.com
-  tony@att.com: tony@att.com
-  kivinen@iki.fi: kivinen@iki.fi
-  suresh.krishnan@ericsson.com: suresh.krishnan@ericsson.com
-  matthijs@nlnetlabs.nl: matthijs@nlnetlabs.nl
-  olau@iola.dk: olau@iola.dk
-  esanchez@yaco.es: esanchez@yaco.es
-  wiggins@concentricsky.com: wiggins@concentricsky.com
-  peter.musgrave@magorcorp.com: peter.musgrave@magorcorp.com
-  fenner@fenron.net: fenner@fenron.net
-  azarubin@yaco.es: azarubin@yaco.es
-  jtarragon@yaco.es: jtarragon@yaco.es
-  bmheight@gmail.com: bmheight@gmail.com
-  shane@time-travellers.org: shane@time-travellers.org
-  martin@iola.dk: martin@iola.dk
-  york@isoc.org: york@isoc.org
-  housley@vigilsec.com: housley@vigilsec.com
-  rbarnes@bbn.com: rbarnes@bbn.com
-  ejimenez@yaco.es: ejimenez@yaco.es
-  ietf@augustcellars.com: ietf@augustcellars.com
-  lars@netapp.com: lars@netapp.com
-  markus.stenberg@iki.fi: markus.stenberg@iki.fi
-  tterriberry@mozilla.com: tterriberry@mozilla.com
-  bartosz.balazinski@interdigital.com: bartosz.balazinski@interdigital.com
-  liudapeng@chinamobile.com: liudapeng@chinamobile.com
-  fanpeng@chinamobile.com: fanpeng@chinamobile.com
-  gnocuil@gmail.com: gnocuil@gmail.com
-  denghui@chinamobile.com: denghui@chinamobile.com
-  sunqi.csnet.thu@gmail.com: sunqi.csnet.thu@gmail.com
-  phdgang@gmail.com: phdgang@gmail.com
-  harald@alvestrand.no: harald@alvestrand.no
-  denglingli@chinamobile.com: denglingli@chinamobile.com
-  buildbot@tools.ietf.org: buildbot@tools.ietf.org
-  willem@nlnetlabs.nl: willem@nlnetlabs.nl
-  tjw.ietf@gmail.com: tjw.ietf@gmail.com
-  stephen.farrell@cs.tcd.ie: stephen.farrell@cs.tcd.ie
-  mdouglass@sphericalcowgroup.com: mdouglass@sphericalcowgroup.com
-  anurag_nc@yahoo.com: anurag_nc@yahoo.com
-  mahoney@nostrum.com: mahoney@nostrum.com
-  peter@akayla.com: peter@akayla.com
-  sbirkholz@amsl.com: sbirkholz@amsl.com
-  david.i.allan@ericsson.com: david.i.allan@ericsson.com
-  alireza.mohammadi@icann.org: alireza.mohammadi@icann.org
-  suresh@kaloom.com: suresh@kaloom.com
-  ford@isoc.org: ford@isoc.org
-  fenton@bluepopcorn.net: fenton@bluepopcorn.net
-  johnl@taugh.com: johnl@taugh.com
-  magnus.westerlund@ericsson.com: magnus.westerlund@ericsson.com
-  pusateri@bangj.com: pusateri@bangj.com
-  sasha@dashcare.nl: sasha@dashcare.nl
-  mrcullen42@gmail.com: mrcullen42@gmail.com
-  rcross: rcross
-  henrik: henrik
-  krathnayake@ietf.org: krathnayake@ietf.org
-  lars@eggert.org: lars@eggert.org
-  paul.higgs@ericsson.com: paul.higgs@ericsson.com
-  bclaise@cisco.com: bclaise@cisco.com
-  randy@psg.com: randy@psg.com
-  bortzmeyer+ietf@nic.fr: bortzmeyer+ietf@nic.fr
-  stbryant@cisco.com: stbryant@cisco.com
-  worley@alum.mit.edu: worley@alum.mit.edu
-  daniele.ceccarelli@ericsson.com: daniele.ceccarelli@ericsson.com
-  acmorton@att.com: acmorton@att.com
-  julian.reschke@gmx.de: julian.reschke@gmx.de
-  paul.hoffman@vpnc.org: paul.hoffman@vpnc.org
-  brian@innovationslab.net: brian@innovationslab.net
-  mnot@pobox.com: mnot@pobox.com
-  davemgarrett@gmail.com: davemgarrett@gmail.com
-  turners@ieca.com: turners@ieca.com
-  chopps@rawdofmt.org: chopps@rawdofmt.org
-  jonathan@vidyo.com: jonathan@vidyo.com
-  cbowers@juniper.net: cbowers@juniper.net
-  lloyd.wood@yahoo.co.uk: lloyd.wood@yahoo.co.uk
-  adityachunar12345@gmail.com: adityachunar12345@gmail.com
-  adrian@olddog.co.uk: adrian@olddog.co.uk
-  paul@nohats.ca: paul@nohats.ca
-  vkg@bell-labs.com: vkg@bell-labs.com
-  jclarke@cisco.com: jclarke@cisco.com
-  mdb@juniper.net: mdb@juniper.net
-  nishida@sfc.wide.ad.jp: nishida@sfc.wide.ad.jp
-  jbui@amsl.com: jbui@amsl.com
-  serge.raes@orange.com: serge.raes@orange.com
-  johnl@iecc.com: johnl@iecc.com
-  rg+ietf@qti.qualcomm.com: rg+ietf@qti.qualcomm.com
-  watsonbladd@gmail.com: watsonbladd@gmail.com
-  gregimirsky@gmail.com: gregimirsky@gmail.com
-  jmagallanes@amsl.com: jmagallanes@amsl.com
-  dhruv.ietf@gmail.com: dhruv.ietf@gmail.com
-  ghwood@ietf.org: ghwood@ietf.org
-  lear@cisco.com: lear@cisco.com
-  spencerdawkins.ietf@gmail.com: spencerdawkins.ietf@gmail.com
-  dkg@fifthhorseman.net: dkg@fifthhorseman.net
+  - email: henrik@levkowetz.com
+    name:
+    username: henrik@levkowetz.com
+
+  - email: fenner@research.att.com
+    name:
+    username: fenner@research.att.com
+
+  - email: barbara.fuller@neustar.biz
+    name:
+    username: barbara.fuller@neustar.biz
+
+  - email: presnick@qualcomm.com
+    name:
+    username: presnick@qualcomm.com
+
+  - email: smccammon@amsl.com
+    name:
+    username: smccammon@amsl.com
+
+  - email: presnick@qti.qualcomm.com
+    name:
+    username: presnick@qti.qualcomm.com
+
+  - email: martin.thomson@gmail.com
+    name:
+    username: martin.thomson@gmail.com
+
+  - email: rcross@amsl.com
+    name:
+    username: rcross@amsl.com
+
+  - email: cmorgan@amsl.com
+    name:
+    username: cmorgan@amsl.com
+
+  - email: valery@smyslov.net
+    name:
+    username: valery@smyslov.net
+
+  - email: rjsparks@nostrum.com
+    name:
+    username: rjsparks@nostrum.com
+
+  - email: michael.lee@neustar.biz
+    name:
+    username: michael.lee@neustar.biz
+
+  - email: ''
+    name:
+    username:
+
+  - email: jennifer@painless-security.com
+    name:
+    username: jennifer@painless-security.com
+
+  - email: pasi.eronen@nokia.com
+    name:
+    username: pasi.eronen@nokia.com
+
+  - email: adam@nostrum.com
+    name:
+    username: adam@nostrum.com
+
+  - email: mcr@sandelman.ca
+    name:
+    username: mcr@sandelman.ca
+
+  - email: jmh@joelhalpern.com
+    name:
+    username: jmh@joelhalpern.com
+
+  - email: mark@painless-security.com
+    name:
+    username: mark@painless-security.com
+
+  - email: vidyut.luther@neustar.biz
+    name:
+    username: vidyut.luther@neustar.biz
+
+  - email: comimom@gmail.com
+    name:
+    username: comimom@gmail.com
+
+  - email: nathan@resolutehosting.com
+    name:
+    username: nathan@resolutehosting.com
+
+  - email: spikeekips@gmail.com
+    name:
+    username: spikeekips@gmail.com
+
+  - email: ekr@rtfm.com
+    name:
+    username: ekr@rtfm.com
+
+  - email: fluffy@cisco.com
+    name:
+    username: fluffy@cisco.com
+
+  - email: rjs@nostrum.com
+    name:
+    username: rjs@nostrum.com
+
+  - email: lars.eggert@nokia.com
+    name:
+    username: lars.eggert@nokia.com
+
+  - email: fenner@fenron.com
+    name:
+    username: fenner@fenron.com
+
+  - email: chris.newman@sun.com
+    name:
+    username: chris.newman@sun.com
+
+  - email: cabo@tzi.org
+    name:
+    username: cabo@tzi.org
+
+  - email: jelte@nlnetlabs.nl
+    name:
+    username: jelte@nlnetlabs.nl
+
+  - email: arifumi@nttv6.net
+    name:
+    username: arifumi@nttv6.net
+
+  - email: ben@nostrum.com
+    name:
+    username: ben@nostrum.com
+
+  - email: tony@att.com
+    name:
+    username: tony@att.com
+
+  - email: kivinen@iki.fi
+    name:
+    username: kivinen@iki.fi
+
+  - email: suresh.krishnan@ericsson.com
+    name:
+    username: suresh.krishnan@ericsson.com
+
+  - email: matthijs@nlnetlabs.nl
+    name:
+    username: matthijs@nlnetlabs.nl
+
+  - email: olau@iola.dk
+    name:
+    username: olau@iola.dk
+
+  - email: esanchez@yaco.es
+    name:
+    username: esanchez@yaco.es
+
+  - email: wiggins@concentricsky.com
+    name:
+    username: wiggins@concentricsky.com
+
+  - email: peter.musgrave@magorcorp.com
+    name:
+    username: peter.musgrave@magorcorp.com
+
+  - email: fenner@fenron.net
+    name:
+    username: fenner@fenron.net
+
+  - email: azarubin@yaco.es
+    name:
+    username: azarubin@yaco.es
+
+  - email: jtarragon@yaco.es
+    name:
+    username: jtarragon@yaco.es
+
+  - email: bmheight@gmail.com
+    name:
+    username: bmheight@gmail.com
+
+  - email: shane@time-travellers.org
+    name:
+    username: shane@time-travellers.org
+
+  - email: martin@iola.dk
+    name:
+    username: martin@iola.dk
+
+  - email: york@isoc.org
+    name:
+    username: york@isoc.org
+
+  - email: housley@vigilsec.com
+    name:
+    username: housley@vigilsec.com
+
+  - email: rbarnes@bbn.com
+    name:
+    username: rbarnes@bbn.com
+
+  - email: ejimenez@yaco.es
+    name:
+    username: ejimenez@yaco.es
+
+  - email: ietf@augustcellars.com
+    name:
+    username: ietf@augustcellars.com
+
+  - email: lars@netapp.com
+    name:
+    username: lars@netapp.com
+
+  - email: markus.stenberg@iki.fi
+    name:
+    username: markus.stenberg@iki.fi
+
+  - email: tterriberry@mozilla.com
+    name:
+    username: tterriberry@mozilla.com
+
+  - email: bartosz.balazinski@interdigital.com
+    name:
+    username: bartosz.balazinski@interdigital.com
+
+  - email: liudapeng@chinamobile.com
+    name:
+    username: liudapeng@chinamobile.com
+
+  - email: fanpeng@chinamobile.com
+    name:
+    username: fanpeng@chinamobile.com
+
+  - email: gnocuil@gmail.com
+    name:
+    username: gnocuil@gmail.com
+
+  - email: denghui@chinamobile.com
+    name:
+    username: denghui@chinamobile.com
+
+  - email: sunqi.csnet.thu@gmail.com
+    name:
+    username: sunqi.csnet.thu@gmail.com
+
+  - email: phdgang@gmail.com
+    name:
+    username: phdgang@gmail.com
+
+  - email: harald@alvestrand.no
+    name:
+    username: harald@alvestrand.no
+
+  - email: denglingli@chinamobile.com
+    name:
+    username: denglingli@chinamobile.com
+
+  - email: buildbot@tools.ietf.org
+    name:
+    username: buildbot@tools.ietf.org
+
+  - email: willem@nlnetlabs.nl
+    name:
+    username: willem@nlnetlabs.nl
+
+  - email: tjw.ietf@gmail.com
+    name:
+    username: tjw.ietf@gmail.com
+
+  - email: stephen.farrell@cs.tcd.ie
+    name:
+    username: stephen.farrell@cs.tcd.ie
+
+  - email: mdouglass@sphericalcowgroup.com
+    name:
+    username: mdouglass@sphericalcowgroup.com
+
+  - email: anurag_nc@yahoo.com
+    name:
+    username: anurag_nc@yahoo.com
+
+  - email: mahoney@nostrum.com
+    name:
+    username: mahoney@nostrum.com
+
+  - email: peter@akayla.com
+    name:
+    username: peter@akayla.com
+
+  - email: sbirkholz@amsl.com
+    name:
+    username: sbirkholz@amsl.com
+
+  - email: david.i.allan@ericsson.com
+    name:
+    username: david.i.allan@ericsson.com
+
+  - email: alireza.mohammadi@icann.org
+    name:
+    username: alireza.mohammadi@icann.org
+
+  - email: suresh@kaloom.com
+    name:
+    username: suresh@kaloom.com
+
+  - email: ford@isoc.org
+    name:
+    username: ford@isoc.org
+
+  - email: fenton@bluepopcorn.net
+    name:
+    username: fenton@bluepopcorn.net
+
+  - email: johnl@taugh.com
+    name:
+    username: johnl@taugh.com
+
+  - email: magnus.westerlund@ericsson.com
+    name:
+    username: magnus.westerlund@ericsson.com
+
+  - email: pusateri@bangj.com
+    name:
+    username: pusateri@bangj.com
+
+  - email: sasha@dashcare.nl
+    name:
+    username: sasha@dashcare.nl
+
+  - email: mrcullen42@gmail.com
+    name:
+    username: mrcullen42@gmail.com
+
+  - email: rcross
+    name:
+    username: rcross
+
+  - email: henrik
+    name:
+    username: henrik
+
+  - email: krathnayake@ietf.org
+    name:
+    username: krathnayake@ietf.org
+
+  - email: lars@eggert.org
+    name:
+    username: lars@eggert.org
+
+  - email: paul.higgs@ericsson.com
+    name:
+    username: paul.higgs@ericsson.com
+
+  - email: bclaise@cisco.com
+    name:
+    username: bclaise@cisco.com
+
+  - email: randy@psg.com
+    name:
+    username: randy@psg.com
+
+  - email: bortzmeyer+ietf@nic.fr
+    name:
+    username: bortzmeyer+ietf@nic.fr
+
+  - email: stbryant@cisco.com
+    name:
+    username: stbryant@cisco.com
+
+  - email: worley@alum.mit.edu
+    name:
+    username: worley@alum.mit.edu
+
+  - email: daniele.ceccarelli@ericsson.com
+    name:
+    username: daniele.ceccarelli@ericsson.com
+
+  - email: acmorton@att.com
+    name:
+    username: acmorton@att.com
+
+  - email: julian.reschke@gmx.de
+    name:
+    username: julian.reschke@gmx.de
+
+  - email: paul.hoffman@vpnc.org
+    name:
+    username: paul.hoffman@vpnc.org
+
+  - email: brian@innovationslab.net
+    name:
+    username: brian@innovationslab.net
+
+  - email: mnot@pobox.com
+    name:
+    username: mnot@pobox.com
+
+  - email: davemgarrett@gmail.com
+    name:
+    username: davemgarrett@gmail.com
+
+  - email: turners@ieca.com
+    name:
+    username: turners@ieca.com
+
+  - email: chopps@rawdofmt.org
+    name:
+    username: chopps@rawdofmt.org
+
+  - email: jonathan@vidyo.com
+    name:
+    username: jonathan@vidyo.com
+
+  - email: cbowers@juniper.net
+    name:
+    username: cbowers@juniper.net
+
+  - email: lloyd.wood@yahoo.co.uk
+    name:
+    username: lloyd.wood@yahoo.co.uk
+
+  - email: adityachunar12345@gmail.com
+    name:
+    username: adityachunar12345@gmail.com
+
+  - email: adrian@olddog.co.uk
+    name:
+    username: adrian@olddog.co.uk
+
+  - email: paul@nohats.ca
+    name:
+    username: paul@nohats.ca
+
+  - email: vkg@bell-labs.com
+    name:
+    username: vkg@bell-labs.com
+
+  - email: jclarke@cisco.com
+    name:
+    username: jclarke@cisco.com
+
+  - email: mdb@juniper.net
+    name:
+    username: mdb@juniper.net
+
+  - email: nishida@sfc.wide.ad.jp
+    name:
+    username: nishida@sfc.wide.ad.jp
+
+  - email: jbui@amsl.com
+    name:
+    username: jbui@amsl.com
+
+  - email: serge.raes@orange.com
+    name:
+    username: serge.raes@orange.com
+
+  - email: johnl@iecc.com
+    name:
+    username: johnl@iecc.com
+
+  - email: rg+ietf@qti.qualcomm.com
+    name:
+    username: rg+ietf@qti.qualcomm.com
+
+  - email: watsonbladd@gmail.com
+    name:
+    username: watsonbladd@gmail.com
+
+  - email: gregimirsky@gmail.com
+    name:
+    username: gregimirsky@gmail.com
+
+  - email: jmagallanes@amsl.com
+    name:
+    username: jmagallanes@amsl.com
+
+  - email: dhruv.ietf@gmail.com
+    name:
+    username: dhruv.ietf@gmail.com
+
+  - email: ghwood@ietf.org
+    name:
+    username: ghwood@ietf.org
+
+  - email: lear@cisco.com
+    name:
+    username: lear@cisco.com
+
+  - email: spencerdawkins.ietf@gmail.com
+    name:
+    username: spencerdawkins.ietf@gmail.com
+
+  - email: dkg@fifthhorseman.net
+    name:
+    username: dkg@fifthhorseman.net
+
 milestones:
   Cleanup:
     :name: Cleanup

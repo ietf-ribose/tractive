@@ -10,6 +10,14 @@ RSpec.describe Tractive do
   end
 
   def db_result_hash
-    CONFIG.slice("users", "milestones", "labels")
+    result_hash = CONFIG.slice("users", "milestones", "labels")
+    result_hash["users"] = result_hash["users"].map do |user|
+      {
+        "email" => user["username"] || "",
+        "name" => nil,
+        "username" => nil
+      }
+    end
+    result_hash
   end
 end

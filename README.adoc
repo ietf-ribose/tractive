@@ -1,5 +1,4 @@
 = Tractive: migrating from Trac to GitHub
-
 == Purpose
 
 Tractive is a tool that helps you migrate Trac instances to GitHub.
@@ -432,7 +431,7 @@ users:
     username: example-vale
 ----
 
-If you don't want to map a user, you can just leave the username empty like below:
+If you don't want to map a user, you can just leave the `username` empty like below:
 ----
 users:
   - email: matthew@example.org

@@ -432,6 +432,8 @@ users:
     username: example-vale
 ----
 
+NOTE: If the user don't want to be mapped you can just leave the username empty.
+
 ==== Milestone mapping
 
 `milestones:`:: mapping of milestones.

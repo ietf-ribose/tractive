@@ -432,7 +432,13 @@ users:
     username: example-vale
 ----
 
-NOTE: If the user don't want to be mapped you can just leave the username empty.
+If you don't want to map a user, you can just leave the username empty like below:
+----
+users:
+  - email: matthew@example.org
+    name: Matthew
+    username:
+----
 
 ==== Milestone mapping
 

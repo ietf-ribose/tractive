@@ -30,7 +30,7 @@ module Tractive
       tracstates  = Ticket.distinct.select(:status).select_map(:status).compact
 
       {
-        "users" => Utilities.make_hash("", users),
+        "users" => Utilities.make_each_hash(users, %w[email name username]),
         "milestones" => milestones,
         "labels" => {
           "type" => Utilities.make_hash("type_", types),

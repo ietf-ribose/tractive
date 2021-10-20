@@ -8,6 +8,9 @@ RSpec.describe Migrator::Engine do
   end
 
   it "should output composed tickets in file" do
+    stub_get_labels_request
+    stub_create_labels_request
+
     buffer = StringIO.new
     filename = "#{Dir.pwd}/dryrun_out.json"
     allow(File).to receive(:new).with(filename, "w+").and_return(buffer)

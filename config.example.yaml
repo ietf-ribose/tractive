@@ -54,14 +54,38 @@ labels:
 
   # less useful, but also possible:
   priority:
-    Low:                '@low'
-    High:               '@high'
+    Low:
+      name:             low
+      color:            22dd00
+    High:
+      name:             high
+      color:            ff0000
   severity:
-    blocker:            '#high'
-    critical:           '#critical'
-    major:              '#major'
-    minor:              '#minor'
-    trivial:            '#trivial'
+    trivial:
+      name:             trivial
+      color:            ff0000
+    major:
+      name:             major
+      color:            b44647
+    minor:
+      name:             minor
+      color:            f7347a
+    medium:
+      name:             medium
+      color:            f3c77c
+  tracstate:
+    accepted:
+      name:             accepted
+      color:            22dd00
+    assigned:
+      name:             assigned
+      color:            aadd88
+    closed:
+      name:             closed
+      color:            ee00aa
+    new:
+      name:             new
+      color:
   version:
     '1.3':              v1.3
     '1.4':              v1.4

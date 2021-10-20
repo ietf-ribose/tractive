@@ -10,8 +10,8 @@ module Tractive
       def make_each_hash(values, keys)
         values.map do |value|
           value = [value] unless value.is_a?(Array)
-          keys.zip(value).to_h
-        end
+          [value[0], keys.zip(value).to_h]
+        end.to_h
       end
 
       def setup_db!(db_url)

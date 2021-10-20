@@ -385,23 +385,53 @@ The pattern of a mapping is like:
 +
 [source,yaml]
 ----
-  blocker:  '#blocker'
-  critical: '#critical'
-  major:    '#major'
-  medium:   '#medium'
-  minor:    '#minor'
-  trivial:  '#easy'
-  waiting:  '#pending'
-  n/a:
+  trivial:
+    name: trivial
+    color: ff0000
+  major:
+    name: major
+    color: b44647
+  minor:
+    name: minor
+    color: f7347a
+  medium:
+    name: medium
+    color: f3c77c
 ----
 
 `priority:`::: Priority of the Trac ticket.
 +
 [source,yaml]
 ----
-  Low:  '@low'
-  High: '@high'
+  Low:
+    name: low
+    color: 22dd00
+  High:
+    name: high
+    color: ff0000
 ----
+
+
+`tracstate:`::: Status of the Trac ticket.
++
+[source,yaml]
+----
+  accepted:
+    name: accepted
+    color: 22dd00
+  assigned:
+    name: assigned
+    color: aadd88
+  closed:
+    name: closed
+    color: ee00aa
+  new:
+    name: new
+    color:
+----
+
+
+Note: As `severity`, `priority` and `tracstate` are converted into `labels` on github so there is an option to specify the `color` for those labels.
 
 
 ==== User mapping
@@ -412,7 +442,8 @@ GitHub usernames for users, in the following pattern:
 [source,yaml]
 ----
 users:
-  - email: {Trac email or username}
+  {Trac email or username}:
+    email: {Github email}
     name: {name of the person}
     username: {username on GitHub}
   ...
@@ -423,10 +454,12 @@ EXAMPLE:
 [source,yaml]
 ----
 users:
-  - email: matthew@example.org
+  matthew@gmail.org:
+    email: matthew@example.org
     name: Matthew
     username: example-matt
-  - email: valencia
+  valencia:
+    email: valencia
     name: Valencia
     username: example-vale
 ----
@@ -434,7 +467,8 @@ users:
 If you don't want to map a user, you can just leave the `username` empty like below:
 ----
 users:
-  - email: matthew@example.org
+  matthew@gmail.org:
+    email: matthew@example.org
     name: Matthew
     username:
 ----

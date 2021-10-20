@@ -201,7 +201,7 @@ module Migrator
       def create_labels_on_github(labels)
         return if labels.nil? || labels.empty?
 
-        existing_labels = @client.labels(@repo).map { |label| label["name"] }
+        existing_labels = @client.labels(@repo, per_page: 100).map { |label| label["name"] }
         new_labels = labels.reject { |label| existing_labels.include?(label["name"]) }
 
         new_labels.each do |label|

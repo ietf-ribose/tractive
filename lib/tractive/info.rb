@@ -36,9 +36,9 @@ module Tractive
           "type" => Utilities.make_hash("type_", types),
           "component" => Utilities.make_hash("component_", components),
           "resolution" => Utilities.make_hash("resolution_", resolutions),
-          "severity" => Utilities.make_hash("severity", severity),
-          "priority" => Utilities.make_hash("priority_", priorities),
-          "tracstate" => Utilities.make_hash("tracstate_", tracstates)
+          "severity" => Utilities.make_each_hash(severity, %w[name color]),
+          "priority" => Utilities.make_each_hash(priorities, %w[name color]),
+          "tracstate" => Utilities.make_each_hash(tracstates, %w[name color])
         }
       }
     end

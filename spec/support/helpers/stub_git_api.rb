@@ -19,5 +19,22 @@ module Helpers
         .to_return(status: 200,
                    body: "[]")
     end
+
+    def stub_get_labels_request
+      stub_request(:get, "https://api.github.com/repos/test/repo/labels")
+        .to_return(
+          status: 200,
+          body: [
+            { "name" => "priority_medium" },
+            { "name" => "priority_major" },
+            { "name" => "priority_minor" }
+          ].to_json
+        )
+    end
+
+    def stub_create_labels_request
+      stub_request(:post, "https://api.github.com/repos/test/repo/labels")
+        .to_return(status: 200, body: "[]")
+    end
   end
 end

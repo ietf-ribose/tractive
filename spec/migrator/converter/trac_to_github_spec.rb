@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe Migrator::Converter::TracToGithub do
-  it "compose correct issue" do
+  before :each do
     stub_issues_request
     stub_milestone_map_request
     stub_milestone_request
+    stub_get_labels_request
+    stub_create_labels_request
+  end
+
+  it "compose correct issue" do
     ticket = Tractive::Ticket.find(id: 3)
 
     actual_ticket_hash = Migrator::Converter::TracToGithub.new(options_for_migrator).compose(ticket)
@@ -15,9 +20,6 @@ RSpec.describe Migrator::Converter::TracToGithub do
   end
 
   it "compose correct issue without assignee" do
-    stub_issues_request
-    stub_milestone_map_request
-    stub_milestone_request
     ticket = Tractive::Ticket.find(id: 98)
 
     actual_ticket_hash = Migrator::Converter::TracToGithub.new(options_for_migrator).compose(ticket)
@@ -28,10 +30,6 @@ RSpec.describe Migrator::Converter::TracToGithub do
   end
 
   it "compose correct issue with all comments as single post" do
-    stub_issues_request
-    stub_milestone_map_request
-    stub_milestone_request
-
     ticket = Tractive::Ticket.find(id: 170)
 
     actual_ticket_hash = Migrator::Converter::TracToGithub.new(options_for_migrator(singlepost: true)).compose(ticket)

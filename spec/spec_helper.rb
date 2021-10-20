@@ -9,7 +9,6 @@ require_relative "support/helpers/ticket_compose"
 
 WebMock.disable_net_connect!(allow_localhost: true)
 CONFIG = YAML.load_file("spec/files/test.config.yaml")
-CONFIG["users"] = CONFIG["users"].map { |user| [user["email"], user["username"]] }.to_h
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

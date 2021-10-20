@@ -17,6 +17,9 @@ module Migrator
         @wiki_attachments_url = args[:cfg]["trac"]["wiki_attachments_url"]
 
         load_milestone_map
+        create_labels_on_github(@labels_cfg["severity"].values)
+        create_labels_on_github(@labels_cfg["priority"].values)
+        create_labels_on_github(@labels_cfg["tracstate"].values)
 
         @uri_parser = URI::Parser.new
         @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url)
@@ -116,7 +119,8 @@ module Migrator
         # compose body
         body = [badgetable, body, footer].join("\n\n___\n")
 
-        labels.add("owner:#{github_assignee}")
+        labels.add("name" => "owner:#{github_assignee}") unless github_assignee.nil? || github_assignee.empty?
+        labels = labels.map { |label| label["name"] }
 
         issue = {
           "title" => ticket[:summary],
@@ -129,7 +133,7 @@ module Migrator
 
         if @users.key?(ticket[:owner])
           owner = trac_mail(ticket[:owner])
-          github_owner = @users[owner]
+          github_owner = @users[owner]["username"]
           $logger.debug("..owner in trac: #{owner}")
           $logger.debug("..assignee in GitHub: #{github_owner}")
           issue["assignee"] = github_owner
@@ -155,11 +159,11 @@ module Migrator
       private
 
       def map_user(user)
-        @users[user] || user
+        @users.fetch(user, {})["email"] || user
       end
 
       def map_assignee(user)
-        @users[user]
+        @users.fetch(user, {})["email"]
       end
 
       def load_milestone_map
@@ -168,9 +172,9 @@ module Migrator
         newmilestonekeys = @milestonesfromtrac.keys - @milestonemap.keys
 
         newmilestonekeys.each do |milestonelabel|
-          milestone           = {
+          milestone = {
             "title" => milestonelabel.to_s,
-            "state" => @milestonesfromtrac[milestonelabel][:completed].nil? ? "open" : "closed",
+            "state" => @milestonesfromtrac[milestonelabel][:completed].to_i.zero? ? "open" : "closed",
             "description" => @milestonesfromtrac[milestonelabel][:description] || "no description in trac",
             "due_on" => "2012-10-09T23:39:01Z"
           }
@@ -192,6 +196,21 @@ module Migrator
                                                          direction: "desc" })
         @milestonemap = milestonesongithub.map { |i| [i["title"], i["number"]] }.to_h
         nil
+      end
+
+      def create_labels_on_github(labels)
+        return if labels.nil? || labels.empty?
+
+        existing_labels = @client.labels(@repo).map { |label| label["name"] }
+        new_labels = labels.reject { |label| existing_labels.include?(label["name"]) }
+
+        new_labels.each do |label|
+          params = { name: label["name"] }
+          params["color"] = label["color"] unless label["color"].nil?
+
+          @client.create_label(@repo, params)
+          $logger.info("Created label: #{label["name"]}")
+        end
       end
 
       def ticket_change(append, meta)

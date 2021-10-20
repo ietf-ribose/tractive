@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tractive (1.0.3)
+    tractive (1.0.4)
       mysql2
       ox
       rest-client

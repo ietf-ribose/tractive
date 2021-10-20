@@ -21,7 +21,7 @@ module Helpers
     end
 
     def stub_get_labels_request
-      stub_request(:get, "https://api.github.com/repos/test/repo/labels")
+      stub_request(:get, "https://api.github.com/repos/test/repo/labels?per_page=100")
         .to_return(
           status: 200,
           body: [

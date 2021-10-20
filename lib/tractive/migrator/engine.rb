@@ -58,7 +58,7 @@ module Migrator
       @dry_run          = args[:opts][:dryrun]
       @output_file      = File.new(dry_run_output_file, "w+")
       @delimiter        = "{"
-      @revmap           = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]["revmapfile"])
+      @revmap           = load_revmap_file(args[:opts][:revmapfile] || args[:cfg]["revmap_path"])
       @safetychecks     = safetychecks
       @start_ticket     = (start_ticket || (@last_created_issue + 1)).to_i
       @filter_closed    = filter_closed

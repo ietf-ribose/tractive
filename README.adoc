@@ -431,7 +431,7 @@ The pattern of a mapping is like:
 ----
 
 
-Note: As `severity`, `priority` and `tracstate` are converted into `labels` on github so there is an option to specify the `color` for those labels.
+NOTE: As `severity`, `priority` and `tracstate` are converted into `labels` on github so there is an option to specify the `color` for those labels.
 
 
 ==== User mapping

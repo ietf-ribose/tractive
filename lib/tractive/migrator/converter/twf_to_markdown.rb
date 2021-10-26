@@ -41,6 +41,8 @@ module Migrator
                       .map { |rev, sha| [rev.gsub(/^r/, ""), sha] }.to_h # remove leading "r" if present
           end
         end
+
+        revmap
       end
 
       # CommitTicketReference

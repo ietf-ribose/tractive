@@ -48,7 +48,7 @@ module Tractive
       def map_changeset(str, revmap, changeset_base_url = "")
         if revmap&.key?(str)
           base_url = changeset_base_url
-          base_url += "/" if url[-1] && url[-1] != "/"
+          base_url += "/" if base_url[-1] && base_url[-1] != "/"
           "#{base_url}#{revmap[str].strip}"
         else
           "[#{str}]"

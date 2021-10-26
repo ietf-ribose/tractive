@@ -25,6 +25,9 @@ Style/Documentation:
 Style/GlobalVars:
   Enabled: false
 
+Style/HashTransformKeys:
+   Enabled: false
+
 Metrics/AbcSize:
   Enabled: false
 

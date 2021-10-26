@@ -87,7 +87,7 @@ module Migrator
 
           revmap = f.each_line
                     .map { |line| line.split(/\s+\|\s+/) }
-                    .map { |rev, sha, _| [rev.gsub(/^r/, ""), sha] }.to_h # remove leading "r" if present
+                    .map { |rev, sha| [rev.gsub(/^r/, ""), sha] }.to_h # remove leading "r" if present
         end
       end
 

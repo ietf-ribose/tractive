@@ -4,11 +4,12 @@ module Migrator
   module Converter
     # twf => Trac wiki format
     class TwfToMarkdown
-      def initialize(base_url, attach_url, changeset_base_url, wiki_attachments_url)
+      def initialize(base_url, attach_url, changeset_base_url, wiki_attachments_url, revmap_file_path)
         @base_url = base_url
         @attach_url = attach_url
         @changeset_base_url = changeset_base_url
         @wiki_attachments_url = wiki_attachments_url
+        @revmap = load_revmap_file(revmap_file_path)
       end
 
       def convert(str)
@@ -25,6 +26,22 @@ module Migrator
       end
 
       private
+
+      def load_revmap_file(revmapfile)
+        # load revision mapping file and convert it to a hash.
+        # This revmap file allows to map between SVN revisions (rXXXX)
+        # and git commit sha1 hashes.
+        revmap = nil
+        if revmapfile
+          File.open(revmapfile, "r:UTF-8") do |f|
+            $logger.info("loading revision map #{revmapfile}")
+
+            revmap = f.each_line
+                      .map { |line| line.split(/\s+\|\s+/) }
+                      .map { |rev, sha| [rev.gsub(/^r/, ""), sha] }.to_h # remove leading "r" if present
+          end
+        end
+      end
 
       # CommitTicketReference
       def convert_ticket_reference(str)
@@ -72,9 +89,10 @@ module Migrator
         str.gsub!(%r{#{Regexp.quote(changeset_base_url)}/(\d+)/?}, '[changeset:\1]') if changeset_base_url
         str.gsub!(/\[changeset:"r(\d+)".*\]/, '[changeset:\1]')
         str.gsub!(/\[changeset:r(\d+)\]/, '[changeset:\1]')
-        str.gsub!(/\br(\d+)\b/) { Tractive::Utilities.map_changeset(Regexp.last_match[1]) }
-        str.gsub!(/\[changeset:"(\d+)".*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1]) }
-        str.gsub!(/\[changeset:"(\d+).*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1]) }
+        str.gsub!(/\br(\d+)\b/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
+        str.gsub!(/\[changeset:"(\d+)".*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
+        str.gsub!(/\[changeset:(\d+).*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
+        str.gsub!(/\[(\d+)\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
       end
 
       # Font styles

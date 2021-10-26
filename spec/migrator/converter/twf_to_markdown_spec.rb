@@ -3,6 +3,21 @@
 RSpec.describe Migrator::Converter::TwfToMarkdown do
   let(:twf_to_markdown) { Migrator::Converter::TwfToMarkdown.new(*options_for_markdown_converter.values) }
 
+  it "should convert changesets" do
+    stub_issues_request
+    stub_milestone_map_request
+    stub_milestone_request
+
+    str1 = "Fixed in [1234]"
+    str2 = "Fixed in [1234567]"
+
+    twf_to_markdown.send(:convert_changeset, str1, options_for_markdown_converter[:changeset_base_url])
+    twf_to_markdown.send(:convert_changeset, str2, options_for_markdown_converter[:changeset_base_url])
+
+    expect(str1).to eq("Fixed in https://github.com/repo/commits/abcd123")
+    expect(str2).to eq("Fixed in [1234567]")
+  end
+
   it "should convert ticket base url" do
     str = "https://foo.bar/trac/foobar/ticket/123"
 

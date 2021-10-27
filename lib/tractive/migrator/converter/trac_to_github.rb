@@ -15,6 +15,7 @@ module Migrator
         @repo                 = args[:cfg]["github"]["repo"]
         @client               = GithubApi::Client.new(access_token: args[:cfg]["github"]["token"])
         @wiki_attachments_url = args[:cfg]["trac"]["wiki_attachments_url"]
+        @revmap_file_path     = args[:opts][:revmapfile] || args[:cfg]["revmap_path"]
 
         load_milestone_map
         create_labels_on_github(@labels_cfg["severity"].values)
@@ -22,7 +23,7 @@ module Migrator
         create_labels_on_github(@labels_cfg["tracstate"].values)
 
         @uri_parser = URI::Parser.new
-        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url)
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url, @revmap_file_path)
       end
 
       def compose(ticket)
@@ -262,7 +263,7 @@ module Migrator
           changeset = body.match(/In \[changeset:"(\d+)/).to_a[1]
           text += if changeset
                     # changesethash = @revmap[changeset]
-                    "_committed #{Tractive::Utilities.map_changeset(changeset)}_"
+                    "_committed #{Tractive::Utilities.map_changeset(changeset, @revmap, @changeset_base_url)}_"
                   else
                     "_commented_\n\n"
                   end

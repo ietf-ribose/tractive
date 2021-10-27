@@ -101,7 +101,7 @@ module Migrator
         milestone = @milestonemap[ticket[:milestone]]
 
         # compute footer
-        footer = "_Issue migrated from trac:#{ticket[:id]} at #{Time.now}_"
+        footer = "_Issue migrated from #{trac_ticket_link(ticket)} at #{Time.now}_"
 
         # compute badgetabe
         #
@@ -321,6 +321,12 @@ module Migrator
       def interested_in_change?(kind, newvalue)
         !(%w[keywords cc reporter version].include?(kind) ||
           (kind == "comment" && (newvalue.nil? || newvalue.lstrip.empty?)))
+      end
+
+      def trac_ticket_link(ticket)
+        return "trac:#{ticket[:id]}" unless @tracticketbaseurl
+
+        "[trac:#{ticket[:id]}](#{@tracticketbaseurl}/#{ticket[:id]})"
       end
     end
   end

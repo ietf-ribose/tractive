@@ -297,6 +297,8 @@ trac:
   ticketbaseurl: https://example.org/trac/foobar/ticket
 ----
 
+`ticketbaseurl:`::: The Trac Url which will be added in Github issues. A link will be added in the footer of Github issue to link it to Trac ticket.
+
 [[config-github]]
 ==== GitHub configuration
 

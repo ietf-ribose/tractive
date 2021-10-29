@@ -21,6 +21,7 @@ module Migrator
         create_labels_on_github(@labels_cfg["severity"].values)
         create_labels_on_github(@labels_cfg["priority"].values)
         create_labels_on_github(@labels_cfg["tracstate"].values)
+        create_labels_on_github(@labels_cfg["component"].values)
 
         @uri_parser = URI::Parser.new
         @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url, @revmap_file_path)
@@ -78,7 +79,6 @@ module Migrator
 
         badges = Set[]
 
-        badges.add(@labels_cfg.fetch("component", {})[ticket[:component]])
         badges.add(@labels_cfg.fetch("type", {})[ticket[:type]])
         badges.add(@labels_cfg.fetch("resolution", {})[ticket[:resolution]])
         badges.add(@labels_cfg.fetch("version", {})[ticket[:version]])
@@ -86,6 +86,8 @@ module Migrator
         labels.add(@labels_cfg.fetch("severity", {})[ticket[:severity]])
         labels.add(@labels_cfg.fetch("priority", {})[ticket[:priority]])
         labels.add(@labels_cfg.fetch("tracstate", {})[ticket[:status]])
+        labels.add(@labels_cfg.fetch("component", {})[ticket[:component]])
+
         labels.delete(nil)
 
         keywords = ticket[:keywords]
@@ -203,7 +205,7 @@ module Migrator
         return if labels.nil? || labels.empty?
 
         existing_labels = @client.labels(@repo, per_page: 100).map { |label| label["name"] }
-        new_labels = labels.reject { |label| existing_labels.include?(label["name"]) }
+        new_labels = labels.reject { |label| existing_labels.include?(label["name"].strip) }
 
         new_labels.each do |label|
           params = { name: label["name"] }

@@ -34,8 +34,8 @@ module Tractive
         "milestones" => milestones,
         "labels" => {
           "type" => Utilities.make_hash("type_", types),
-          "component" => Utilities.make_hash("component_", components),
           "resolution" => Utilities.make_hash("resolution_", resolutions),
+          "component" => Utilities.make_each_hash(components, %w[name color], "component: "),
           "severity" => Utilities.make_each_hash(severity, %w[name color]),
           "priority" => Utilities.make_each_hash(priorities, %w[name color]),
           "tracstate" => Utilities.make_each_hash(tracstates, %w[name color])

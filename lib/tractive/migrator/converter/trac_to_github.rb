@@ -6,7 +6,7 @@ module Migrator
       def initialize(args)
         @tracticketbaseurl    = args[:cfg]["trac"]["ticketbaseurl"]
         @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("attachments", "url")
-        @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"]
+        @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"] || ""
         @singlepost           = args[:opts][:singlepost]
         @labels_cfg           = args[:cfg]["labels"].transform_values(&:to_h)
         @milestonesfromtrac   = args[:cfg]["milestones"]
@@ -205,7 +205,7 @@ module Migrator
         return if labels.nil? || labels.empty?
 
         existing_labels = @client.labels(@repo, per_page: 100).map { |label| label["name"] }
-        new_labels = labels.reject { |label| existing_labels.include?(label["name"].strip) }
+        new_labels = labels.reject { |label| existing_labels.include?(label["name"]&.strip) }
 
         new_labels.each do |label|
           params = { name: label["name"] }

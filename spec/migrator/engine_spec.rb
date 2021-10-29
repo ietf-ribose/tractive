@@ -5,6 +5,9 @@ RSpec.describe Migrator::Engine do
     stub_issues_request
     stub_milestone_map_request
     stub_milestone_request
+
+    time_now = Time.now
+    allow(Time).to receive(:now).and_return(time_now)
   end
 
   it "should output composed tickets in file" do

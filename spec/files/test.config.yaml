@@ -670,18 +670,42 @@ labels:
     defect: type_defect
     enhancement: type_enhancement
   component:
-    admin/: component_admin/
-    'Datatracker: Base templates': 'component_Datatracker: Base templates'
-    'Datatracker: Testing': 'component_Datatracker: Testing'
-    idtracker/: component_idtracker/
-    doc/: component_doc/
-    'Project: Agenda': 'component_Project: Agenda'
-    doc/charter-: component_doc/charter-
-    submit/: component_submit/
-    'MailArchive: User Interface': 'component_MailArchive: User Interface'
-    group/: component_group/
-    meeting/: component_meeting/
-    meeting/*/schedule/: component_meeting/*/schedule/
+    admin/:
+      name: 'component: admin/'
+      color:
+    'Datatracker: Base templates':
+      name: 'component: Datatracker: Base templates'
+      color:
+    'Datatracker: Testing':
+      name: 'component: Datatracker: Testing'
+      color:
+    idtracker/:
+      name: 'component: idtracker/'
+      color:
+    doc/:
+      name: 'component: doc/'
+      color:
+    'Project: Agenda':
+      name: 'component: Project: Agenda'
+      color:
+    doc/charter-:
+      name: 'component: doc/charter-'
+      color:
+    submit/:
+      name: 'component: submit/'
+      color:
+    'MailArchive: User Interface':
+      name: 'component: MailArchive: User Interface'
+      color:
+    group/:
+      name: 'component: group/'
+      color:
+    meeting/:
+      name: 'component: meeting/'
+      color:
+    meeting/*/schedule/:
+      name: 'component: meeting/*/schedule/'
+      color:
   resolution:
     fixed: resolution_fixed
     wontfix: resolution_wontfix

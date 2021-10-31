@@ -7,10 +7,10 @@ module Tractive
         array.map { |i| [i, "#{prefix}#{i}"] }.to_h
       end
 
-      def make_each_hash(values, keys)
+      def make_each_hash(values, keys, prefix = "")
         values.map do |value|
           value = [value] unless value.is_a?(Array)
-          [value[0], keys.zip(value).to_h]
+          [value[0], keys.zip(value.map { |v| "#{prefix}#{v}" }).to_h]
         end.to_h
       end
 

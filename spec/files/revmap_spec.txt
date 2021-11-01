@@ -1,2 +1,3 @@
-r1 | a781c88 | test file added
-r2 | a78fsc8 | another file added
+r1 | a781c88
+r2 | a78fsc8
+r1234 | abcd123

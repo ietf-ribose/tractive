@@ -6,7 +6,7 @@ module Migrator
       def initialize(args)
         @tracticketbaseurl    = args[:cfg]["trac"]["ticketbaseurl"]
         @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("attachments", "url")
-        @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"]
+        @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"] || ""
         @singlepost           = args[:opts][:singlepost]
         @labels_cfg           = args[:cfg]["labels"].transform_values(&:to_h)
         @milestonesfromtrac   = args[:cfg]["milestones"]
@@ -15,14 +15,16 @@ module Migrator
         @repo                 = args[:cfg]["github"]["repo"]
         @client               = GithubApi::Client.new(access_token: args[:cfg]["github"]["token"])
         @wiki_attachments_url = args[:cfg]["trac"]["wiki_attachments_url"]
+        @revmap_file_path     = args[:opts][:revmapfile] || args[:cfg]["revmap_path"]
 
         load_milestone_map
         create_labels_on_github(@labels_cfg["severity"].values)
         create_labels_on_github(@labels_cfg["priority"].values)
         create_labels_on_github(@labels_cfg["tracstate"].values)
+        create_labels_on_github(@labels_cfg["component"].values)
 
         @uri_parser = URI::Parser.new
-        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url)
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url, @revmap_file_path)
       end
 
       def compose(ticket)
@@ -77,7 +79,6 @@ module Migrator
 
         badges = Set[]
 
-        badges.add(@labels_cfg.fetch("component", {})[ticket[:component]])
         badges.add(@labels_cfg.fetch("type", {})[ticket[:type]])
         badges.add(@labels_cfg.fetch("resolution", {})[ticket[:resolution]])
         badges.add(@labels_cfg.fetch("version", {})[ticket[:version]])
@@ -85,6 +86,8 @@ module Migrator
         labels.add(@labels_cfg.fetch("severity", {})[ticket[:severity]])
         labels.add(@labels_cfg.fetch("priority", {})[ticket[:priority]])
         labels.add(@labels_cfg.fetch("tracstate", {})[ticket[:status]])
+        labels.add(@labels_cfg.fetch("component", {})[ticket[:component]])
+
         labels.delete(nil)
 
         keywords = ticket[:keywords]
@@ -100,7 +103,7 @@ module Migrator
         milestone = @milestonemap[ticket[:milestone]]
 
         # compute footer
-        footer = "_Issue migrated from trac:#{ticket[:id]} at #{Time.now}_"
+        footer = "_Issue migrated from #{trac_ticket_link(ticket)} at #{Time.now}_"
 
         # compute badgetabe
         #
@@ -202,7 +205,7 @@ module Migrator
         return if labels.nil? || labels.empty?
 
         existing_labels = @client.labels(@repo, per_page: 100).map { |label| label["name"] }
-        new_labels = labels.reject { |label| existing_labels.include?(label["name"]) }
+        new_labels = labels.reject { |label| existing_labels.include?(label["name"]&.strip) }
 
         new_labels.each do |label|
           params = { name: label["name"] }
@@ -262,7 +265,7 @@ module Migrator
           changeset = body.match(/In \[changeset:"(\d+)/).to_a[1]
           text += if changeset
                     # changesethash = @revmap[changeset]
-                    "_committed #{Tractive::Utilities.map_changeset(changeset)}_"
+                    "_committed #{Tractive::Utilities.map_changeset(changeset, @revmap, @changeset_base_url)}_"
                   else
                     "_commented_\n\n"
                   end
@@ -320,6 +323,12 @@ module Migrator
       def interested_in_change?(kind, newvalue)
         !(%w[keywords cc reporter version].include?(kind) ||
           (kind == "comment" && (newvalue.nil? || newvalue.lstrip.empty?)))
+      end
+
+      def trac_ticket_link(ticket)
+        return "trac:#{ticket[:id]}" unless @tracticketbaseurl
+
+        "[trac:#{ticket[:id]}](#{@tracticketbaseurl}/#{ticket[:id]})"
       end
     end
   end

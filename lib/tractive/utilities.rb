@@ -7,10 +7,10 @@ module Tractive
         array.map { |i| [i, "#{prefix}#{i}"] }.to_h
       end
 
-      def make_each_hash(values, keys)
+      def make_each_hash(values, keys, prefix = "")
         values.map do |value|
           value = [value] unless value.is_a?(Array)
-          [value[0], keys.zip(value).to_h]
+          [value[0], keys.zip(value.map { |v| "#{prefix}#{v}" }).to_h]
         end.to_h
       end
 
@@ -45,11 +45,13 @@ module Tractive
       end
 
       # returns the git commit hash for a specified revision (using revmap hash)
-      def map_changeset(str)
-        if @revmap&.key?(str)
-          "[r#{str}](../commit/#{@revmap[str]}) #{@revmap[str]}"
+      def map_changeset(str, revmap, changeset_base_url = "")
+        if revmap&.key?(str)
+          base_url = changeset_base_url
+          base_url += "/" if base_url[-1] && base_url[-1] != "/"
+          "#{base_url}#{revmap[str].strip}"
         else
-          str
+          "[#{str}]"
         end
       end
 

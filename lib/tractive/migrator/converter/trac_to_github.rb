@@ -208,7 +208,7 @@ module Migrator
         existing_labels = []
         result = @client.labels(@repo, per_page: 100, page: page).map { |label| label["name"] }
 
-        while !result.empty?
+        until result.empty?
           existing_labels += result
           page += 1
           result = @client.labels(@repo, per_page: 100, page: page).map { |label| label["name"] }

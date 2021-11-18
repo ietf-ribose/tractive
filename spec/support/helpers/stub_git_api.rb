@@ -21,7 +21,7 @@ module Helpers
     end
 
     def stub_get_labels_request
-      stub_request(:get, "https://api.github.com/repos/test/repo/labels?per_page=100")
+      stub_request(:get, "https://api.github.com/repos/test/repo/labels?page=1&per_page=100")
         .to_return(
           status: 200,
           body: [
@@ -29,6 +29,12 @@ module Helpers
             { "name" => "priority_major" },
             { "name" => "priority_minor" }
           ].to_json
+        )
+
+      stub_request(:get, "https://api.github.com/repos/test/repo/labels?page=2&per_page=100")
+        .to_return(
+          status: 200,
+          body: [].to_json
         )
     end
 

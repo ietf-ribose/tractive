@@ -10,12 +10,15 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
     str1 = "Fixed in [1234]"
     str2 = "Fixed in [1234567]"
+    str3 = "Fixed in [1234/mailarch]"
 
     twf_to_markdown.send(:convert_changeset, str1, options_for_markdown_converter[:changeset_base_url])
     twf_to_markdown.send(:convert_changeset, str2, options_for_markdown_converter[:changeset_base_url])
+    twf_to_markdown.send(:convert_changeset, str3, options_for_markdown_converter[:changeset_base_url])
 
     expect(str1).to eq("Fixed in https://github.com/repo/commits/abcd123")
     expect(str2).to eq("Fixed in [1234567]")
+    expect(str3).to eq("Fixed in https://github.com/repo/commits/abcd123")
   end
 
   it "should convert ticket base url" do

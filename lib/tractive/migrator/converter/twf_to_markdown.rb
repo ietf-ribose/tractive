@@ -95,7 +95,7 @@ module Migrator
         str.gsub!(/\[changeset:"(\d+)".*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
         str.gsub!(/\[changeset:(\d+).*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
         str.gsub!(/\[(\d+)\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
-        str.gsub!(/\[(\d+)\/.*\]/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
+        str.gsub!(%r{\[(\d+)/.*\]}) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }
       end
 
       # Font styles

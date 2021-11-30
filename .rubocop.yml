@@ -34,6 +34,9 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Enabled: false
 
+Metrics/ModuleLength:
+  Max: 150
+
 Security/Open:
   Enabled: false
 

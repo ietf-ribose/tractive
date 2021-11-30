@@ -732,3 +732,7 @@ labels:
     closed:
       name: closed
       color:
+
+attachments:
+  url: http://www.abc.com/test
+  hashed: true

@@ -19,14 +19,18 @@ module Tractive
       def filter_column(options)
         return self if options.nil? || options.values.compact.empty?
 
-        case options[:operator].downcase
-        when "like"
-          where { Sequel.like(options[:column_name].to_sym, options[:column_value]) }
-        when "not like"
-          where { ~Sequel.like(options[:column_name].to_sym, options[:column_value]) }
-        else
-          where { Sequel.lit("#{options[:column_name]} #{options[:operator]} '#{options[:column_value]}'") }
-        end
+        query = case options[:operator].downcase
+                when "like"
+                  Sequel.like(options[:column_name].to_sym, options[:column_value])
+                when "not like"
+                  ~Sequel.like(options[:column_name].to_sym, options[:column_value])
+                else
+                  Sequel.lit("#{options[:column_name]} #{options[:operator]} '#{options[:column_value]}'")
+                end
+
+        query = Sequel.|(query, { options[:column_name].to_sym => nil }) if options[:include_null]
+
+        where { query }
       end
     end
 

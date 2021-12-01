@@ -11,6 +11,12 @@ RSpec.describe Tractive::Trac do
     expect(tickets.sql).to eq("SELECT * FROM `ticket` WHERE ((`id` >= 10) AND (`component` LIKE 'MailArchive%' ESCAPE '\\')) ORDER BY `id`")
   end
 
+  it "counts total tickets having `MailArchive` as prefix in component including null values" do
+    tickets = Tractive::Ticket.for_migration(10, false, options_for_column_having_prefix("component", "MailArchive", true))
+    expect(tickets.count).to eq(2)
+    expect(tickets.sql).to eq("SELECT * FROM `ticket` WHERE ((`id` >= 10) AND ((`component` LIKE 'MailArchive%' ESCAPE '\\') OR (`component` IS NULL))) ORDER BY `id`")
+  end
+
   it "should count total tickets having `medium` priority" do
     tickets = Tractive::Ticket.for_migration(1, false, options_for_column_equal("priority", "medium"))
 
@@ -24,11 +30,12 @@ RSpec.describe Tractive::Trac do
     expect(ticket.all_changes.count).to eq(19)
   end
 
-  def options_for_column_having_prefix(column_name, prefix)
+  def options_for_column_having_prefix(column_name, prefix, include_null = false)
     {
       column_name: column_name,
       operator: "like",
-      column_value: "#{prefix}%"
+      column_value: "#{prefix}%",
+      include_null: include_null
     }
   end
 

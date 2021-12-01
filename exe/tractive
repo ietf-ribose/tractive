@@ -30,6 +30,8 @@ class TractiveCommand < Thor
                             desc: "Operator for filter."
   method_option "columnvalue", type: :string, aliases: ["--column-value"],
                                desc: "Value of the column to filter."
+  method_option "includenull", type: :boolean, aliases: ["--include-null"],
+                               desc: "Flag for including null values in the filter result."
 
   method_option "importfromfile", type: :string, aliases: ["-I", "--import-from-file"],
                                   desc: "Import issues from a json file"

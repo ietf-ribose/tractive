@@ -682,6 +682,7 @@ The following options are allowed (at least one necessary):
 * `column-name`
 * `operator`
 * `column-value`
+* `include-null`
 
 | Boolean
 
@@ -696,6 +697,10 @@ The following options are allowed (at least one necessary):
 | `--column-value`
 | Value of the column to filter.
 | String
+
+| `--include-null`
+| Include rows having null value in filtered column. This is database dependent for example `SQLite` by default does not include null values while filtering.
+| Boolean
 
 | `-h`, `help`
 | Display the Tractive help message, or you can provide a command to know more

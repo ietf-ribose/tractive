@@ -699,7 +699,7 @@ The following options are allowed (at least one necessary):
 | String
 
 | `--include-null`
-| Include rows having null value in filtered column. This is database dependent for example `SQLite` by default does not include null values while filtering.
+| Include rows having null value in filtered column.
 | Boolean
 
 | `-h`, `help`

@@ -510,7 +510,7 @@ milestones:
 
     `url:`:::: URL to obtain Trac attachments from
 
-    `hashed:`:::: Wether the url has hased or plain image names and ids
+    `hashed:`:::: Whether the url has hased or plain image names and ids
 
     `export_folder:`:::: folder where the attachments will be downloaded to from Trac.
 
@@ -773,7 +773,7 @@ Then you can run the migration with:
 ----
 tractive migrate-wikis \
   --attachment-base-url <url for the attachments> \
-  --export-file-path <full path of trac database> \
+  --trac-database-path <full path of trac database> \
   --repo-path <path to cloned Git wiki repository, e.g. {name-of-repo}.wiki>
 ----
 
@@ -790,7 +790,7 @@ After that open a terminal in the git wiki folder and run `git push`
 If attachment files are reachable via a URL we reference this here.
 | String
 
-| `-e`, `--export-file-path`
+| `-d`, `--trac-database-path`
 | (required unless specified in config file) Full path of the Trac sqlite3 database export file.
 | String
 

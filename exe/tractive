@@ -54,8 +54,8 @@ class TractiveCommand < CommandBase
   desc "migrate-wikis", "Migrate Trac wikis to a git repository, preserving history (including authors, dates, and comments)"
   method_option "attachment-base-url", type: :string, aliases: ["-a"], banner: "http://<base-url>",
                                        desc: "If attachment files are reachable via a URL we reference this here"
-  method_option "export-file-path", type: :string, aliases: ["-e"], banner: "/PATH/TO/EXPORTFILE",
-                                    desc: "Full path of the Trac sqlite3 database export file"
+  method_option "trac-database-path", type: :string, aliases: ["-d"], banner: "/PATH/TO/EXPORTFILE",
+                                desc: "Full path of the Trac sqlite3 database export file"
   method_option "repo-path", type: :string, aliases: ["-r"], banner: "/GIT/ROOT/DIR",
                              desc: "Full path to the root of the git-repository that is our destination"
   def migrate_wikis

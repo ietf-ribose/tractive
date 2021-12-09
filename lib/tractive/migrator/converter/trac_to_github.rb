@@ -291,7 +291,7 @@ module Migrator
           name = meta[:filename]
           body = meta[:description]
           if @attachurl
-            url = @uri_parser.escape("#{@attachurl}/#{attachment_path(meta[:id], name, @attachment_options)}")
+            url = @uri_parser.escape("#{@attachurl}/#{Tractive::Utilities.attachment_path(meta[:id], name, @attachment_options)}")
             text += "[`#{name}`](#{url})"
             body += "\n![#{name}](#{url})" if [".png", ".jpg", ".gif"].include? File.extname(name).downcase
           else
@@ -342,17 +342,6 @@ module Migrator
         return "trac:#{ticket[:id]}" unless @tracticketbaseurl
 
         "[trac:#{ticket[:id]}](#{@tracticketbaseurl}/#{ticket[:id]})"
-      end
-
-      def attachment_path(id, filename, options = {})
-        return "#{id}/#{filename}" unless options[:hashed]
-
-        folder_name = Digest::SHA1.hexdigest(id)
-        parent_folder_name = folder_name[0..2]
-        hashed_filename = Digest::SHA1.hexdigest(filename)
-        file_extension = File.extname(filename)
-
-        "#{parent_folder_name}/#{folder_name}/#{hashed_filename}#{file_extension}"
       end
     end
   end

@@ -16,8 +16,8 @@ module Migrator
 
         @tracticketbaseurl    = @config["trac"]["ticketbaseurl"]
         @changeset_base_url   = @config["trac"]["changeset_base_url"] || ""
-        @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url")
-        @repo_path            = @options["repo-path"]
+        @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
+        @repo_path            = @options["repo-path"] || ""
         @revmap_path          = @config["revmap_path"]
 
         @attachment_options   = {
@@ -31,39 +31,6 @@ module Migrator
       end
 
       def migrate_wikis
-        process_wikis
-        # rename_current
-      end
-
-      private
-
-      def verify_options
-        $logger.info("Verifying options...")
-
-        missing_options = []
-        missing_options << "attachment-base-url" if @wiki_attachments_url.nil? || @wiki_attachments_url.empty?
-        missing_options << "repo-path" if @repo_path.nil? || @repo_path.empty?
-
-        return if missing_options.empty?
-
-        $logger.error("Following options are missing: #{missing_options} - exiting...")
-        exit(1)
-      end
-
-      def verify_locations
-        $logger.info("Verifying locations...")
-        missing_directories = []
-
-        # git-root exists?
-        missing_directories << "repo-path" unless Dir.exist?(@repo_path)
-
-        return if missing_directories.empty?
-
-        $logger.error("Following directories are missing: #{missing_directories} - exiting ...")
-        exit(1)
-      end
-
-      def process_wikis
         $logger.info("Processing the wiki...")
 
         Dir.chdir(@options["repo-path"]) do
@@ -106,6 +73,34 @@ module Migrator
         end
       end
 
+      private
+
+      def verify_options
+        $logger.info("Verifying options...")
+
+        missing_options = []
+        missing_options << "attachment-base-url" if @wiki_attachments_url.empty?
+        missing_options << "repo-path" if @repo_path.empty?
+
+        return if missing_options.empty?
+
+        $logger.error("Following options are missing: #{missing_options} - exiting...")
+        exit(1)
+      end
+
+      def verify_locations
+        $logger.info("Verifying locations...")
+        missing_directories = []
+
+        # git-root exists?
+        missing_directories << "repo-path" unless Dir.exist?(@repo_path)
+
+        return if missing_directories.empty?
+
+        $logger.error("Following directories are missing: #{missing_directories} - exiting ...")
+        exit(1)
+      end
+
       def cleanse_filename(name)
         # Get rid of 'magic' characters from potential filename - replace with '_'
         # Magic: [ /<>- ]
@@ -128,33 +123,6 @@ module Migrator
       def execute_command(command)
         `#{command}`
         $CHILD_STATUS
-      end
-
-      def rename_current
-        # We're going to do ONE commit that renames All The Things to *.md
-        $logger.info("Renaming all to *.md...")
-
-        Dir.chdir(@options["repo-path"]) do
-          wikis = Tractive::Wiki.latest_versions.order(:name)
-
-          # For every every file in the wiki, get the max-version, rename to *.md
-          wikis.each do |row|
-            next if skip_file(row[:name])
-
-            fname = cleanse_filename(row[:name])
-            fname_md = "#{fname}.md"
-
-            # git-mv the file to give it the .md extension
-            rc = execute_command("git mv #{fname} #{fname_md}")
-            $logger.error("ERROR [#{rc}] at git-mv #{fname}!!!") unless rc.success?
-          end
-
-          # git-commit ALL THE THINGS
-          rc = execute_command("git commit -m \"#{MOVE_COMMENT}\"")
-          $logger.error("ERROR [#{rc}] at MOVE git-commit!!!") unless rc.success?
-
-          rc
-        end
       end
     end
   end

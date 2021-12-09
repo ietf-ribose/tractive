@@ -4,9 +4,10 @@ module Migrator
   module Converter
     # twf => Trac wiki format
     class TwfToMarkdown
-      def initialize(base_url, attach_url, changeset_base_url, wiki_attachments_url, revmap_file_path)
+      def initialize(base_url, attachment_options, changeset_base_url, wiki_attachments_url, revmap_file_path)
         @base_url = base_url
-        @attach_url = attach_url
+        @attach_url = attachment_options[:url]
+        @attach_hashed = attachment_options[:hashed]
         @changeset_base_url = changeset_base_url
         @wiki_attachments_url = wiki_attachments_url
         @revmap = load_revmap_file(revmap_file_path)
@@ -127,15 +128,15 @@ module Migrator
         image_path = if mod == "source"
                        "![#{path.split("/").last}](#{base_url}#{path})"
                      elsif mod == "wiki"
-                       _, file = path.split(":")
-                       upload_path = "#{wiki_attachments_url}/#{file}"
+                       id, file = path.split(":")
+                       upload_path = "#{wiki_attachments_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
                        "![#{file}](#{upload_path})"
                      elsif path.start_with?("http")
                        # [[Image(http://example.org/s.jpg)]]
                        "![#{d[:path]}](#{d[:path]})"
                      else
                        _, id, file = path.split(":")
-                       file_path = "#{attach_url}/#{id}/#{file}"
+                       file_path = "#{attach_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
                        "![#{d[:path]}](#{file_path})"
                      end
 

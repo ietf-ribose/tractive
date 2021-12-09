@@ -13,7 +13,7 @@ module Helpers
     def options_for_markdown_converter(options = {})
       {
         base_url: options[:base_url] || "https://foo.bar/trac/foobar/ticket",
-        attach_url: options[:attach_url] || "https://foo.bar/trac/attachments",
+        attachment_options: { url: options[:attach_url] || "https://foo.bar/trac/attachments", hashed: false },
         changeset_base_url: options[:changeset_base_url] || "https://github.com/repo/commits",
         wiki_attachments_url: options[:wiki_attachments_url] || "https://foo.bar/wiki/attachments",
         revmap_file_path: options[:revmap_file_path] || "spec/files/revmap_spec.txt"

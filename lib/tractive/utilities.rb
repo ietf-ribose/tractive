@@ -22,7 +22,8 @@ module Tractive
           "lib/tractive/models/revision.rb",
           "lib/tractive/models/session.rb",
           "lib/tractive/models/ticket_change.rb",
-          "lib/tractive/models/ticket.rb"
+          "lib/tractive/models/ticket.rb",
+          "lib/tractive/models/wiki.rb"
         ]
         db = Sequel.connect(db_url) if db_url
 
@@ -33,6 +34,17 @@ module Tractive
         end
 
         db
+      end
+
+      def attachment_path(id, filename, options = {})
+        return "#{id}/#{filename}" unless options[:hashed]
+
+        folder_name = Digest::SHA1.hexdigest(id)
+        parent_folder_name = folder_name[0..2]
+        hashed_filename = Digest::SHA1.hexdigest(filename)
+        file_extension = File.extname(filename)
+
+        "#{parent_folder_name}/#{folder_name}/#{hashed_filename}#{file_extension}"
       end
 
       def setup_logger(options = {})
@@ -46,7 +58,7 @@ module Tractive
 
       # returns the git commit hash for a specified revision (using revmap hash)
       def map_changeset(str, revmap, changeset_base_url = "")
-        if revmap&.key?(str)
+        if revmap&.key?(str) && !revmap[str].nil?
           base_url = changeset_base_url
           base_url += "/" if base_url[-1] && base_url[-1] != "/"
           "#{base_url}#{revmap[str].strip}"

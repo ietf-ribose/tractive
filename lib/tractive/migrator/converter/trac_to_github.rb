@@ -5,7 +5,7 @@ module Migrator
     class TracToGithub
       def initialize(args)
         @tracticketbaseurl    = args[:cfg]["trac"]["ticketbaseurl"]
-        @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("attachments", "url")
+        @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("ticket", "attachments", "url")
         @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"] || ""
         @singlepost           = args[:opts][:singlepost]
         @labels_cfg           = args[:cfg]["labels"].transform_values(&:to_h)
@@ -14,9 +14,12 @@ module Migrator
         @trac_mails_cache     = {}
         @repo                 = args[:cfg]["github"]["repo"]
         @client               = GithubApi::Client.new(access_token: args[:cfg]["github"]["token"])
-        @wiki_attachments_url = args[:cfg]["trac"]["wiki_attachments_url"]
+        @wiki_attachments_url = args[:cfg].dig("wiki", "attachments", "url")
         @revmap_file_path     = args[:opts][:revmapfile] || args[:cfg]["revmap_path"]
-        @attachment_options   = { hashed: args[:cfg].dig("attachments", "hashed") }
+        @attachment_options   = {
+          url: @attachurl,
+          hashed: args[:cfg].dig("ticket", "attachments", "hashed")
+        }
 
         load_milestone_map
         create_labels_on_github(@labels_cfg["severity"].values)
@@ -25,7 +28,7 @@ module Migrator
         create_labels_on_github(@labels_cfg["component"].values)
 
         @uri_parser = URI::Parser.new
-        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachurl, @changeset_base_url, @wiki_attachments_url, @revmap_file_path)
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachment_options, @changeset_base_url, @wiki_attachments_url, @revmap_file_path)
       end
 
       def compose(ticket)

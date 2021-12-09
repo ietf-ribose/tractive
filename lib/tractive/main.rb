@@ -9,7 +9,7 @@ module Tractive
       @cfg  = YAML.load_file(@opts[:config])
 
       Tractive::Utilities.setup_logger(output_stream: @opts[:logfile] || $stderr, verbose: @opts[:verbose])
-      @db = Tractive::Utilities.setup_db!(@cfg["trac"]["database"])
+      @db = Tractive::Utilities.setup_db!(@opts["export_file_path"] || @cfg["trac"]["database"])
     rescue Sequel::DatabaseConnectionError, Sequel::AdapterNotFound, URI::InvalidURIError, Sequel::DatabaseError => e
       $logger.error e.message
       exit 1
@@ -31,6 +31,10 @@ module Tractive
 
     def migrate
       Migrator::Engine.new(opts: @opts, cfg: @cfg, db: @db).migrate
+    end
+
+    def migrate_wikis
+      Migrator::Wikis::MigrateFromDb.new(opts: @opts, cfg: @cfg).migrate_wikis
     end
 
     def info

@@ -14,7 +14,7 @@ revmap_path: "spec/files/revmap_spec.txt"
 users:
   henrik@levkowetz.com:
     email: henrik@levkowetz.com
-    name:
+    name: henrik
     username: henrik@levkowetz.com
 
   fenner@research.att.com:
@@ -24,7 +24,7 @@ users:
 
   barbara.fuller@neustar.biz:
     email: barbara.fuller@neustar.biz
-    name:
+    name: Barbara Fuller
     username: barbara.fuller@neustar.biz
 
   presnick@qualcomm.com:
@@ -733,6 +733,12 @@ labels:
       name: closed
       color:
 
-attachments:
-  url: http://www.abc.com/test/ticket
-  hashed: true
+ticket:
+  attachments:
+    url: http://www.abc.com/test/ticket
+    hashed: true
+
+wiki:
+  attachments:
+    url: http://www.abc.com/test/wiki
+    hashed: true

@@ -92,7 +92,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
     img4 = "[[Image(source:/trunk/trac/htdocs/trac_logo_mini.png)]]"
 
     base_url = options_for_markdown_converter[:base_url]
-    attach_url = options_for_markdown_converter[:attach_url]
+    attach_url = options_for_markdown_converter[:attachment_options][:url]
     wiki_attachments_url = options_for_markdown_converter[:wiki_attachments_url]
 
     twf_to_markdown.send(:convert_image, img1, base_url, attach_url, wiki_attachments_url)
@@ -102,7 +102,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
     expect(img1).to eq("This is an image ![https://google/image/1](https://google/image/1)")
     expect(img2).to eq("![ticket:1:picture.png](#{attach_url}/1/picture.png)")
-    expect(img3).to eq("![picture.png](#{wiki_attachments_url}/picture.png)")
+    expect(img3).to eq("![picture.png](#{wiki_attachments_url}/WikiFormatting/picture.png)")
     expect(img4).to eq("![trac_logo_mini.png](#{base_url}/trunk/trac/htdocs/trac_logo_mini.png)")
   end
 end

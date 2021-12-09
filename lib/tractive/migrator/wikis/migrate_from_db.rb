@@ -5,8 +5,6 @@ require "csv"
 module Migrator
   module Wikis
     class MigrateFromDb
-      MOVE_COMMENT = "Renaming all files to have .md extension"
-
       def initialize(args)
         $logger.debug("OPTIONS = #{args}")
 

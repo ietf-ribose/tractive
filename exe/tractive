@@ -55,7 +55,7 @@ class TractiveCommand < CommandBase
   method_option "attachment-base-url", type: :string, aliases: ["-a"], banner: "http://<base-url>",
                                        desc: "If attachment files are reachable via a URL we reference this here"
   method_option "trac-database-path", type: :string, aliases: ["-d"], banner: "/PATH/TO/EXPORTFILE",
-                                desc: "Full path of the Trac sqlite3 database export file"
+                                      desc: "Full path of the Trac sqlite3 database export file"
   method_option "repo-path", type: :string, aliases: ["-r"], banner: "/GIT/ROOT/DIR",
                              desc: "Full path to the root of the git-repository that is our destination"
   def migrate_wikis

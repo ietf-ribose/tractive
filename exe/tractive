@@ -58,10 +58,6 @@ class TractiveCommand < CommandBase
                                     desc: "Full path of the Trac sqlite3 database export file"
   method_option "repo-path", type: :string, aliases: ["-r"], banner: "/GIT/ROOT/DIR",
                              desc: "Full path to the root of the git-repository that is our destination"
-  method_option "author-map", type: :string, aliases: ["-A"], banner: "/PATH/TO/AUTHORMAP",
-                              desc: "Full path to the trac-author -> git-author file to be used to match Trac contribnutors to their git equivalents"
-  method_option "default-comment", type: :string, aliases: ["-C"], banner: "COMMENT", default: "Initial load from Trac",
-                                   desc: "Specify the git-commit message to use if a given Trac wiki version has no comment"
   def migrate_wikis
     Tractive::Main.new(options).migrate_wikis
   end

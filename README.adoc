@@ -174,7 +174,7 @@ With this information you can now build the RevMap with:
 
 [source,sh]
 ----
-tractive generate-revmap \
+tractive generate revmap \
   --svn-url <url of the SVN repository> \
   --rev-timestamp-file <reposurgeon timestamp map, e.g. {name-of-repo}.fo> \
   --git-local-repo-path <path to converted Git repository, e.g. {name-of-repo}-git> \
@@ -186,7 +186,7 @@ issues and commits will replace references to SVN revisions with the
 corresponding Git commit SHA, enabling GitHub to expose those linkages in the
 user interface.
 
-.Options for `tractive generate-revmap` command
+.Options for `tractive generate revmap` command
 [cols="3a,5a,2a",options="header"]
 |===
 | Option | Description | Type
@@ -315,7 +315,7 @@ e.g. 'ghp_fpsc4de1f0c46e01576810740c9242097cba4619486'.
 e.g. '/Users/user/repo-git'.
 
 `revmap_path:`::: Local path to the RevMap file generated via the
-`tractive generate-revmap` command.
+`tractive generate revmap` command.
 
 
 EXAMPLE:
@@ -326,7 +326,8 @@ github:
   repo: 'example-org/target-repository'
   token: 'ghp_fpsc4de1f0c46e01576810740c9242097cba4619486'
   local_repo_path: '/Users/user/repo-git'
-  revmap_path: ./example-revmap.txt
+
+revmap_path: ./example-revmap.txt
 ----
 
 
@@ -359,8 +360,12 @@ The pattern of a mapping is like:
 +
 [source,yaml]
 ----
-  configuration:      conf
-  documentation:      doc
+  configuration:      
+    name: conf
+    color: ff00ff
+  documentation:      
+    name: doc
+    color: 00ff00
 ----
 
 `resolution:`::: Resolution of the Trac ticket. e.g.
@@ -433,7 +438,7 @@ The pattern of a mapping is like:
 ----
 
 
-NOTE: As `severity`, `priority` and `tracstate` are converted into `labels` on github so there is an option to specify the `color` for those labels.
+NOTE: As `component`, `severity`, `priority` and `tracstate` are converted into `labels` on github so there is an option to specify the `color` for those labels.
 
 
 ==== User mapping
@@ -499,22 +504,32 @@ milestones:
 
 
 ==== Attachments migration configuration
+`ticket | wiki:`:: specifies the options for the tickets or wikis
 
-`attachments:`:: specifies method of obtaining attachments from Trac.
+  `attachments:`::: specifies method of obtaining attachments from Trac.
 
-`url:`::: URL to obtain Trac attachments from
+    `url:`:::: URL to obtain Trac attachments from
 
-`export_folder:`::: folder where the attachments will be downloaded to from Trac.
+    `hashed:`:::: Wether the url has hased or plain image names and ids
 
-`export_script:`::: output of a script that utilizes `trac-admin` to download
-all attachments from Trac.
+    `export_folder:`:::: folder where the attachments will be downloaded to from Trac.
+
+    `export_script:`:::: output of a script that utilizes `trac-admin` to download 
+    all attachments from Trac.
 
 [source,yaml]
 ----
-attachments:
-  url: https://abc.com/raw-attachment/ticket
-  export_folder: ./attachments
-  export_script: attachments.sh
+ticket:
+  attachments:
+    url: https://abc.com/raw-attachment/ticket
+    hashed: true
+    export_folder: ./attachments
+    export_script: attachments.sh
+    
+wiki:
+  attachments:
+    url: https://abc.com/raw-attachment/wiki
+    hashed: true
 ----
 
 By using the <<gather-info,`-i` option>>, you can easily produce a YAML file
@@ -742,6 +757,50 @@ The following options are allowed (at least one necessary):
 | `-v`, `--verbose`
 | Enable verbose mode.
 | Boolean
+
+|===
+
+
+=== Migrating Wikis
+
+You need the following for wiki migration
+
+* Clone of the github wiki repo.
+
+Then you can run the migration with:
+
+[source,sh]
+----
+tractive migrate-wikis \
+  --attachment-base-url <url for the attachments> \
+  --export-file-path <full path of trac database> \
+  --repo-path <path to cloned Git wiki repository, e.g. {name-of-repo}.wiki>
+----
+
+After that open a terminal in the git wiki folder and run `git push`
+
+.Options for `tractive migrate-wikis` command
+[cols="3a,5a,2a",options="header"]
+|===
+| Option | Description | Type
+
+| `a`, `--attachment-base-url`
+| 
+(required unless specified in config file) 
+If attachment files are reachable via a URL we reference this here.
+| String
+
+| `-e`, `--export-file-path`
+| (required unless specified in config file) Full path of the Trac sqlite3 database export file.
+| String
+
+| `-r`, `--repo-path`
+| (required) Full path to the root of the git-repository that is our destination.
+| String
+
+| `-c`, `--config`
+| Path to config file.
+| String
 
 |===
 

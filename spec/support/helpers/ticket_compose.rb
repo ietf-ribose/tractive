@@ -10,6 +10,7 @@ module Helpers
             "body" => "`resolution_wontfix` `type_task`   |    by henrik@levkowetz.com\n\n___\n\n___\n_@henrik@levkowetz.com_ _changed milestone from `2.02` to ``_\n\n___\n_@henrik@levkowetz.com_ _changed milestone from `` to `Soonish`_\n\n___\n_@pasi.eronen@nokia.com_ _changed status from `new` to `closed`_\n\n___\n_@pasi.eronen@nokia.com_ _set resolution to `wontfix`_\n\n___\n_@pasi.eronen@nokia.com_ _commented_\n\nWe're not currently using buildbot -- will close the ticket.\n\n___\n_Issue migrated from trac:170 at #{Time.now}_",
             "labels" => ["n/a", "closed", "component: Datatracker: Testing"],
             "closed" => true,
+            "closed_at" => "2009-11-03T01:50:22Z",
             "created_at" => format_time(ticket[:time]),
             "milestone" => nil,
             "assignee" => nil
@@ -32,6 +33,7 @@ module Helpers
           "body" => "`resolution_fixed` `type_task`   |    by henrik@levkowetz.com\n\n___\n\n\n\n\n___\n_Issue migrated from trac:3 at #{Time.now}_",
           "labels" => ["n/a", "closed", "component: admin/", "owner:henrik@levkowetz.com"],
           "closed" => true,
+          "closed_at" => "2007-06-28T19:12:15Z",
           "created_at" => format_time(ticket[:time]),
           "milestone" => nil,
           "assignee" => "henrik@levkowetz.com"
@@ -98,6 +100,7 @@ module Helpers
           "body" => "`resolution_fixed` `type_cleanup`   |    by fenner@research.att.com\n\n___\n\n\nI noticed two problems while trying to validate my Related Documents tool:\n\n1. There are duplicate entries for three RFCs in internet_drafts.  This requires some research to resolve, since it's not completely clear which one is the proper value.  I started to add the following to sql_fixup.sql, but stopped because I didn't want to research what was right:\n\n```\n--\n-- There were duplicates for the rfc_number field.\n-- Since an RFC can only come from a single I-D, there are\n-- various places where the code has this assumption.\n-- The cgi stuff would just get an inconsistent result\n-- in this case, but the django stuff will throw an exception.\n-- So we fix up the cases that we know about, and we make\n-- the RFC number field UNIQUE so that the database won't let\n-- it happen again.\n-- In order for this to work, rfc_number has to be NULL to flag\n-- \"no rfc\", not 0.\nUPDATE internet_drafts SET rfc_number=NULL WHERE rfc_number=0;\n\n-- 1707\n\n-- 1861\n\n-- 2358\nUPDATE internet_drafts SET replaced_by=1764, rfc_number=NULL where id_document_tag=824;\n\nALTER TABLE  `internet_drafts` ADD UNIQUE (`rfc_number`);\n```\n\n2. There are RFCs referred to in internet_drafts that are not in the rfcs table.\n\n```\nmysql> select id_document_tag,a.rfc_number\n from internet_drafts a\n left join rfcs on a.rfc_number = rfcs.rfc_number\n where a.rfc_number != 0\n     and rfcs.rfc_number is null;\n+-----------------+------------+\n| id_document_tag | rfc_number |\n+-----------------+------------+\n|            2977 |       2498 |\n|            4611 |       2873 |\n+-----------------+------------+\n2 rows in set (0.10 sec)\n```\n\nThe easy answer here is to add the corresponding rows for RFCs 2498 and 2873 to the `rfcs` database.\n\n___\n_Issue migrated from trac:98 at #{Time.now}_",
           "labels" => ["n/a", "closed", "component: Datatracker: Base templates"],
           "closed" => true,
+          "closed_at" => "2010-03-24T23:35:17Z",
           "created_at" => format_time(ticket[:time]),
           "milestone" => nil
         }

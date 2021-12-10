@@ -37,7 +37,7 @@ RSpec.describe Migrator::Engine do
   it "should compose correct mock ticket when filtering" do
     mock_ticket = Migrator::Engine.new(options_for_migrator(filter: true)).send(:mock_ticket_details, 1)
 
-    expect(mock_ticket[:summary]).to eq("Not available in trac 1")
+    expect(mock_ticket[:summary]).to eq("Placeholder issue 1 created to align github issue and trac ticket numbers during migration.")
   end
 
   it "should generate correct comment body" do

@@ -96,7 +96,7 @@ module Migrator
 
     def mock_ticket_details(ticket_id)
       summary = if @filter_applied
-                  "Placeholder issue #{ticket_id} created to align github issue and trac ticket numbers during migration."
+                  "Placeholder issue #{ticket_id} created to align Github issue and trac ticket numbers during migration."
                 else
                   "DELETED in trac #{ticket_id}"
                 end

@@ -96,7 +96,7 @@ module Migrator
 
     def mock_ticket_details(ticket_id)
       summary = if @filter_applied
-                  "Not available in trac #{ticket_id}"
+                  "Placeholder issue #{ticket_id} created to align github issue and trac ticket numbers during migration."
                 else
                   "DELETED in trac #{ticket_id}"
                 end
@@ -105,7 +105,8 @@ module Migrator
         summary: summary,
         time: Time.now.to_i,
         status: "closed",
-        reporter: "tractive"
+        reporter: "tractive",
+        closed_at: Time.at(0).utc
       }
     end
 

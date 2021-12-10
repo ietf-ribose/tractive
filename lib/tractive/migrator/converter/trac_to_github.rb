@@ -28,12 +28,18 @@ module Migrator
         create_labels_on_github(@labels_cfg["component"].values)
 
         @uri_parser = URI::Parser.new
-        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachment_options, @changeset_base_url, @wiki_attachments_url, @revmap_file_path)
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(
+          @tracticketbaseurl,
+          @attachment_options,
+          @changeset_base_url,
+          @wiki_attachments_url,
+          @revmap_file_path
+        )
       end
 
       def compose(ticket)
-        body   = ""
-        closed = nil
+        body = ""
+        closed_time = nil
 
         # summary line:
         # body += %i[id component priority resolution].map do |cat|
@@ -74,7 +80,7 @@ module Migrator
           @labels_cfg.fetch(x[:field], {})[x[:newvalue]]
           labels.delete(del) if del
           # labels.add(add) if add
-          closed = x[:time] if (x[:field] == "status") && (x[:newvalue] == "closed")
+          closed_time = x[:time] if (x[:field] == "status") && (x[:newvalue] == "closed")
         end
 
         # we separate labels from badges
@@ -153,8 +159,12 @@ module Migrator
           # issue["updated_at"] = format_time(ticket[:changetime])
         end
 
-        if issue["closed"] && closed
-          #  issue["closed_at"] = format_time(closed)
+        if issue["closed"]
+          issue["closed_at"] = if closed_time
+                                 format_time(closed_time)
+                               else
+                                 format_time(ticket[:closed_at].to_i)
+                               end
         end
 
         {

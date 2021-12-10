@@ -39,5 +39,9 @@ module Tractive
       change_arr = changes + attachments
       change_arr.sort_by { |change| change[:time] }
     end
+
+    def closed_comments
+      changes_dataset.where(field: "status", newvalue: "closed")
+    end
   end
 end

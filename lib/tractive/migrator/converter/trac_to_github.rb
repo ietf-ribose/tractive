@@ -4,7 +4,7 @@ module Migrator
   module Converter
     class TracToGithub
       def initialize(args)
-        @trac_ticket_base_url    = args[:cfg]["trac"]["ticketbaseurl"]
+        @trac_ticket_base_url = args[:cfg]["trac"]["ticketbaseurl"]
         @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("ticket", "attachments", "url")
         @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"] || ""
         @singlepost           = args[:opts][:singlepost]

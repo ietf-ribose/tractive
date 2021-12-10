@@ -4,7 +4,7 @@ module Migrator
   module Converter
     class TracToGithub
       def initialize(args)
-        @tracticketbaseurl    = args[:cfg]["trac"]["ticketbaseurl"]
+        @trac_ticket_base_url    = args[:cfg]["trac"]["ticketbaseurl"]
         @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("ticket", "attachments", "url")
         @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"] || ""
         @singlepost           = args[:opts][:singlepost]
@@ -29,7 +29,7 @@ module Migrator
 
         @uri_parser = URI::Parser.new
         @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(
-          @tracticketbaseurl,
+          @trac_ticket_base_url,
           @attachment_options,
           @changeset_base_url,
           @wiki_attachments_url,
@@ -80,7 +80,7 @@ module Migrator
           @labels_cfg.fetch(x[:field], {})[x[:newvalue]]
           labels.delete(del) if del
           # labels.add(add) if add
-          closed_time = x[:time] if (x[:field] == "status") && (x[:newvalue] == "closed")
+          closed_time = x[:time] if x[:field] == "status" && x[:newvalue] == "closed"
         end
 
         # we separate labels from badges
@@ -349,9 +349,9 @@ module Migrator
       end
 
       def trac_ticket_link(ticket)
-        return "trac:#{ticket[:id]}" unless @tracticketbaseurl
+        return "trac:#{ticket[:id]}" unless @trac_ticket_base_url
 
-        "[trac:#{ticket[:id]}](#{@tracticketbaseurl}/#{ticket[:id]})"
+        "[trac:#{ticket[:id]}](#{@trac_ticket_base_url}/#{ticket[:id]})"
       end
     end
   end

@@ -9,14 +9,14 @@ module Http
       end
 
       def execute(&block)
-        retries = -1
+        retries = 0
 
         begin
           retries += 1
           RestClient::Request.execute(@args, &block)
         rescue RestClient::Forbidden => e
           retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i
-          raise e if retry_after.negative?
+          raise e if retry_after.negative? || retries > @max_retries
 
           while retry_after.positive?
             minutes = retry_after / 60

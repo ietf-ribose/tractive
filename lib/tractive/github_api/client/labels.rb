@@ -5,7 +5,7 @@ module GithubApi
     module Labels
       def list_labels(repo, params = {})
         JSON.parse(
-          RestClient.get(
+          Http::Client::Request.get(
             "https://api.github.com/repos/#{repo}/labels",
             {
               "Authorization" => "token #{@token}",
@@ -18,7 +18,7 @@ module GithubApi
 
       def create_label(repo, params)
         JSON.parse(
-          RestClient.post(
+          Http::Client::Request.post(
             "https://api.github.com/repos/#{repo}/labels",
             params.to_json,
             {

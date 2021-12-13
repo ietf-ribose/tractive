@@ -6,7 +6,7 @@ module GithubApi
     module Milestones
       def list_milestones(repo, params)
         JSON.parse(
-          RestClient.get(
+          Http::Client::Request.get(
             "https://api.github.com/repos/#{repo}/milestones?per_page=100",
             {
               "Authorization" => "token #{@token}",
@@ -19,7 +19,7 @@ module GithubApi
 
       def create_milestone(repo, params)
         JSON.parse(
-          RestClient.post(
+          Http::Client::Request.post(
             "https://api.github.com/repos/#{repo}/milestones",
             params.to_json,
             {

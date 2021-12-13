@@ -6,7 +6,7 @@ module GithubApi
     module Issues
       def create_issue(repo, params)
         JSON.parse(
-          RestClient.post(
+          Http::Client::Request.post(
             "https://api.github.com/repos/#{repo}/import/issues",
             params.to_json,
             {
@@ -20,7 +20,7 @@ module GithubApi
 
       def list_issues(repo, params)
         JSON.parse(
-          RestClient.get(
+          Http::Client::Request.get(
             "https://api.github.com/repos/#{repo}/issues",
             {
               "Authorization" => "token #{@token}",
@@ -33,7 +33,7 @@ module GithubApi
 
       def issue(repo, number)
         JSON.parse(
-          RestClient.get(
+          Http::Client::Request.get(
             "https://api.github.com/repos/#{repo}/issues/#{number}",
             { "Authorization" => "token #{@token}" }
           )
@@ -42,7 +42,7 @@ module GithubApi
 
       def issue_import_status(repo, id)
         JSON.parse(
-          RestClient.get(
+          Http::Client::Request.get(
             "https://api.github.com/repos/#{repo}/import/issues/#{id}",
             {
               "Authorization" => "token #{@token}",
@@ -54,7 +54,7 @@ module GithubApi
 
       def issue_comments(repo, issue_id)
         JSON.parse(
-          RestClient.get(
+          Http::Client::Request.get(
             "https://api.github.com/repos/#{repo}/issues/#{issue_id}/comments",
             {
               "Authorization" => "token #{@token}",
@@ -66,7 +66,7 @@ module GithubApi
 
       def update_issue_comment(repo, comment_id, comment_body)
         JSON.parse(
-          RestClient.patch(
+          Http::Client::Request.patch(
             "https://api.github.com/repos/#{repo}/issues/comments/#{comment_id}",
             { body: comment_body }.to_json,
             { "Authorization" => "token #{@token}" }

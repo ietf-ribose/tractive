@@ -3,7 +3,11 @@
 RSpec.describe Http::Client::Request do
   context "#execute" do
     it "should call `RestClient::Request.execute`" do
-      expect(RestClient::Request).to receive(:execute).with(method: :get)
+      expect(RestClient::Request)
+        .to receive(:execute)
+        .with(method: :get)
+        .exactly(1)
+        .times
 
       Http::Client::Request.execute(method: :get)
     end

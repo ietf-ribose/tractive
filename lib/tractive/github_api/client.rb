@@ -4,6 +4,8 @@ require_relative "client/issues"
 require_relative "client/labels"
 require_relative "client/milestones"
 
+require_relative "../http/client"
+
 # Service to perform github actions
 module GithubApi
   class Client

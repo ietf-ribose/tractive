@@ -16,6 +16,7 @@ module Http
           RestClient::Request.execute(@args, &block)
         rescue RestClient::Forbidden => e
           retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i
+          raise e if retry_after.negative?
 
           while retry_after.positive?
             minutes = retry_after / 60

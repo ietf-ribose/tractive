@@ -17,9 +17,10 @@ module Migrator
         @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
         @repo_path            = @options["repo-path"] || ""
         @revmap_path          = @config["revmap_path"]
+        @attachments_hashed   = @config.dig("wiki", "attachments", "hashed")
 
         @attachment_options   = {
-          hashed: @config.dig("ticket", "attachments", "hashed")
+          hashed: @attachments_hashed
         }
 
         verify_options
@@ -47,6 +48,7 @@ module Migrator
             $logger.debug("Object: #{wiki}")
 
             wiki_markdown_text = @twf_to_markdown.convert(wiki[:text])
+            wiki_markdown_text += wiki_attachments(wiki)
 
             # Create file with content
             File.open(file_name, "w") do |f|
@@ -116,6 +118,22 @@ module Migrator
         author_email = @authors_map[author]&.[]("email") || author
 
         "#{author_name} <#{author_email}>"
+      end
+
+      def wiki_attachments(wiki)
+        attachments = wiki.attachments
+        return "" if attachments.count.zero?
+
+        attachments_list = ["# Attachments\n"]
+
+        attachments.each do |attachment|
+          attachment_path = Tractive::Utilities.attachment_path(
+            wiki.name, attachment.filename, hashed: @attachments_hashed
+          )
+          attachments_list << "- [#{attachment.filename}](#{@wiki_attachments_url}/#{attachment_path})"
+        end
+
+        attachments_list.join("\n")
       end
 
       def execute_command(command)

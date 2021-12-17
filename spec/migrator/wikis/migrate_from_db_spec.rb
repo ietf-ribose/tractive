@@ -73,6 +73,24 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
     end
   end
 
+  context "#wiki_attachments" do
+    let(:wiki_migrator) { described_class.new(opts: options_for_wiki, cfg: CONFIG) }
+
+    it "should append attachments to wikis if present" do
+      wiki = Tractive::Wiki.latest_versions.first(name: "Model")
+
+      wiki_text = wiki_migrator.send(:wiki_attachments, wiki)
+      expect(wiki_text).to include("# Attachments\n\n- [models.pdf](http://base-url/for/wiki/68c/68c2cc7f0ceaa3e499ecb4db331feb4debbbcc23/96272cf52834b1fb60bdb3c268a96e7135fd87ff.pdf)")
+    end
+
+    it "should not append attachments to wikis if not present" do
+      wiki = Tractive::Wiki.latest_versions.first(name: "CodeRepository")
+
+      wiki_text = wiki_migrator.send(:wiki_attachments, wiki)
+      expect(wiki_text).not_to include("# Attachments\n\n")
+    end
+  end
+
   def options_for_wiki(options = {})
     {
       "repo-path" => "spec/files/trac_test.wiki",

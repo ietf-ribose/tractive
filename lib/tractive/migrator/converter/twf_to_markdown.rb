@@ -15,6 +15,8 @@ module Migrator
 
       def convert(str)
         convert_newlines(str)
+        convert_comments(str)
+        convert_html_snippets(str)
         convert_code_snippets(str)
         convert_headings(str)
         convert_links(str)
@@ -22,6 +24,7 @@ module Migrator
         convert_changeset(str, @changeset_base_url)
         convert_image(str, @base_url, @attach_url, @wiki_attachments_url)
         convert_ticket(str, @base_url)
+        revert_image_references(str)
 
         str
       end
@@ -46,18 +49,12 @@ module Migrator
         revmap
       end
 
-      # CommitTicketReference
-      def convert_ticket_reference(str)
-        str.gsub!(/\{\{\{\n(#!CommitTicketReference .+?)\}\}\}/m, '\1')
-        str.gsub!(/#!CommitTicketReference .+\n/, "")
-      end
-
       # Ticket
       def convert_ticket(str, base_url)
         # replace a full ticket id with the github short refrence
         if base_url
           baseurlpattern = base_url.gsub("/", "\\/")
-          str.gsub!(%r{#{baseurlpattern}/(\d+)}) { "ticket:#{Regexp.last_match[1]}" }
+          str.gsub!(%r{#{baseurlpattern}/(\d+)}, '#\1')
         end
 
         # Ticket
@@ -78,6 +75,22 @@ module Migrator
       def convert_newlines(str)
         str.gsub!(/\[\[br\]\]/i, "\n")
         str.gsub!("\r\n", "\n")
+      end
+
+      # Comments
+      def convert_comments(str)
+        str.gsub!(/\{\{\{#!comment([\s|\n])(.*?)\}\}\}/m, '<!--\1\2\1-->')
+      end
+
+      # Comments
+      def convert_html_snippets(str)
+        str.gsub!(/\{\{\{#!html(.*?)\}\}\}/m, '\1')
+      end
+
+      # CommitTicketReference
+      def convert_ticket_reference(str)
+        str.gsub!(/\{\{\{\n(#!CommitTicketReference .+?)\}\}\}/m, '\1')
+        str.gsub!(/#!CommitTicketReference .+\n/, "")
       end
 
       # Code
@@ -103,7 +116,7 @@ module Migrator
       def convert_font_styles(str)
         str.gsub!(/'''(.+?)'''/, '**\1**')
         str.gsub!(/''(.+?)''/, '*\1*')
-        str.gsub!(%r{[^:]//(.+?[^:])//}, '_\1_')
+        str.gsub!(%r{([^:])//(.+?[^:])//}, '\1_\2_')
       end
 
       # Links
@@ -119,28 +132,34 @@ module Migrator
         # [[Image(ticket:1:picture.gif)]] (file attached to a ticket)
 
         image_regex = /\[\[Image\((?:(?<module>(?:source|wiki)):)?(?<path>[^)]+)\)\]\]/
-        d = image_regex.match(str)
-        return if d.nil?
 
-        path = d[:path]
-        mod = d[:module]
+        str.gsub!(image_regex) do
+          path = Regexp.last_match[:path]
+          mod = Regexp.last_match[:module]
 
-        image_path = if mod == "source"
-                       "![#{path.split("/").last}](#{base_url}#{path})"
-                     elsif mod == "wiki"
-                       id, file = path.split(":")
-                       upload_path = "#{wiki_attachments_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
-                       "![#{file}](#{upload_path})"
-                     elsif path.start_with?("http")
-                       # [[Image(http://example.org/s.jpg)]]
-                       "![#{d[:path]}](#{d[:path]})"
-                     else
-                       _, id, file = path.split(":")
-                       file_path = "#{attach_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
-                       "![#{d[:path]}](#{file_path})"
-                     end
+          converted_image = if mod == "source"
+                              "![#{path.split("/").last}](#{base_url}#{path})"
+                            elsif mod == "wiki"
+                              id, file = path.split(":")
+                              upload_path = "#{wiki_attachments_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
+                              "![#{file}](#{upload_path})"
+                            elsif path.start_with?("http")
+                              # [[Image(http://example.org/s.jpg)]]
+                              "![#{path}](#{path})"
+                            else
+                              _, id, file = path.split(":")
+                              file_path = "#{attach_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
+                              "![#{path}](#{file_path})"
+                            end
 
-        str.gsub!(image_regex, image_path)
+          # There are also ticket references in the format of ticket:1 so
+          # changing this now and will revert it at the end again
+          converted_image.gsub(/ticket:(\d+)/, 'ImageTicket~\1')
+        end
+      end
+
+      def revert_image_references(str)
+        str.gsub!(/ImageTicket~(\d)/, 'ticket:\1')
       end
     end
   end

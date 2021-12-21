@@ -96,11 +96,53 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
   end
 
   it "should convert code snippets" do
-    str = "{{{single line code}}} \n {{{ multiline \n code }}}"
+    str = <<~WIKI_CODE_SNIPPET
+      {{{single line code}}}
+
+      {{{
+      multiline
+      code
+      }}}
+
+      {{{#!ruby
+      def foo
+        puts "hello world"
+      end
+      }}}
+
+      {{{#!python
+      def foo
+        puts "hello world"
+      end
+      }}}
+    WIKI_CODE_SNIPPET
+
+    expected_str = <<~MARKDOWN_CODE_SNIPPET
+      `single line code`
+
+      ```
+      multiline
+      code
+      ```
+
+      ```ruby
+      def foo
+        puts "hello world"
+      end
+
+      ```
+
+      ```python
+      def foo
+        puts "hello world"
+      end
+
+      ```
+    MARKDOWN_CODE_SNIPPET
 
     twf_to_markdown.send(:convert_code_snippets, str)
 
-    expect(str).to eq("`single line code` \n ``` multiline \n code ```")
+    expect(str).to eq(expected_str)
   end
 
   it "should convert font styles" do
@@ -167,13 +209,13 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       ====== h6 ======
 
       New lines formatters:
-      foo [[br]] bar \r\n baz [[BR]]
+      foo[[br]]bar\r\nbaz[[BR]]
 
       Comments:
       - {{{#!comment This is a single line comment}}}
-      - {{{#!comment
-          This is a multiline comment
-        }}}
+      {{{#!comment
+        This is a multiline comment
+      }}}
 
       Html Snippet:
       {{{#!html
@@ -183,11 +225,22 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       }}}
 
       Code Snippets:
-      - {{{single line code}}}
-      - {{{
-          multiline
-          code
-        }}}
+      {{{single line code}}}
+      {{{
+        multiline
+        code
+      }}}
+
+      {{{#!ruby
+      def foo
+        puts "ruby world"
+      end
+      }}}
+
+      {{{#!python
+      def foo:
+        print("python world")
+      }}}
 
       Font Styles:
       - '''bold'''
@@ -226,16 +279,16 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       ###### h6
 
       New lines formatters:
-      foo\s
-       bar\s
-       baz\s
+      foo
+      bar
+      baz
 
 
       Comments:
       - <!-- This is a single line comment -->
-      - <!--
-          This is a multiline comment
-      \s\s
+      <!--
+        This is a multiline comment
+
       -->
 
       Html Snippet:
@@ -246,11 +299,24 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
 
       Code Snippets:
-      - `single line code`
-      - ```
-          multiline
-          code
-        ```
+      `single line code`
+      ```
+        multiline
+        code
+      ```
+
+      ```ruby
+      def foo
+        puts "ruby world"
+      end
+
+      ```
+
+      ```python
+      def foo:
+        print("python world")
+
+      ```
 
       Font Styles:
       - **bold**

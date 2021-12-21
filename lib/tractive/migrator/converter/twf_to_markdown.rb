@@ -82,7 +82,7 @@ module Migrator
         str.gsub!(/\{\{\{#!comment([\s|\n])(.*?)\}\}\}/m, '<!--\1\2\1-->')
       end
 
-      # Comments
+      # HTML Snippets
       def convert_html_snippets(str)
         str.gsub!(/\{\{\{#!html(.*?)\}\}\}/m, '\1')
       end

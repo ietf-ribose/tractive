@@ -16,7 +16,8 @@ module Helpers
         attachment_options: { url: options[:attach_url] || "https://foo.bar/trac/attachments", hashed: false },
         changeset_base_url: options[:changeset_base_url] || "https://github.com/repo/commits",
         wiki_attachments_url: options[:wiki_attachments_url] || "https://foo.bar/wiki/attachments",
-        revmap_file_path: options[:revmap_file_path] || "spec/files/revmap_spec.txt"
+        revmap_file_path: options[:revmap_file_path] || "spec/files/revmap_spec.txt",
+        git_repo: options[:git_repo] || "foo/bar"
       }
     end
 

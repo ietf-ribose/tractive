@@ -13,6 +13,7 @@ module Migrator
         @authors_map = @config["users"].to_h
 
         @tracticketbaseurl    = @config["trac"]["ticketbaseurl"]
+        @git_repo             = @config["git"]["repo"]
         @changeset_base_url   = @config["trac"]["changeset_base_url"] || ""
         @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
         @repo_path            = @options["repo-path"] || ""
@@ -26,7 +27,7 @@ module Migrator
         verify_options
         verify_locations
 
-        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachment_options, @changeset_base_url, @wiki_attachments_url, @revmap_path)
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachment_options, @changeset_base_url, @wiki_attachments_url, @revmap_path, @git_repo)
       end
 
       def migrate_wikis

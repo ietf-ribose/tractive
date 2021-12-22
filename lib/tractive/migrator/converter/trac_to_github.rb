@@ -33,7 +33,8 @@ module Migrator
           @attachment_options,
           @changeset_base_url,
           @wiki_attachments_url,
-          @revmap_file_path
+          @revmap_file_path,
+          @repo
         )
       end
 

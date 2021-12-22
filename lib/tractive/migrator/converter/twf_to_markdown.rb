@@ -132,38 +132,43 @@ module Migrator
       end
 
       def convert_single_bracket_wiki_links(str, git_repo)
-        str.gsub!(/\[(wiki:)?([^\s]*) ?(.*?)\]/) do
-          wiki = Regexp.last_match[1]
-          path = Regexp.last_match[2]
-          name = Regexp.last_match[3]
+        str.gsub!(/(!?)\[(wiki:)?([^\s]*) ?(.*?)\]/) do |match_result|
+          source = Regexp.last_match[2]
+          path = Regexp.last_match[3]
+          name = Regexp.last_match[4]
 
-          if wiki
-            "{{#{name}}}(https://github.com/#{git_repo}/wiki/#{name})"
-          elsif path.start_with?("http")
-            name = path if name.empty?
-            "{{#{name}}}(#{path})"
-          else
-            "[#{path}]"
-          end
+          formatted_link(
+            match_result,
+            git_repo,
+            { source: source, path: path, name: name }
+          )
         end
       end
 
       def convert_double_bracket_wiki_links(str, git_repo)
         str.gsub!(/(!?)\[\[(wiki:)?([^|\n]*)\|?(.*)\]\]/) do |match_result|
-          wiki = Regexp.last_match[2]
+          source = Regexp.last_match[2]
           path = Regexp.last_match[3]
           name = Regexp.last_match[4]
 
-          if Regexp.last_match[1] == "!"
-            match_result
-          elsif wiki
-            "{{#{name}}}(https://github.com/#{git_repo}/wiki/#{name})"
-          elsif path.start_with?("http")
-            name = path if name.empty?
-            "{{#{name}}}(#{path})"
-          else
-            "[#{path}]"
-          end
+          formatted_link(
+            match_result,
+            git_repo,
+            { source: source, path: path, name: name }
+          )
+        end
+      end
+
+      def formatted_link(unformatted_text, git_repo, url_options = {})
+        return unformatted_text if unformatted_text.start_with?("!")
+
+        if url_options[:source] == "wiki:"
+          "{{#{name}}}(https://github.com/#{git_repo}/wiki/#{name})"
+        elsif url_options[:path].start_with?("http")
+          url_options[:name] = url_options[:path] if url_options[:name].empty?
+          "{{#{url_options[:name]}}}(#{url_options[:path]})"
+        else
+          unformatted_text
         end
       end
 

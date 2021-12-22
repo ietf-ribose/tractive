@@ -204,6 +204,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
     it "should convert links in single square bracket" do
       str = <<~LINKS
         [https://www.google.com google single]
+        [comment:3 fenner@research.att.com]
         Link in the middle [https://www.google.com Google] of line
         [https://www.google.com]
         Link without name in [https://www.google.com] middle of line.
@@ -211,6 +212,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
       expected_str = <<~CONVERTED_LINKS
         [google single](https://www.google.com)
+        [comment:3 fenner@research.att.com]
         Link in the middle [Google](https://www.google.com) of line
         [https://www.google.com](https://www.google.com)
         Link without name in [https://www.google.com](https://www.google.com) middle of line.

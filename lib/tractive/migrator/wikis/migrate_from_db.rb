@@ -13,7 +13,7 @@ module Migrator
         @authors_map = @config["users"].to_h
 
         @tracticketbaseurl    = @config["trac"]["ticketbaseurl"]
-        @git_repo             = @config["git"]["repo"]
+        @git_repo             = @config["github"]["repo"]
         @changeset_base_url   = @config["trac"]["changeset_base_url"] || ""
         @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
         @repo_path            = @options["repo-path"] || ""

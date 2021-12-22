@@ -97,6 +97,7 @@ module Migrator
       # Code
       def convert_code_snippets(str)
         str.gsub!(/\{\{\{([^\n]+?)\}\}\}/, '`\1`')
+        str.gsub!(/\{\{\{#!(.*?)\n(.+?)\}\}\}/m, "```\\1\n\\2\n```")
         str.gsub!(/\{\{\{(.+?)\}\}\}/m, '```\1```')
         str.gsub!(/(?<=```)#!/m, "")
       end

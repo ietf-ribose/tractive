@@ -20,10 +20,10 @@ module Migrator
         convert_html_snippets(str)
         convert_code_snippets(str)
         convert_headings(str)
-        convert_image(str, @base_url, @attach_url, @wiki_attachments_url)
         convert_links(str, @git_repo)
         convert_font_styles(str)
         convert_changeset(str, @changeset_base_url)
+        convert_image(str, @base_url, @attach_url, @wiki_attachments_url)
         convert_ticket(str, @base_url)
         revert_intermediate_references(str)
 
@@ -127,7 +127,7 @@ module Migrator
         convert_double_bracket_wiki_links(str, git_repo)
         convert_single_bracket_wiki_links(str, git_repo)
 
-        str.gsub!(/\[(http[^\s\[\]]+)\s([^\[\]]+)\]/, '[\2](\1)')
+        str.gsub!(/(^!)\[(http[^\s\[\]]+)\s([^\[\]]+)\]/, '[\2](\1)')
         str.gsub!(/!(([A-Z][a-z0-9]+){2,})/, '\1')
       end
 
@@ -146,7 +146,7 @@ module Migrator
       end
 
       def convert_double_bracket_wiki_links(str, git_repo)
-        str.gsub!(/(!?)\[\[(wiki:)?([^|\n]*)\|?(.*)\]\]/) do |match_result|
+        str.gsub!(/(!?)\[\[(wiki:)?([^|\n]*)\|?(.*?)\]\]/) do |match_result|
           source = Regexp.last_match[2]
           path = Regexp.last_match[3]
           name = Regexp.last_match[4]
@@ -160,7 +160,7 @@ module Migrator
       end
 
       def formatted_link(unformatted_text, git_repo, url_options = {})
-        return unformatted_text if unformatted_text.start_with?("!")
+        return unformatted_text.gsub("!", "{~") if unformatted_text.start_with?("!")
 
         if url_options[:source] == "wiki:"
           "{{#{name}}}(https://github.com/#{git_repo}/wiki/#{name})"
@@ -237,6 +237,7 @@ module Migrator
         str.gsub!(/ImageTicket~(\d)/, 'ticket:\1')
         str.gsub!("{{", "[")
         str.gsub!("}}", "]")
+        str.gsub!(/(\{~)*/, "")
       end
     end
   end

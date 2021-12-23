@@ -189,16 +189,9 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       CONVERTED_LINKS
 
       twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:git_repo])
+      twf_to_markdown.send(:revert_intermediate_references, str)
 
       expect(str).to eq(expected_str)
-    end
-
-    it "should not convert links in CamelCase starting with `!`" do
-      str = "!UrlDesign !ProjectSetup"
-
-      twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:git_repo])
-
-      expect(str).to eq("UrlDesign ProjectSetup")
     end
 
     it "should convert links in single square bracket" do
@@ -208,6 +201,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         Link in the middle [https://www.google.com Google] of line
         [https://www.google.com]
         Link without name in [https://www.google.com] middle of line.
+        Multiple links [https://www.google.com one] in one [https://www.facebook.com facebook two] line.
       LINKS
 
       expected_str = <<~CONVERTED_LINKS
@@ -216,6 +210,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         Link in the middle [Google](https://www.google.com) of line
         [https://www.google.com](https://www.google.com)
         Link without name in [https://www.google.com](https://www.google.com) middle of line.
+        Multiple links [one](https://www.google.com) in one [facebook two](https://www.facebook.com) line.
       CONVERTED_LINKS
 
       twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:git_repo])
@@ -230,6 +225,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         Link in the middle [[https://www.google.com|Google]] of line
         [[https://www.google.com]]
         Link without name in [[https://www.google.com]] middle of line.
+        Multiple links [[https://www.google.com|one]] in one [[https://www.facebook.com|facebook two]] line.
       LINKS
 
       expected_str = <<~CONVERTED_LINKS
@@ -237,6 +233,24 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         Link in the middle [Google](https://www.google.com) of line
         [https://www.google.com](https://www.google.com)
         Link without name in [https://www.google.com](https://www.google.com) middle of line.
+        Multiple links [one](https://www.google.com) in one [facebook two](https://www.facebook.com) line.
+      CONVERTED_LINKS
+
+      twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:git_repo])
+      twf_to_markdown.send(:revert_intermediate_references, str)
+
+      expect(str).to eq(expected_str)
+    end
+
+    it "should not convert links starting with `!`" do
+      str = <<~LINKS
+        !UrlDesign !ProjectSetup
+        Don't make link in middle ![https://www.google.com google single] of the line.
+      LINKS
+
+      expected_str = <<~CONVERTED_LINKS
+        UrlDesign ProjectSetup
+        Don't make link in middle [https://www.google.com google single] of the line.
       CONVERTED_LINKS
 
       twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:git_repo])
@@ -332,8 +346,13 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         - ''italic''
         - //italic//
 
-        External Links:
+        Links:
         - [https://www.google.com google engine]
+        - !UrlDesign
+        - UrlDesign
+        - Multiple links [https://www.google.com one] in one [https://www.facebook.com two] line.
+        - Multiple links [[https://www.google.com|one]] in one [[https://www.facebook.com|two]] line.
+        - ![https://www.google.com google single]
 
         Here are some images:
         - [[Image(https://google/image/1)]]
@@ -408,8 +427,13 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         - *italic*
         - _italic_
 
-        External Links:
+        Links:
         - [google engine](https://www.google.com)
+        - UrlDesign
+        - [UrlDesign](https://github.com/#{options_for_markdown_converter[:git_repo]}/wiki/UrlDesign)
+        - Multiple links [one](https://www.google.com) in one [two](https://www.facebook.com) line.
+        - Multiple links [one](https://www.google.com) in one [two](https://www.facebook.com) line.
+        - [https://www.google.com google single]
 
         Here are some images:
         - ![https://google/image/1](https://google/image/1)

@@ -4,13 +4,14 @@ module Migrator
   module Converter
     # twf => Trac wiki format
     class TwfToMarkdown
-      def initialize(base_url, attachment_options, changeset_base_url, wiki_attachments_url, revmap_file_path)
+      def initialize(base_url, attachment_options, changeset_base_url, wiki_attachments_url, revmap_file_path, git_repo)
         @base_url = base_url
         @attach_url = attachment_options[:url]
         @attach_hashed = attachment_options[:hashed]
         @changeset_base_url = changeset_base_url
         @wiki_attachments_url = wiki_attachments_url
         @revmap = load_revmap_file(revmap_file_path)
+        @git_repo = git_repo
       end
 
       def convert(str)
@@ -19,12 +20,12 @@ module Migrator
         convert_html_snippets(str)
         convert_code_snippets(str)
         convert_headings(str)
-        convert_links(str)
+        convert_links(str, @git_repo)
         convert_font_styles(str)
         convert_changeset(str, @changeset_base_url)
         convert_image(str, @base_url, @attach_url, @wiki_attachments_url)
         convert_ticket(str, @base_url)
-        revert_image_references(str)
+        revert_intermediate_references(str)
 
         str
       end
@@ -121,9 +122,82 @@ module Migrator
       end
 
       # Links
-      def convert_links(str)
-        str.gsub!(/\[(http[^\s\[\]]+)\s([^\[\]]+)\]/, '[\2](\1)')
+      def convert_links(str, git_repo)
+        convert_camel_case_links(str, git_repo)
+        convert_double_bracket_wiki_links(str, git_repo)
+        convert_single_bracket_wiki_links(str, git_repo)
+
+        str.gsub!(/(^!)\[(http[^\s\[\]]+)\s([^\[\]]+)\]/, '[\2](\1)')
         str.gsub!(/!(([A-Z][a-z0-9]+){2,})/, '\1')
+      end
+
+      def convert_single_bracket_wiki_links(str, git_repo)
+        str.gsub!(/(!?)\[(wiki:)?([^\s]*) ?(.*?)\]/) do |match_result|
+          source = Regexp.last_match[2]
+          path = Regexp.last_match[3]
+          name = Regexp.last_match[4]
+
+          formatted_link(
+            match_result,
+            git_repo,
+            { source: source, path: path, name: name }
+          )
+        end
+      end
+
+      def convert_double_bracket_wiki_links(str, git_repo)
+        str.gsub!(/(!?)\[\[(wiki:)?([^|\n]*)\|?(.*?)\]\]/) do |match_result|
+          source = Regexp.last_match[2]
+          path = Regexp.last_match[3]
+          name = Regexp.last_match[4]
+
+          formatted_link(
+            match_result,
+            git_repo,
+            { source: source, path: path, name: name }
+          )
+        end
+      end
+
+      def formatted_link(unformatted_text, git_repo, url_options = {})
+        return unformatted_text.gsub("!", "{~") if unformatted_text.start_with?("!")
+
+        if url_options[:source] == "wiki:"
+          "{{#{name}}}(https://github.com/#{git_repo}/wiki/#{name})"
+        elsif url_options[:path].start_with?("http")
+          url_options[:name] = url_options[:path] if url_options[:name].empty?
+          "{{#{url_options[:name]}}}(#{url_options[:path]})"
+        else
+          unformatted_text
+        end
+      end
+
+      # CamelCase page names follow these rules:
+      #   1. The name must consist of alphabetic characters only;
+      #      no digits, spaces, punctuation or underscores are allowed.
+      #   2. A name must have at least two capital letters.
+      #   3. The first character must be capitalized.
+      #   4. Every capital letter must be followed by one or more lower-case letters.
+      #   5. The use of slash ( / ) is permitted in page names, where it typically represents a hierarchy.
+      def convert_camel_case_links(str, git_repo)
+        name_regex = %r{(^| )(!?)(/?[A-Z][a-z]+(/?[A-Z][a-z]+)+/?)}
+        wiki_pages_names = Tractive::Wiki.select(:name).distinct.map(:name)
+        str.gsub!(name_regex) do
+          start = Regexp.last_match[2]
+          name = Regexp.last_match[3]
+
+          wiki_link = if start != "!" && wiki_pages_names.include?(name)
+                        make_wiki_link(name, git_repo)
+                      else
+                        name
+                      end
+
+          "#{Regexp.last_match[1]}#{wiki_link}"
+        end
+      end
+
+      def make_wiki_link(wiki_name, git_repo)
+        "[#{wiki_name}](https://github.com/#{git_repo}/wiki/#{wiki_name})"
       end
 
       def convert_image(str, base_url, attach_url, wiki_attachments_url)
@@ -139,18 +213,18 @@ module Migrator
           mod = Regexp.last_match[:module]
 
           converted_image = if mod == "source"
-                              "![#{path.split("/").last}](#{base_url}#{path})"
+                              "!{{#{path.split("/").last}}}(#{base_url}#{path})"
                             elsif mod == "wiki"
                               id, file = path.split(":")
                               upload_path = "#{wiki_attachments_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
-                              "![#{file}](#{upload_path})"
+                              "!{{#{file}}}(#{upload_path})"
                             elsif path.start_with?("http")
                               # [[Image(http://example.org/s.jpg)]]
-                              "![#{path}](#{path})"
+                              "!{{#{path}}}(#{path})"
                             else
                               _, id, file = path.split(":")
                               file_path = "#{attach_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
-                              "![#{path}](#{file_path})"
+                              "!{{#{path}}}(#{file_path})"
                             end
 
           # There are also ticket references in the format of ticket:1 so
@@ -159,8 +233,11 @@ module Migrator
         end
       end
 
-      def revert_image_references(str)
+      def revert_intermediate_references(str)
         str.gsub!(/ImageTicket~(\d)/, 'ticket:\1')
+        str.gsub!("{{", "[")
+        str.gsub!("}}", "]")
+        str.gsub!(/(\{~)*/, "")
       end
     end
   end

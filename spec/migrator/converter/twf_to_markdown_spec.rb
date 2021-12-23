@@ -41,6 +41,15 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
     end
   end
 
+  describe "#convert_tables" do
+    it "should convert tables" do
+      str = "|| col1 || col2 ||\n|| r1 || r2 ||"
+      twf_to_markdown.send(:convert_tables, str)
+
+      expect(str).to eq("| col1 | col2 |\n| --- | --- |\n| r1 | r2 |\n")
+    end
+  end
+
   describe "#convert_headings" do
     it "should convet headings properly" do
       str  = "= h1 = \n"
@@ -198,6 +207,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       str = <<~LINKS
         [https://www.google.com google single]
         [comment:3 fenner@research.att.com]
+        [wiki:WikiStart#CodeSprints Code Sprints]
         Link in the middle [https://www.google.com Google] of line
         [https://www.google.com]
         Link without name in [https://www.google.com] middle of line.
@@ -207,6 +217,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       expected_str = <<~CONVERTED_LINKS
         [google single](https://www.google.com)
         [comment:3 fenner@research.att.com]
+        [Code Sprints](https://github.com/foo/bar/wiki/WikiStart#code-sprints)
         Link in the middle [Google](https://www.google.com) of line
         [https://www.google.com](https://www.google.com)
         Link without name in [https://www.google.com](https://www.google.com) middle of line.
@@ -359,6 +370,16 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         - [[Image(ticket:1:picture.png)]]
         - [[Image(wiki:WikiFormatting:picture.png)]]
         - [[Image(source:/trunk/trac/htdocs/trac_logo_mini.png)]]
+
+        Tables:
+        || Column 1 || Column 2 || Column 3 ||
+        ||  hello   ||  world   ||  hello   ||
+        ||  hello   ||  good    ||  world   ||
+        ||  hello   ||  bad     ||  world   ||
+
+        || Col 1 || Col 2 || Col 3 ||
+        ||  hello   ||  world   ||  hello   ||
+        ||  hello   ||  good    ||  world   ||
       WIKI_FORMAT_TEXT
 
       base_url = options_for_markdown_converter[:base_url]
@@ -440,6 +461,18 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         - ![ticket:1:picture.png](#{attach_url}/1/picture.png)
         - ![picture.png](#{wiki_attachments_url}/WikiFormatting/picture.png)
         - ![trac_logo_mini.png](#{base_url}/trunk/trac/htdocs/trac_logo_mini.png)
+
+        Tables:
+        | Column 1 | Column 2 | Column 3 |
+        | --- | --- | --- |
+        |  hello   |  world   |  hello   |
+        |  hello   |  good    |  world   |
+        |  hello   |  bad     |  world   |
+
+        | Col 1 | Col 2 | Col 3 |
+        | --- | --- | --- |
+        |  hello   |  world   |  hello   |
+        |  hello   |  good    |  world   |
       MARKDOWN_FORMAT_TEXT
 
       twf_to_markdown.convert(str)

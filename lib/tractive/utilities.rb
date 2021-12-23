@@ -36,6 +36,10 @@ module Tractive
         db
       end
 
+      def dasharize(str)
+        str.gsub(/([a-z\d])([A-Z])/, '\1-\2').downcase
+      end
+
       def attachment_path(id, filename, options = {})
         return "#{id}/#{filename}" unless options[:hashed]
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Migrator::Wikis::MigrateFromDb do
-  context "#verify_options" do
+  describe "#verify_options" do
     it "should `exit` if attachment-base-url is missing" do
       expect { Migrator::Wikis::MigrateFromDb.new(opts: options_for_wiki("attachment-base-url" => ""), cfg: CONFIG).send(:verify_options) }.to raise_error(SystemExit)
     end
@@ -19,7 +19,7 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
     end
   end
 
-  context "#verify_locations" do
+  describe "#verify_locations" do
     it "should `exit` if repo-path directory is missing" do
       expect { Migrator::Wikis::MigrateFromDb.new(opts: options_for_wiki("repo-path" => "invalid-location"), cfg: CONFIG).send(:verify_locations) }.to raise_error(SystemExit)
     end
@@ -29,7 +29,39 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
     end
   end
 
-  context "#cleanse_filename" do
+  describe "#filename_for_wiki" do
+    it "should return `Home.md` for default home-page-name" do
+      wiki = Tractive::Wiki.first(name: "WikiStart")
+
+      expect(
+        Migrator::Wikis::MigrateFromDb.new(
+          opts: options_for_wiki, cfg: CONFIG
+        ).send(:filename_for_wiki, wiki)
+      ).to eq("Home.md")
+    end
+
+    it "should return `Home.md` when home-page-name is passed in options" do
+      wiki = Tractive::Wiki.first(name: "ProjectSetup")
+
+      expect(
+        Migrator::Wikis::MigrateFromDb.new(
+          opts: options_for_wiki("home-page-name" => "ProjectSetup"), cfg: CONFIG
+        ).send(:filename_for_wiki, wiki)
+      ).to eq("Home.md")
+    end
+
+    it "should return `Model.md`" do
+      wiki = Tractive::Wiki.first(name: "Model")
+
+      expect(
+        Migrator::Wikis::MigrateFromDb.new(
+          opts: options_for_wiki, cfg: CONFIG
+        ).send(:filename_for_wiki, wiki)
+      ).to eq("Model.md")
+    end
+  end
+
+  describe "#cleanse_filename" do
     it "should cleanse filename" do
       filename = "Hello-World<hello>/"
       wiki_migrator = Migrator::Wikis::MigrateFromDb.new(opts: options_for_wiki, cfg: CONFIG)
@@ -37,7 +69,7 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
     end
   end
 
-  context "#skip_file" do
+  describe "#skip_file" do
     let(:wiki_migrator) { Migrator::Wikis::MigrateFromDb.new(opts: options_for_wiki, cfg: CONFIG) }
 
     it "should return `true` if filename start with `Trac`" do
@@ -57,7 +89,7 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
     end
   end
 
-  context "#generate_author" do
+  describe "#generate_author" do
     let(:wiki_migrator) { Migrator::Wikis::MigrateFromDb.new(opts: options_for_wiki, cfg: CONFIG) }
 
     it "should return `empty` if author is empty" do
@@ -73,7 +105,7 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
     end
   end
 
-  context "#wiki_attachments" do
+  describe "#wiki_attachments" do
     let(:wiki_migrator) { described_class.new(opts: options_for_wiki, cfg: CONFIG) }
 
     it "should append attachments to wikis if present" do
@@ -94,7 +126,8 @@ RSpec.describe Migrator::Wikis::MigrateFromDb do
   def options_for_wiki(options = {})
     {
       "repo-path" => "spec/files/trac_test.wiki",
-      "attachment-base-url" => "http://base-url/for/wiki"
+      "attachment-base-url" => "http://base-url/for/wiki",
+      "home-page-name" => "WikiStart"
     }.merge(options)
   end
 end

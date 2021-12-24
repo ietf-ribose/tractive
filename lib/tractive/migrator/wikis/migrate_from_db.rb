@@ -15,10 +15,12 @@ module Migrator
         @tracticketbaseurl    = @config["trac"]["ticketbaseurl"]
         @git_repo             = @config["github"]["repo"]
         @changeset_base_url   = @config["trac"]["changeset_base_url"] || ""
-        @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
-        @repo_path            = @options["repo-path"] || ""
         @revmap_path          = @config["revmap_path"]
         @attachments_hashed   = @config.dig("wiki", "attachments", "hashed")
+
+        @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
+        @repo_path            = @options["repo-path"] || ""
+        @home_page_name       = @options["home-page-name"]
 
         @attachment_options   = {
           hashed: @attachments_hashed
@@ -27,7 +29,14 @@ module Migrator
         verify_options
         verify_locations
 
-        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(@tracticketbaseurl, @attachment_options, @changeset_base_url, @wiki_attachments_url, @revmap_path, @git_repo)
+        @twf_to_markdown = Migrator::Converter::TwfToMarkdown.new(
+          @tracticketbaseurl,
+          @attachment_options,
+          @changeset_base_url,
+          @wiki_attachments_url,
+          @revmap_path,
+          git_repo: @git_repo
+        )
       end
 
       def migrate_wikis
@@ -44,7 +53,8 @@ module Migrator
                         wiki[:comment].gsub('"', '\"')
                       end
 
-            file_name = "#{cleanse_filename(wiki[:name])}.md"
+            file_name = filename_for_wiki(wiki)
+
             $logger.info("Working with file [#{file_name}]")
             $logger.debug("Object: #{wiki}")
 
@@ -75,6 +85,12 @@ module Migrator
       end
 
       private
+
+      def filename_for_wiki(wiki)
+        return "Home.md" if @home_page_name == wiki[:name]
+
+        "#{cleanse_filename(wiki[:name])}.md"
+      end
 
       def verify_options
         $logger.info("Verifying options...")

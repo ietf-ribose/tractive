@@ -4,14 +4,16 @@ module Migrator
   module Converter
     # twf => Trac wiki format
     class TwfToMarkdown
-      def initialize(base_url, attachment_options, changeset_base_url, wiki_attachments_url, revmap_file_path, git_repo)
+      def initialize(base_url, attachment_options, changeset_base_url, wiki_attachments_url, revmap_file_path, options = {})
         @base_url = base_url
         @attach_url = attachment_options[:url]
         @attach_hashed = attachment_options[:hashed]
         @changeset_base_url = changeset_base_url
         @wiki_attachments_url = wiki_attachments_url
         @revmap = load_revmap_file(revmap_file_path)
-        @git_repo = git_repo
+
+        @git_repo = options[:git_repo]
+        @home_page_name = options[:home_page_name]
       end
 
       def convert(str)
@@ -175,7 +177,9 @@ module Migrator
 
         if url_options[:source] == "wiki:"
           link, internal_link = url_options[:path].split("#")
+          link = "Home" if link == @home_page_name
           internal_link = Tractive::Utilities.dasharize(internal_link) if internal_link
+          url_options[:name] = link if url_options[:name].empty?
           "{{#{url_options[:name]}}}(https://github.com/#{git_repo}/wiki/#{link}##{internal_link})"
         elsif url_options[:path].start_with?("http")
           url_options[:name] = url_options[:path] if url_options[:name].empty?
@@ -210,6 +214,7 @@ module Migrator
       end
 
       def make_wiki_link(wiki_name, git_repo)
+        wiki_name = "Home" if wiki_name == @home_page_name
         "[#{wiki_name}](https://github.com/#{git_repo}/wiki/#{wiki_name})"
       end
 

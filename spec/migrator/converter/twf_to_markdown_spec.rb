@@ -381,6 +381,11 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         ||  hello   ||  good    ||  world   ||
         ||  hello   ||  bad     ||  world   ||
 
+        || Column 1 || Column 2 || Column 3
+        ||  hello   ||  world   ||  hello
+        ||  hello   ||  good    ||  world how are you?
+        ||  hello   ||  bad     ||  world
+
         || Col 1 || Col 2 || Col 3 ||
         ||  hello   ||  world   ||  hello   ||
         ||  hello   ||  good    ||  world   ||
@@ -472,6 +477,12 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         |  hello   |  world   |  hello   |
         |  hello   |  good    |  world   |
         |  hello   |  bad     |  world   |
+
+        | Column 1 | Column 2 | Column 3 |
+        | --- | --- | --- |
+        |  hello   |  world   |  hello |
+        |  hello   |  good    |  world how are you? |
+        |  hello   |  bad     |  world |
 
         | Col 1 | Col 2 | Col 3 |
         | --- | --- | --- |

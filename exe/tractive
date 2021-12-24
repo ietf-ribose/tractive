@@ -58,6 +58,9 @@ class TractiveCommand < CommandBase
                                       desc: "Full path of the Trac sqlite3 database export file"
   method_option "repo-path", type: :string, aliases: ["-r"], banner: "/GIT/ROOT/DIR",
                              desc: "Full path to the root of the git-repository that is our destination"
+  method_option "home-page-name", type: :string, aliases: ["-h"], default: "WikiStart",
+                                  desc: "Name of the SVN wiki to map to the home page in Github wiki"
+
   def migrate_wikis
     Tractive::Main.new(options).migrate_wikis
   end

@@ -34,7 +34,7 @@ module Migrator
           @changeset_base_url,
           @wiki_attachments_url,
           @revmap_file_path,
-          git_repo: @repo
+          git_repo: @repo, home_page_name: args[:opts]["home-page-name"]
         )
       end
 

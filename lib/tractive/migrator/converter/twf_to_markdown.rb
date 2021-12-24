@@ -17,6 +17,9 @@ module Migrator
       end
 
       def convert(str)
+        # Fix 'Windows EOL' to 'Linux EOL'
+        str.gsub!('\r\n', '\n')
+
         convert_tables(str)
         convert_newlines(str)
         convert_comments(str)

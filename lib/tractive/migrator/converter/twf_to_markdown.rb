@@ -129,6 +129,8 @@ module Migrator
 
       # Tables
       def convert_tables(str)
+        str.gsub!(/^( *\|\|[^\n]+\|\| *[^\n|]+$)+$/, '\1 ||')
+
         str.gsub!(/(?:^( *\|\|[^\n]+\|\| *)\n?)+/) do |match_result|
           rows = match_result.gsub("||", "|").split("\n")
           rows.insert(1, "| #{"--- | " * (rows[0].split("|").size - 1)}".strip)

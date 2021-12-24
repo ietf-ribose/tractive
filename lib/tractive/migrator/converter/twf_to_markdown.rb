@@ -15,6 +15,7 @@ module Migrator
       end
 
       def convert(str)
+        convert_tables(str)
         convert_newlines(str)
         convert_comments(str)
         convert_html_snippets(str)
@@ -121,6 +122,16 @@ module Migrator
         str.gsub!(%r{([^:])//(.+?[^:])//}, '\1_\2_')
       end
 
+      # Tables
+      def convert_tables(str)
+        str.gsub!(/(?:^( *\|\|[^\n]+\|\| *)\n?)+/) do |match_result|
+          rows = match_result.gsub("||", "|").split("\n")
+          rows.insert(1, "| #{"--- | " * (rows[0].split("|").size - 1)}".strip)
+
+          "#{rows.join("\n")}\n"
+        end
+      end
+
       # Links
       def convert_links(str, git_repo)
         convert_camel_case_links(str, git_repo)
@@ -163,7 +174,9 @@ module Migrator
         return unformatted_text.gsub("!", "{~") if unformatted_text.start_with?("!")
 
         if url_options[:source] == "wiki:"
-          "{{#{name}}}(https://github.com/#{git_repo}/wiki/#{name})"
+          link, internal_link = url_options[:path].split("#")
+          internal_link = Tractive::Utilities.dasharize(internal_link) if internal_link
+          "{{#{url_options[:name]}}}(https://github.com/#{git_repo}/wiki/#{link}##{internal_link})"
         elsif url_options[:path].start_with?("http")
           url_options[:name] = url_options[:path] if url_options[:name].empty?
           "{{#{url_options[:name]}}}(#{url_options[:path]})"

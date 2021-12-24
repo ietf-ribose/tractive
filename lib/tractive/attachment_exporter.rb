@@ -53,9 +53,10 @@ module Tractive
         $logger.info "Saving attachments of ticket #{attachment.id}... "
         FileUtils.mkdir_p "#{output_dir}/#{attachment.id}"
 
-        File.open("#{output_dir}/#{attachment.id}/#{attachment.filename}", "wb") do |file|
-          file.write URI.open(uri_parser.escape("#{trac_url}/#{attachment.id}/#{attachment.filename}")).read
-        end
+        File.binwrite(
+          "#{output_dir}/#{attachment.id}/#{attachment.filename}",
+          URI.open(uri_parser.escape("#{trac_url}/#{attachment.id}/#{attachment.filename}")).read
+        )
       end
     end
   end

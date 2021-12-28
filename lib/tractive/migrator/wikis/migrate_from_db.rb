@@ -21,6 +21,8 @@ module Migrator
         @wiki_attachments_url = @options["attachment-base-url"] || @config.dig("wiki", "attachments", "url") || ""
         @repo_path            = @options["repo-path"] || ""
         @home_page_name       = @options["home-page-name"]
+        @wiki_extensions      = @options["wiki-extensions"]
+        @source_folders       = @options["source-folders"]
 
         @attachment_options   = {
           hashed: @attachments_hashed
@@ -35,7 +37,10 @@ module Migrator
           @changeset_base_url,
           @wiki_attachments_url,
           @revmap_path,
-          git_repo: @git_repo, home_page_name: @home_page_name
+          git_repo: @git_repo,
+          home_page_name: @home_page_name,
+          wiki_extensions: @wiki_extensions,
+          source_folders: @source_folders
         )
       end
 

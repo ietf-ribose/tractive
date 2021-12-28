@@ -60,7 +60,10 @@ class TractiveCommand < CommandBase
                              desc: "Full path to the root of the git-repository that is our destination"
   method_option "home-page-name", type: :string, aliases: ["-h"], default: "WikiStart",
                                   desc: "Name of the SVN wiki to map to the home page in Github wiki"
-
+  method_option "wiki-extensions", type: :array, aliases: ["-e"], default: [".py", "changelog", "expire-ids"],
+                                   desc: "Array of strings to determinte whether a given path is a file path or a directory in wiki"
+  method_option "source-folders", type: :array, aliases: ["-f"], default: ["personal", "attic", "sprint", "branch/hawk"],
+                                  desc: "Array of strings to figure out if a path is complete or partial"
   def migrate_wikis
     Tractive::Main.new(options).migrate_wikis
   end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "cgi"
+
 module Migrator
   module Converter
     # twf => Trac wiki format
@@ -14,11 +16,13 @@ module Migrator
 
         @git_repo = options[:git_repo]
         @home_page_name = options[:home_page_name]
+        @wiki_extensions = options[:wiki_extensions] # || [".py", "changelog", "expire-ids"]
+        @source_folders = options[:source_folders] # || %w[personal attic sprint branch/hawk]
       end
 
       def convert(str)
         # Fix 'Windows EOL' to 'Linux EOL'
-        str.gsub!('\r\n', '\n')
+        str.gsub!("\r\n", "\n")
 
         convert_tables(str)
         convert_newlines(str)
@@ -150,7 +154,7 @@ module Migrator
       end
 
       def convert_single_bracket_wiki_links(str, git_repo)
-        str.gsub!(/(!?)\[(wiki:)?([^\s]*) ?(.*?)\]/) do |match_result|
+        str.gsub!(/(!?)\[((?:wiki|source):)?([^\s\]]*) ?(.*?)\]/) do |match_result|
           source = Regexp.last_match[2]
           path = Regexp.last_match[3]
           name = Regexp.last_match[4]
@@ -164,7 +168,7 @@ module Migrator
       end
 
       def convert_double_bracket_wiki_links(str, git_repo)
-        str.gsub!(/(!?)\[\[(wiki:)?([^|\n]*)\|?(.*?)\]\]/) do |match_result|
+        str.gsub!(/(!?)\[\[((?:wiki|source):)?([^|\n]*)\|?(.*?)\]\]/) do |match_result|
           source = Regexp.last_match[2]
           path = Regexp.last_match[3]
           name = Regexp.last_match[4]
@@ -186,12 +190,77 @@ module Migrator
           internal_link = Tractive::Utilities.dasharize(internal_link) if internal_link
           url_options[:name] = link if url_options[:name].empty?
           "{{#{url_options[:name]}}}(https://github.com/#{git_repo}/wiki/#{link}##{internal_link})"
+        elsif url_options[:source] == "source:"
+          url_options[:name] = url_options[:path] if url_options[:name].empty?
+          "{{#{url_options[:name]}}}(https://github.com/#{git_repo}/#{source_git_path(url_options[:path])})"
         elsif url_options[:path].start_with?("http")
           url_options[:name] = url_options[:path] if url_options[:name].empty?
           "{{#{url_options[:name]}}}(#{url_options[:path]})"
         else
           unformatted_text
         end
+      end
+
+      def source_git_path(trac_path)
+        trac_path = trac_path.gsub("trunk/", "main/")
+        trac_path = trac_path.delete_prefix("/").delete_suffix("/")
+
+        return "" if trac_path.empty?
+
+        uri = URI.parse(trac_path)
+
+        trac_path = uri.path
+        line_number = uri.fragment
+        trac_path, revision = trac_path.split("@")
+
+        if trac_path.split("/").count <= 1
+          wiki_path(trac_path)
+        else
+          unless trac_path.start_with?("tags")
+            params = CGI.parse(uri.query || "")
+            revision ||= params["rev"].first
+
+            # TODO: Currently @ does not work with file paths except for main branch
+            sha = @revmap[revision]&.strip
+
+            trac_path = if sha && file?(trac_path)
+                          trac_path.gsub("main/", "#{sha}/")
+                        else
+                          sha || trac_path
+                        end
+          end
+
+          wiki_path(trac_path.delete_prefix("tags/"), line_number)
+        end
+      end
+
+      def index_paths
+        @index_paths ||= {
+          "tags" => "tags",
+          "tags/" => "tags",
+          "branch" => "branches/all"
+        }
+      end
+
+      def file?(trac_path)
+        return false unless trac_path
+
+        @wiki_extensions.any? { |extension| trac_path.end_with?(extension) }
+      end
+
+      def wiki_path(path, line_number = "")
+        # TODO: This will not work for folders given in the source_folder parameter and
+        # will not work for subfolders paths like `personal/rjs` unless given in the parameters.
+        return "branches/all?query=#{path}" if @source_folders.any? { |folder| folder == path }
+        return index_paths[path] if index_paths[path]
+
+        prefix = if file?(path)
+                   "blob"
+                 else
+                   "tree"
+                 end
+
+        "#{prefix}/#{path}#{"#" unless line_number.to_s.empty?}#{line_number}"
       end
 
       # CamelCase page names follow these rules:

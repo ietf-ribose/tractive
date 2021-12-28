@@ -17,7 +17,12 @@ module Helpers
         changeset_base_url: options[:changeset_base_url] || "https://github.com/repo/commits",
         wiki_attachments_url: options[:wiki_attachments_url] || "https://foo.bar/wiki/attachments",
         revmap_file_path: options[:revmap_file_path] || "spec/files/revmap_spec.txt",
-        options: { git_repo: options[:git_repo] || "foo/bar", home_page_name: "WikiStart" }
+        options: {
+          git_repo: options[:git_repo] || "foo/bar",
+          home_page_name: "WikiStart",
+          wiki_extensions: [".py", "changelog", "expire-ids"],
+          source_folders: %w[personal attic sprint branch/hawk branch]
+        }
       }
     end
 

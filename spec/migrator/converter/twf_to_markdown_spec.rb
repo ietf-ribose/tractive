@@ -205,25 +205,21 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       expect(str).to eq(expected_str)
     end
 
-    it "should convert links in single square bracket" do
+    it "should convert external links in single square bracket" do
       str = <<~LINKS
         [https://www.google.com google single]
-        [comment:3 fenner@research.att.com]
-        [wiki:WikiStart#CodeSprints Code Sprints]
-        [wiki:WikiStart]
-        Link in the middle [https://www.google.com Google] of line
         [https://www.google.com]
+        [comment:3 fenner@research.att.com]
+        Link in the middle [https://www.google.com Google] of line
         Link without name in [https://www.google.com] middle of line.
         Multiple links [https://www.google.com one] in one [https://www.facebook.com facebook two] line.
       LINKS
 
       expected_str = <<~CONVERTED_LINKS
         [google single](https://www.google.com)
-        [comment:3 fenner@research.att.com]
-        [Code Sprints](https://github.com/foo/bar/wiki/Home#code-sprints)
-        [Home](https://github.com/foo/bar/wiki/Home#)
-        Link in the middle [Google](https://www.google.com) of line
         [https://www.google.com](https://www.google.com)
+        [comment:3 fenner@research.att.com]
+        Link in the middle [Google](https://www.google.com) of line
         Link without name in [https://www.google.com](https://www.google.com) middle of line.
         Multiple links [one](https://www.google.com) in one [facebook two](https://www.facebook.com) line.
       CONVERTED_LINKS
@@ -257,14 +253,178 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       expect(str).to eq(expected_str)
     end
 
+    it "should convert `wiki` links" do
+      str = <<~LINKS
+        [wiki:WikiStart#CodeSprints Code Sprints]
+        [wiki:WikiStart]
+      LINKS
+
+      expected_str = <<~CONVERTED_LINKS
+        [Code Sprints](https://github.com/foo/bar/wiki/Home#code-sprints)
+        [Home](https://github.com/foo/bar/wiki/Home#)
+      CONVERTED_LINKS
+
+      twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+      twf_to_markdown.send(:revert_intermediate_references, str)
+
+      expect(str).to eq(expected_str)
+    end
+
+    context "source links" do
+      it "convert for files" do
+        str = "[source:trunk/ietf/bin/expire-ids expire_ids]"
+
+        expected_str = "[expire_ids](https://github.com/foo/bar/blob/main/ietf/bin/expire-ids)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert SHA references for file" do
+        str = "[source:trunk/ietf/ipr/models.py@107#L78 IprDetail]"
+        expected_str = "[IprDetail](https://github.com/foo/bar/blob/a1b2c3/ietf/ipr/models.py#L78)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert SHA references for file with line numbers" do
+        str = <<~LINKS
+          [source:trunk/ietf/doc/expire.py?rev=7921#L145 doc.expire.clean_up_draft_files()]
+          [source:trunk/ietf/doc/views_draft.py?rev=7921#L341 doc.views_draft.replaces()]
+        LINKS
+
+        expected_str = <<~CONVERTED_LINKS
+          [doc.expire.clean_up_draft_files()](https://github.com/foo/bar/blob/ababab/ietf/doc/expire.py#L145)
+          [doc.views_draft.replaces()](https://github.com/foo/bar/blob/ababab/ietf/doc/views_draft.py#L341)
+        CONVERTED_LINKS
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert SHA references for branch" do
+        str = "[source:sprint/77/henrik@2118]"
+        expected_str = "[sprint/77/henrik@2118](https://github.com/foo/bar/tree/ab1234)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert for tags" do
+        str = <<~LINKS
+          [source:tags/]
+          [source:tags/2.46]
+          [source:tags/2.46/changelog v2.46]
+          [source:tags/?order=date&desc=1 tags/]
+        LINKS
+
+        expected_str = <<~CONVERTED_LINKS
+          [tags/](https://github.com/foo/bar/tags)
+          [tags/2.46](https://github.com/foo/bar/tree/2.46)
+          [v2.46](https://github.com/foo/bar/blob/2.46/changelog)
+          [tags/](https://github.com/foo/bar/tags)
+        CONVERTED_LINKS
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert for all branches" do
+        str = "[source:branch/]"
+        expected_str = "[branch/](https://github.com/foo/bar/branches/all?query=branch)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert to main branch if link missing" do
+        str = "[source: source code repository]"
+        expected_str = "[source code repository](https://github.com/foo/bar/)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert for main branch" do
+        str = "[source:trunk/]"
+        expected_str = "[trunk/](https://github.com/foo/bar/tree/main)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert for branch names" do
+        str = <<~LINKS
+          [source:branch/yaco/idsubmit ID Submission Tool Repository]
+          [source:/branch/yaco/liaison/ liaison]
+        LINKS
+
+        expected_str = <<~CONVERTED_LINKS
+          [ID Submission Tool Repository](https://github.com/foo/bar/tree/branch/yaco/idsubmit)
+          [liaison](https://github.com/foo/bar/tree/branch/yaco/liaison)
+        CONVERTED_LINKS
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert partial branches to filters" do
+        str = <<~LINKS
+          [source:personal/]
+          [source:branch/hawk hawk]
+        LINKS
+
+        expected_str = <<~CONVERTED_LINKS
+          [personal/](https://github.com/foo/bar/branches/all?query=personal)
+          [hawk](https://github.com/foo/bar/branches/all?query=branch/hawk)
+        CONVERTED_LINKS
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+
+      it "convert without links" do
+        str = "[source: source code repository]"
+        expected_str = "[source code repository](https://github.com/foo/bar/)"
+
+        twf_to_markdown.send(:convert_links, str, options_for_markdown_converter[:options][:git_repo])
+        twf_to_markdown.send(:revert_intermediate_references, str)
+
+        expect(str).to eq(expected_str)
+      end
+    end
+
     it "should not convert links starting with `!`" do
       str = <<~LINKS
         !UrlDesign !ProjectSetup
+        ![[https://www.google.com]]
         Don't make link in middle ![https://www.google.com google single] of the line.
       LINKS
 
       expected_str = <<~CONVERTED_LINKS
         UrlDesign ProjectSetup
+        [[https://www.google.com]]
         Don't make link in middle [https://www.google.com google single] of the line.
       CONVERTED_LINKS
 
@@ -272,6 +432,132 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
       twf_to_markdown.send(:revert_intermediate_references, str)
 
       expect(str).to eq(expected_str)
+    end
+  end
+
+  describe "#source_git_path" do
+    context "input empty string" do
+      it "returns empty string" do
+        return_value = twf_to_markdown.send(:source_git_path, "")
+        expect(return_value).to be_empty
+      end
+    end
+
+    context "when input start with `trunk/`" do
+      it "returns main branch path" do
+        return_value1 = twf_to_markdown.send(:source_git_path, "trunk/")
+        return_value2 = twf_to_markdown.send(:source_git_path, "/trunk/")
+
+        expect(return_value1).to eq("tree/main")
+        expect(return_value2).to eq("tree/main")
+      end
+
+      it "returns main branch file path with line number" do
+        return_value = twf_to_markdown.send(:source_git_path, "trunk/ietf/ipr/models.py@107#L78")
+        expect(return_value).to eq("blob/a1b2c3/ietf/ipr/models.py#L78")
+      end
+    end
+
+    context "when input is in source folder list" do
+      it "returns filter branches path with filter `query=branch`" do
+        return_value1 = twf_to_markdown.send(:source_git_path, "branch/")
+        return_value2 = twf_to_markdown.send(:source_git_path, "/branch/")
+
+        expect(return_value1).to eq("branches/all?query=branch")
+        expect(return_value2).to eq("branches/all?query=branch")
+      end
+
+      it "returns filter branches path with filter `query=branch/hawk`" do
+        return_value = twf_to_markdown.send(:source_git_path, "/branch/hawk")
+        expect(return_value).to eq("branches/all?query=branch/hawk")
+      end
+
+      it "returns filter branches path with filter `query=personal`" do
+        return_value = twf_to_markdown.send(:source_git_path, "personal/")
+        expect(return_value).to eq("branches/all?query=personal")
+      end
+    end
+
+    context "when input is branch path" do
+      context "with complete path" do
+        it "returns branch path" do
+          return_value = twf_to_markdown.send(:source_git_path, "/branch/ssw/agenda/")
+          expect(return_value).to eq("tree/branch/ssw/agenda")
+        end
+      end
+    end
+
+    context "when input is tag path" do
+      it "returns all tags path" do
+        return_value1 = twf_to_markdown.send(:source_git_path, "tags/")
+        return_value2 = twf_to_markdown.send(:source_git_path, "/tags/")
+
+        expect(return_value1).to eq("tags")
+        expect(return_value2).to eq("tags")
+      end
+
+      it "returns tag path" do
+        return_value = twf_to_markdown.send(:source_git_path, "/tags/4.6/")
+        expect(return_value).to eq("tree/4.6")
+      end
+    end
+  end
+
+  describe "#file?" do
+    context "when nil input" do
+      it "return false" do
+        return_value = twf_to_markdown.send(:file?, nil)
+        expect(return_value).to be false
+      end
+    end
+
+    context "when path ends with a value in wiki_extensions" do
+      it "returns true" do
+        return_value = twf_to_markdown.send(:file?, "path/abc.py")
+        expect(return_value).to be true
+      end
+    end
+
+    context "when path does not ends with a value in wiki_extensions" do
+      it "returns false" do
+        return_value = twf_to_markdown.send(:file?, "path/abc")
+        expect(return_value).to be false
+      end
+    end
+  end
+
+  describe "#wiki_path" do
+    context "when path in source_folders" do
+      it "returns all branches with filter" do
+        return_value = twf_to_markdown.send(:wiki_path, "branch/hawk")
+        expect(return_value).to eq("branches/all?query=branch/hawk")
+      end
+    end
+
+    context "when tags path" do
+      it "returns tags index page path" do
+        return_value = twf_to_markdown.send(:wiki_path, "tags")
+        expect(return_value).to eq("tags")
+      end
+    end
+
+    context "when file path" do
+      it "returns file path" do
+        return_value = twf_to_markdown.send(:wiki_path, "main/changelog")
+        expect(return_value).to eq("blob/main/changelog")
+      end
+
+      it "returns file path with line number" do
+        return_value = twf_to_markdown.send(:wiki_path, "main/ietf/doc/views_draft.py", "L341")
+        expect(return_value).to eq("blob/main/ietf/doc/views_draft.py#L341")
+      end
+    end
+
+    context "when branch path" do
+      it "returns file path" do
+        return_value = twf_to_markdown.send(:wiki_path, "main")
+        expect(return_value).to eq("tree/main")
+      end
     end
   end
 
@@ -367,6 +653,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         - UrlDesign
         - Multiple links [https://www.google.com one] in one [https://www.facebook.com two] line.
         - Multiple links [[https://www.google.com|one]] in one [[https://www.facebook.com|two]] line.
+        - Multiple source links [source:branch/] in one [source:personal/] line.
         - ![https://www.google.com google single]
 
         Here are some images:
@@ -463,6 +750,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         - [UrlDesign](https://github.com/#{options_for_markdown_converter[:options][:git_repo]}/wiki/UrlDesign)
         - Multiple links [one](https://www.google.com) in one [two](https://www.facebook.com) line.
         - Multiple links [one](https://www.google.com) in one [two](https://www.facebook.com) line.
+        - Multiple source links [branch/](https://github.com/foo/bar/branches/all?query=branch) in one [personal/](https://github.com/foo/bar/branches/all?query=personal) line.
         - [https://www.google.com google single]
 
         Here are some images:

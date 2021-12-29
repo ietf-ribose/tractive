@@ -802,6 +802,14 @@ If attachment files are reachable via a URL we reference this here.
 | Path to config file.
 | String
 
+| `-e`, `--wiki-extensions`
+| Space separated list of extensions or filenames (if the file don't have an extension). This is required to convert file SVN source links to Github links. This is used to determine if a path belongs to a file or a directory.
+| Array
+
+| `-f`, `--source-folders`
+| Space separated list of non standard folders in SVN that are used to find if a path is complete or partial.
+| Array
+
 |===
 
 

@@ -90,7 +90,9 @@ module Migrator
 
       # Comments
       def convert_comments(str)
-        str.gsub!(/\{\{\{#!comment([\s|\n])(.*?)\}\}\}/m, '<!--\1\2\1-->')
+        str.gsub!(/\{\{\{(?>((?!(?:}}}|{{{)).+?|\g<0>))*\}\}\}/m) do |str_match|
+          str_match.gsub(/\{\{\{\s*#!comment(\s*)(.*)\}\}\}/m, '<!--\1\2\1-->')
+        end
       end
 
       # HTML Snippets
@@ -114,7 +116,7 @@ module Migrator
 
       # Changeset
       def convert_changeset(str, changeset_base_url)
-        str.gsub!(%r{#{Regexp.quote(changeset_base_url)}/(\d+)/?}, '[changeset:\1]') if changeset_base_url
+        str.gsub!(%r{#{Regexp.quote(changeset_base_url)}/(\d+)/?}, '[changeset:\1]') if changeset_base_url && !changeset_base_url.empty?
         str.gsub!(/\[changeset:"r(\d+)".*\]/, '[changeset:\1]')
         str.gsub!(/\[changeset:r(\d+)\]/, '[changeset:\1]')
         str.gsub!(/\br(\d+)\b/) { Tractive::Utilities.map_changeset(Regexp.last_match[1], @revmap, changeset_base_url) }

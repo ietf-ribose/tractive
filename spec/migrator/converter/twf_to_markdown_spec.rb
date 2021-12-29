@@ -77,18 +77,38 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
   describe "#convert_comments" do
     it "should convert comments" do
-      str1 = "{{{#!comment this is a comment}}}"
-      str2 = <<~WIKI_COMMENT_TEXT
+      str = <<~WIKI_COMMENT_TEXT
+        single line comment: {{{#!comment this is a comment}}}
+
+        multiline comment:
         {{{#!comment
-        this is a comment
+        this is a comment with a codeblock
+        {{{#!ruby
+          def foo
+            puts "bar"
+          end
+        }}}
         }}}
       WIKI_COMMENT_TEXT
 
-      twf_to_markdown.send(:convert_comments, str1)
-      twf_to_markdown.send(:convert_comments, str2)
+      expected_str = <<~CONVERTED_STR
+        single line comment: <!-- this is a comment -->
 
-      expect(str1).to eq("<!-- this is a comment -->")
-      expect(str2).to eq("<!--\nthis is a comment\n\n-->\n")
+        multiline comment:
+        <!--
+        this is a comment with a codeblock
+        {{{#!ruby
+          def foo
+            puts "bar"
+          end
+        }}}
+
+        -->
+      CONVERTED_STR
+
+      twf_to_markdown.send(:convert_comments, str)
+
+      expect(str).to eq(expected_str)
     end
   end
 
@@ -614,7 +634,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         Comments:
         - {{{#!comment This is a single line comment}}}
         {{{#!comment
-          This is a multiline comment
+        This is a multiline comment
         }}}
 
         Html Snippet:
@@ -708,7 +728,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         Comments:
         - <!-- This is a single line comment -->
         <!--
-          This is a multiline comment
+        This is a multiline comment
 
         -->
 

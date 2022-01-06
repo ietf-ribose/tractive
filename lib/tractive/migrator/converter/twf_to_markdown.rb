@@ -16,11 +16,11 @@ module Migrator
 
         @git_repo = options[:git_repo]
         @home_page_name = options[:home_page_name]
-        @wiki_extensions = options[:wiki_extensions] # || [".py", "changelog", "expire-ids"]
-        @source_folders = options[:source_folders] # || %w[personal attic sprint branch/hawk]
+        @wiki_extensions = options[:wiki_extensions]
+        @source_folders = options[:source_folders]
       end
 
-      def convert(str)
+      def convert(str, image_options = {})
         # Fix 'Windows EOL' to 'Linux EOL'
         str.gsub!("\r\n", "\n")
 
@@ -33,7 +33,7 @@ module Migrator
         convert_links(str, @git_repo)
         convert_font_styles(str)
         convert_changeset(str, @changeset_base_url)
-        convert_image(str, @base_url, @attach_url, @wiki_attachments_url)
+        convert_image(str, @base_url, @attach_url, @wiki_attachments_url, image_options)
         convert_ticket(str, @base_url)
         revert_intermediate_references(str)
 
@@ -247,13 +247,13 @@ module Migrator
       def file?(trac_path)
         return false unless trac_path
 
-        @wiki_extensions.any? { |extension| trac_path.end_with?(extension) }
+        @wiki_extensions&.any? { |extension| trac_path.end_with?(extension) }
       end
 
       def wiki_path(path, line_number = "")
         # TODO: This will not work for folders given in the source_folder parameter and
         # will not work for subfolders paths like `personal/rjs` unless given in the parameters.
-        return "branches/all?query=#{path}" if @source_folders.any? { |folder| folder == path }
+        return "branches/all?query=#{path}" if @source_folders&.any? { |folder| folder == path }
         return index_paths[path] if index_paths[path]
 
         prefix = if file?(path)
@@ -294,7 +294,7 @@ module Migrator
         "[#{wiki_name}](https://github.com/#{git_repo}/wiki/#{wiki_name})"
       end
 
-      def convert_image(str, base_url, attach_url, wiki_attachments_url)
+      def convert_image(str, base_url, attach_url, wiki_attachments_url, options = {})
         # https://trac.edgewall.org/wiki/WikiFormatting#Images
         # [[Image(picture.gif)]] Current page (Ticket, Wiki, Comment)
         # [[Image(wiki:WikiFormatting:picture.gif)]] (referring to attachment on another page)
@@ -316,7 +316,15 @@ module Migrator
                               # [[Image(http://example.org/s.jpg)]]
                               "!{{#{path}}}(#{path})"
                             else
-                              _, id, file = path.split(":")
+                              tmp = path.split(":")
+                              id, file = case tmp.size
+                                         when 3
+                                           [tmp[1], tmp[2]]
+                                         when 2
+                                           tmp
+                                         else
+                                           [options[:id].to_s, tmp[0]]
+                                         end
                               file_path = "#{attach_url}/#{Tractive::Utilities.attachment_path(id, file, hashed: @attach_hashed)}"
                               "!{{#{path}}}(#{file_path})"
                             end

@@ -678,6 +678,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
         Here are some images:
         - [[Image(https://google/image/1)]]
+        - [[Image(foobar.png)]]
         - [[Image(ticket:1:picture.png)]]
         - [[Image(wiki:WikiFormatting:picture.png)]]
         - [[Image(source:/trunk/trac/htdocs/trac_logo_mini.png)]]
@@ -775,6 +776,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
 
         Here are some images:
         - ![https://google/image/1](https://google/image/1)
+        - ![foobar.png](https://foo.bar/trac/attachments/123/foobar.png)
         - ![ticket:1:picture.png](#{attach_url}/1/picture.png)
         - ![picture.png](#{wiki_attachments_url}/WikiFormatting/picture.png)
         - ![trac_logo_mini.png](#{base_url}/trunk/trac/htdocs/trac_logo_mini.png)
@@ -798,7 +800,7 @@ RSpec.describe Migrator::Converter::TwfToMarkdown do
         |  hello   |  good    |  world   |
       MARKDOWN_FORMAT_TEXT
 
-      twf_to_markdown.convert(str)
+      twf_to_markdown.convert(str, id: "123")
 
       expect(str).to eq(expected_str)
     end

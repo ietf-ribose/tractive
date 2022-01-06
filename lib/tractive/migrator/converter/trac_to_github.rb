@@ -281,7 +281,7 @@ module Migrator
           # text += "created the issue\n\n"
           if body && !body.lstrip.empty?
             # text += "\n___\n" if not append
-            text += @twf_to_markdown.convert(body)
+            text += @twf_to_markdown.convert(body, id: meta[:ticket])
           end
 
         when "comment"
@@ -295,7 +295,7 @@ module Migrator
                   end
 
           text += "\n___\n" unless append
-          text += @twf_to_markdown.convert(body) if body
+          text += @twf_to_markdown.convert(body, id: meta[:ticket]) if body
 
         when "attachment"
           text += "_uploaded file "

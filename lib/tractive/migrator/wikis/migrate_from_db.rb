@@ -63,7 +63,7 @@ module Migrator
             $logger.info("Working with file [#{file_name}]")
             $logger.debug("Object: #{wiki}")
 
-            wiki_markdown_text = @twf_to_markdown.convert(wiki[:text])
+            wiki_markdown_text = @twf_to_markdown.convert(wiki[:text], id: wiki[:name])
             wiki_markdown_text += wiki_attachments(wiki)
 
             # Create file with content

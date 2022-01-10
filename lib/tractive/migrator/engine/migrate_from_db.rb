@@ -98,10 +98,11 @@ module Migrator
         return unless @delete_mocked_tickets
 
         page = 1
-        issues = @client.issues(@repo, { state: "closed",
-                                         sort: "created",
-                                         direction: "asc" })
+        issues = @client.issues(@repo, { filter: "all",
+                                         state: "closed" })
         until issues.empty?
+          deleted = false
+
           issues.each do |issue|
             next if issue["title"] != "Placeholder issue #{issue["number"]} created to align Github issue and trac ticket numbers during migration."
 
@@ -109,13 +110,13 @@ module Migrator
 
             raise response.data.errors.messages.map { |k, v| "#{k}: #{v}" }.join(", ") if response.data.errors.any?
 
+            deleted = true
             puts "Successfully deleted issue ##{issue["number"]}, Title: #{issue["title"]}"
           end
 
-          page += 1
-          issues = @client.issues(@repo, { state: "closed",
-                                           sort: "created",
-                                           direction: "asc",
+          page += 1 unless deleted
+          issues = @client.issues(@repo, { filter: "all",
+                                           state: "closed",
                                            page: page })
         end
       end

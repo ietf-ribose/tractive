@@ -8,7 +8,7 @@ module Tractive
       @opts = opts
       @cfg  = YAML.load_file(@opts[:config])
 
-      GithubApi::Client.add_graphql_constants(@cfg["github"]["token"])
+      GithubApi::GraphQlClient.add_constants(@cfg["github"]["token"])
 
       Tractive::Utilities.setup_logger(output_stream: @opts[:logfile] || $stderr, verbose: @opts[:verbose])
       @db = Tractive::Utilities.setup_db!(@opts["trac-database-path"] || @cfg["trac"]["database"])

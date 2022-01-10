@@ -106,7 +106,7 @@ module Migrator
           issues.each do |issue|
             next if issue["title"] != "Placeholder issue #{issue["number"]} created to align Github issue and trac ticket numbers during migration."
 
-            response = @client.delete_issue(issue["node_id"])
+            response = @graph_ql_client.delete_issue(issue["node_id"])
 
             raise response.data.errors.messages.map { |k, v| "#{k}: #{v}" }.join(", ") if response.data.errors.any?
 

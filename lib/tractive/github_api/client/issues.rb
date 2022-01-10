@@ -18,16 +18,6 @@ module GithubApi
         )
       end
 
-      def delete_issue(issue_id)
-        variables = {
-          "input" => {
-            "issueId" => issue_id
-          }
-        }
-
-        GraphQlClient.query(DeleteIssueQuery, variables: variables)
-      end
-
       def list_issues(repo, params)
         JSON.parse(
           Http::Client::Request.get(

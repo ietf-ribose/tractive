@@ -32,6 +32,7 @@ module Migrator
       @trac  = Tractive::Trac.new(db)
       @repo  = github["repo"]
       @client = GithubApi::Client.new(access_token: github["token"])
+      @graph_ql_client = GithubApi::GraphQlClient.new
 
       if input_file_name
         @from_file = input_file_name

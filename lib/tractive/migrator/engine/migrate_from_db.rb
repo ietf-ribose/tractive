@@ -23,6 +23,7 @@ module Migrator
         begin
           lasttracid = tractickets.last[:id]
         rescue StandardError
+          delete_mocked_tickets
           raise("trac has no ticket #{start_ticket}")
         end
 
@@ -88,6 +89,34 @@ module Migrator
           end
 
           @last_created_issue = ticket[:id]
+        end
+
+        delete_mocked_tickets
+      end
+
+      def delete_mocked_tickets
+        return unless @delete_mocked_tickets
+
+        page = 1
+        issues = @client.issues(@repo, { state: "closed",
+                                         sort: "created",
+                                         direction: "asc" })
+        until issues.empty?
+          issues.each do |issue|
+            next if issue["title"] != "Placeholder issue #{issue["number"]} created to align Github issue and trac ticket numbers during migration."
+
+            response = @client.delete_issue(issue["node_id"])
+
+            raise response.data.errors.messages.map { |k, v| "#{k}: #{v}" }.join(", ") if response.data.errors.any?
+
+            puts "Successfully deleted issue ##{issue["number"]}, Title: #{issue["title"]}"
+          end
+
+          page += 1
+          issues = @client.issues(@repo, { state: "closed",
+                                           sort: "created",
+                                           direction: "asc",
+                                           page: page })
         end
       end
     end

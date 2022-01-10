@@ -22,7 +22,7 @@ module GithubApi
           }
         }
 
-        GraphQlClient.query(DeleteIssueQuery, variables: variables)
+        Client.query(DeleteIssueQuery, variables: variables)
       end
     end
   end

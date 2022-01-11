@@ -7,5 +7,7 @@ class CommandBase < Thor
                           desc: "Name of the logfile to output logs to."
   class_option "config", type: :string, default: "tractive.config.yaml", banner: "<PATH>", aliases: "-c",
                          desc: "Set the configuration file"
+  class_option "git-token", type: :string,
+                            desc: "The access token for Github actions."
   class_option "verbose", type: :boolean, aliases: ["-v", "--verbose"], desc: "Verbose mode"
 end

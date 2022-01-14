@@ -8,6 +8,9 @@ module Tractive
       @opts = opts
       @cfg  = YAML.load_file(@opts[:config])
 
+      @cfg["github"] ||= {}
+      @cfg["github"]["token"] = @opts["git-token"] if @opts["git-token"]
+
       GithubApi::GraphQlClient.add_constants(@cfg["github"]["token"])
 
       Tractive::Utilities.setup_logger(output_stream: @opts[:logfile] || $stderr, verbose: @opts[:verbose])

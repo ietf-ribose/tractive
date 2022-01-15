@@ -22,6 +22,16 @@ RSpec.describe Migrator::Converter::TracToGithub do
     expect(actual_ticket_hash["comments"]).to match_array(expected_ticket_hash["comments"])
   end
 
+  it "compose correct issue without owners as labels" do
+    ticket = Tractive::Ticket.find(id: 3)
+
+    actual_ticket_hash = Migrator::Converter::TracToGithub.new(options_for_migrator).compose(ticket)
+    expected_ticket_hash = ticket_compose_hash3_without_owner_label(ticket)
+
+    expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])
+    expect(actual_ticket_hash["comments"]).to match_array(expected_ticket_hash["comments"])
+  end
+
   it "compose correct issue without assignee" do
     ticket = Tractive::Ticket.find(id: 98)
 

@@ -19,7 +19,7 @@ RSpec.describe Migrator::Engine do
     allow(File).to receive(:new).with(filename, "w+").and_return(buffer)
 
     converter = Migrator::Converter::TracToGithub.new(options_for_migrator)
-    migrator = Migrator::Engine.new(options_for_migrator(dryrun: true, filter: true, columnname: "id", operator: "<", columnvalue: "4"))
+    migrator = Migrator::Engine.new(options_for_migrator(dryrun: true, filter: true, columnname: "id", operator: "<", columnvalue: "4", "make-owners-labels" => true))
     migrator.migrate
 
     actual_hash = JSON.parse(buffer.string)

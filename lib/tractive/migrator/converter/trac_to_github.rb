@@ -122,10 +122,12 @@ module Migrator
 
         github_assignee = map_assignee(ticket[:owner])
 
-        if @make_owners_label
-          labels.add("name" => "owner:#{github_assignee}") unless github_assignee.nil? || github_assignee.empty?
-        else
-          badges.add("owner:#{github_assignee}")
+        unless github_assignee.nil? || github_assignee.empty?
+          if @make_owners_label
+            labels.add("name" => "owner:#{github_assignee}")
+          else
+            badges.add("owner:#{github_assignee}")
+          end
         end
 
         badges     = badges.to_a.compact.sort

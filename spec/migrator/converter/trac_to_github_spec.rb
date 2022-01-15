@@ -15,7 +15,7 @@ RSpec.describe Migrator::Converter::TracToGithub do
   it "compose correct issue" do
     ticket = Tractive::Ticket.find(id: 3)
 
-    actual_ticket_hash = Migrator::Converter::TracToGithub.new(options_for_migrator).compose(ticket)
+    actual_ticket_hash = Migrator::Converter::TracToGithub.new(options_for_migrator("make-owners-labels" => true)).compose(ticket)
     expected_ticket_hash = ticket_compose_hash3(ticket)
 
     expect(actual_ticket_hash["issue"]).to eq(expected_ticket_hash["issue"])

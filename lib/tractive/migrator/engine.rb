@@ -32,6 +32,7 @@ module Migrator
       @trac  = Tractive::Trac.new(db)
       @repo  = github["repo"]
       @client = GithubApi::Client.new(access_token: github["token"])
+      @graph_ql_client = GithubApi::GraphQlClient.new
 
       if input_file_name
         @from_file = input_file_name
@@ -62,6 +63,7 @@ module Migrator
       @safetychecks     = safetychecks
       @start_ticket     = (start_ticket || (@last_created_issue + 1)).to_i
       @filter_closed    = filter_closed
+      @delete_mocked_tickets = args[:cfg]["ticket"]["delete_mocked"]
     end
 
     def migrate

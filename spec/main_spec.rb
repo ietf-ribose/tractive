@@ -6,6 +6,8 @@ RSpec.describe Tractive::Main do
   end
 
   it "should not Exit if config file is present" do
+    stub_graphql_schema_request
+
     expect { Tractive::Main.new(options_for_main) }.not_to raise_error
   end
 
@@ -14,6 +16,8 @@ RSpec.describe Tractive::Main do
   end
 
   it "should not Exit if all filter params are present" do
+    stub_graphql_schema_request
+
     expect do
       Tractive::Main.new(
         options_for_main(

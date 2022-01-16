@@ -23,6 +23,7 @@ module Migrator
         begin
           lasttracid = tractickets.last[:id]
         rescue StandardError
+          delete_mocked_tickets if can_delete_mocked_tickets?
           raise("trac has no ticket #{start_ticket}")
         end
 
@@ -88,6 +89,46 @@ module Migrator
           end
 
           @last_created_issue = ticket[:id]
+        end
+
+        delete_mocked_tickets if can_delete_mocked_tickets?
+      end
+
+      def can_delete_mocked_tickets?
+        @delete_mocked_tickets
+      end
+
+      def delete_mocked_tickets
+        page = 1
+        issues = @client.issues(@repo, { filter: "all",
+                                         state: "closed",
+                                         page: page })
+
+        until issues.empty?
+          deleted = false
+
+          issues.each do |issue|
+            next if issue["title"] != "Placeholder issue #{issue["number"]} created to align Github issue and trac ticket numbers during migration."
+
+            response = @graph_ql_client.delete_issue(issue["node_id"])
+
+            if response.data.errors.any?
+              error_message = response.data
+                                      .errors
+                                      .messages
+                                      .map { |k, v| "#{k}: #{v}" }
+                                      .join(", ")
+              raise StandardError, error_message
+            end
+
+            deleted = true
+            puts "Successfully deleted issue ##{issue["number"]}, Title: #{issue["title"]}"
+          end
+
+          page += 1 unless deleted
+          issues = @client.issues(@repo, { filter: "all",
+                                           state: "closed",
+                                           page: page })
         end
       end
     end

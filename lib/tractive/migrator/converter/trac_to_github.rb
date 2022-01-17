@@ -102,14 +102,11 @@ module Migrator
 
         labels.delete(nil)
 
-        keywords = ticket[:keywords]
-        if keywords
-          if ticket[:keywords].downcase == "discuss"
-            labels.add(@labels_cfg.fetch("keywords", {})[ticket[:keywords].downcase])
-          else
-            badges.add(@labels_cfg.fetch("keywords", {})[ticket[:keywords]])
-          end
+        keywords = ticket[:keywords]&.split(",") || []
+        keywords.each do |keyword|
+          badges.add(@labels_cfg.fetch("keywords", {})[keyword.strip])
         end
+
         # If the field is not set, it will be nil and generate an unprocessable json
 
         milestone = @milestonemap[ticket[:milestone]]
@@ -272,7 +269,7 @@ module Migrator
         end
 
         case kind
-        when "owner", "status", "title", "resolution", "priority", "component", "type", "severity", "platform", "milestone"
+        when "owner", "status", "title", "resolution", "priority", "component", "type", "severity", "platform", "milestone", "keywords"
           old = meta[:oldvalue]
           new = meta[:newvalue]
           if old && new
@@ -352,7 +349,7 @@ module Migrator
       end
 
       def interested_in_change?(kind, newvalue)
-        !(%w[keywords cc reporter version].include?(kind) ||
+        !(%w[cc reporter version].include?(kind) ||
           (kind == "comment" && (newvalue.nil? || newvalue.lstrip.empty?)))
       end
 

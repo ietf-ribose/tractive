@@ -711,6 +711,11 @@ labels:
     wontfix: resolution_wontfix
     overtaken by events: resolution_overtaken by events
     deployed: resolution_deployed
+  keywords:
+    sprint: keyword_sprint
+    imported: keyword_imported
+    resnick: keyword_resnick
+    hard: keyword_hard
   severity: {}
   priority:
     n/a:

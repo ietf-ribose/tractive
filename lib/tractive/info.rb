@@ -29,12 +29,25 @@ module Tractive
       priorities  = Ticket.distinct.select(:priority).select_map(:priority).compact
       tracstates  = Ticket.distinct.select(:status).select_map(:status).compact
 
+      keywords    = Ticket.distinct
+                          .select(:keywords)
+                          .select_map(:keywords)
+                          .map do |keyword|
+                            keyword&.split(",")&.map do |k|
+                              k.strip.gsub(" ", "_")
+                            end
+                          end
+                          .flatten
+                          .uniq
+                          .compact
+
       {
         "users" => Utilities.make_each_hash(users, %w[email name username]),
         "milestones" => milestones,
         "labels" => {
           "type" => Utilities.make_hash("type_", types),
           "resolution" => Utilities.make_hash("resolution_", resolutions),
+          "keywords" => Utilities.make_hash("keyword_", keywords),
           "component" => Utilities.make_each_hash(components, %w[name color], "component: "),
           "severity" => Utilities.make_each_hash(severity, %w[name color]),
           "priority" => Utilities.make_each_hash(priorities, %w[name color]),

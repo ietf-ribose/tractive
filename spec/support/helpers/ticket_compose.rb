@@ -23,7 +23,7 @@ module Helpers
     def ticket_compose_hash3(ticket)
       changes = ticket.all_changes
       changes = changes.reject do |c|
-        %w[keywords cc reporter version].include?(c.field) ||
+        %w[cc reporter version].include?(c.field) ||
           (c.field == "comment" && (c.newvalue.nil? || c.newvalue.lstrip.empty?))
       end
 
@@ -72,7 +72,7 @@ module Helpers
     def ticket_compose_hash98(ticket)
       changes = ticket.all_changes
       changes = changes.reject do |c|
-        %w[keywords cc reporter version].include?(c.field) ||
+        %w[cc reporter version].include?(c.field) ||
           (c.field == "comment" && (c.newvalue.nil? || c.newvalue.lstrip.empty?))
       end
 
@@ -110,14 +110,14 @@ module Helpers
     def ticket_compose_hash872(ticket)
       changes = ticket.all_changes
       changes = changes.reject do |c|
-        !c.is_a?(Tractive::Attachment) && (%w[keywords cc reporter version].include?(c.field) ||
+        !c.is_a?(Tractive::Attachment) && (%w[cc reporter version].include?(c.field) ||
           (c.field == "comment" && (c.newvalue.nil? || c.newvalue.lstrip.empty?)))
       end
 
       {
         "issue" => {
           "title" => "Discusses page has documents with only ex-AD DISCUSSes",
-          "body" => "`type_defect`   |    by presnick@qualcomm.com\n\n___\n\n\nhttps://datatracker.ietf.org/iesg/discusses/ lists documents where the only DISCUSS holder are retired ADs. It should not have those documents listed.\n\n___\n_Issue migrated from trac:872 at #{Time.now}_",
+          "body" => "`keyword_hard` `keyword_resnick` `keyword_sprint` `type_defect`   |    by presnick@qualcomm.com\n\n___\n\n\nhttps://datatracker.ietf.org/iesg/discusses/ lists documents where the only DISCUSS holder are retired ADs. It should not have those documents listed.\n\n___\n_Issue migrated from trac:872 at #{Time.now}_",
           "labels" => ["medium", "accepted", "component: doc/"],
           "closed" => false,
           "created_at" => format_time(ticket[:time]),
@@ -127,8 +127,11 @@ module Helpers
         "comments" => [
           { "body" => "_@vidyut.luther@neustar.biz_ _uploaded file [`settings.py`](http://www.abc.com/test/ticket/389/389b4f6ee5bd60bebd9d0708da23ba8b4134620b/888c15d72e41c9f0f1882f4aea4c2d19f1a044eb.py) (4.9 KiB)_\n\nExisting settings.py in production right now.", "created_at" => format_time(changes[0][:time]) },
           { "body" => "_@henrik@levkowetz.com_ _changed priority from `minor` to `medium`_", "created_at" => format_time(changes[1][:time]) },
-          { "body" => "_@rjsparks@nostrum.com_ _commented_\n\n\n___\nI've taken several runs at improving this since it was reported. I've been lured by the siren to fix the query rather than fix this particular page's output. It turns out that a query for what this page should show that is both correct and efficient is very hard (perhaps not possible). Instead, we should replumb the page so that we have a chance to remove the set of offending documents from the list being displayed after we've run the query. If it's not done before then, I'll take another run at the next sprint. ", "created_at" => format_time(changes[2][:time]) },
-          { "body" => "_@rjsparks@nostrum.com_ _changed status from `new` to `accepted`_", "created_at" => format_time(changes[3][:time]) }
+          { "body" => "_@henrik@levkowetz.com_ _changed keywords from `` to `resnick`_", "created_at" => format_time(changes[2][:time]) },
+          { "body" => "_@rjsparks@nostrum.com_ _commented_\n\n\n___\nI've taken several runs at improving this since it was reported. I've been lured by the siren to fix the query rather than fix this particular page's output. It turns out that a query for what this page should show that is both correct and efficient is very hard (perhaps not possible). Instead, we should replumb the page so that we have a chance to remove the set of offending documents from the list being displayed after we've run the query. If it's not done before then, I'll take another run at the next sprint. ", "created_at" => format_time(changes[3][:time]) },
+          { "body" => "_@rjsparks@nostrum.com_ _changed keywords from `resnick` to `resnick, sprint`_", "created_at" => format_time(changes[4][:time]) },
+          { "body" => "_@jmh@joelhalpern.com_ _changed keywords from `resnick, sprint` to `resnick, sprint, hard`_", "created_at" => format_time(changes[5][:time]) },
+          { "body" => "_@rjsparks@nostrum.com_ _changed status from `new` to `accepted`_", "created_at" => format_time(changes[6][:time]) }
         ]
       }
     end

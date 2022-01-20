@@ -69,6 +69,55 @@ module Helpers
       }
     end
 
+    def ticket_compose_hash3_without_owner_label(ticket)
+      changes = ticket.all_changes
+      changes = changes.reject do |c|
+        %w[keywords cc reporter version].include?(c.field) ||
+          (c.field == "comment" && (c.newvalue.nil? || c.newvalue.lstrip.empty?))
+      end
+
+      {
+        "issue" => {
+          "title" => "ipr.cgi",
+          "body" => "`owner:henrik@levkowetz.com` `resolution_fixed` `type_task`   |    by henrik@levkowetz.com\n\n___\n\n\n\n\n___\n_Issue migrated from trac:3 at #{Time.now}_",
+          "labels" => ["n/a", "closed", "component: admin/"],
+          "closed" => true,
+          "closed_at" => format_time(ticket.closed_comments.order(:time).last.time),
+          "created_at" => format_time(ticket[:time]),
+          "milestone" => nil,
+          "assignee" => "henrik@levkowetz.com"
+        },
+        "comments" => [
+          { "body" => "_@henrik@levkowetz.com_ _changed status from `new` to `assigned`_", "created_at" => format_time(changes[0][:time]) },
+          { "body" => "_@henrik@levkowetz.com_ _changed owner from `henrik` to `henrik@levkowetz.com`_", "created_at" => format_time(changes[1][:time]) },
+          { "body" => "_@henrik@levkowetz.com_ _changed status from `assigned` to `closed`_", "created_at" => format_time(changes[2][:time]) },
+          { "body" => "_@henrik@levkowetz.com_ _changed resolution from `` to `fixed`_", "created_at" => format_time(changes[3][:time]) },
+          { "body" => "_@fenner@research.att.com_ _changed status from `closed` to `reopened`_", "created_at" => format_time(changes[4][:time]) },
+          { "body" => "_@fenner@research.att.com_ _changed resolution from `fixed` to ``_", "created_at" => format_time(changes[5][:time]) },
+          {
+            "body" => "_@fenner@research.att.com_ _commented_\n\n\n___\nI noticed a couple of major differences between the cgi and django versions:\n\n * The cgi version displays a preview\n * The cgi version displays a message that the disclosure has been submitted and it will be reviewed and posted.  The django version sends you directly to your new disclosure, which could allow you to post a link to it before it is reviewed and posted.  (Should the view detail say \"this is under review\" instead of showing the disclousre?)\n * The cgi version sends email to the secretariat (in the same general format as the preview) as a notification of the new submission.\n\nIf nothing else, the django version should at least send the same kind of email to keep the workflow the same.", "created_at" => format_time(changes[6][:time])
+          },
+          {
+            "body" => "_@henrik@levkowetz.com_ _commented_\n\n\n___\nReplying to [comment:3 fenner@research.att.com]:\n> I noticed a couple of major differences between the cgi and django versions:\n> \n>  * The cgi version displays a preview\n\nMissing feature in django version.\n\n>  * The cgi version displays a message that the disclosure has been submitted and it will be reviewed and posted.  The django version sends you directly to your new disclosure, which could allow you to post a link to it before it is reviewed and posted.  (Should the view detail say \"this is under review\" instead of showing the disclousre?)\n\nYes. Bug in django version.\n\n>  * The cgi version sends email to the secretariat (in the same general format as the preview) as a notification of the new submission.\n\nRight. Bug (missing functionality) in django version.\n\n> If nothing else, the django version should at least send the same kind of email to keep the workflow the same.\n\nYes.", "created_at" => format_time(changes[7][:time])
+          },
+          {
+            "body" => "_@michael.lee@neustar.biz_ _commented_\n\n\n___\nI have following differences:\n\n* The cgi version allows you to submit an IPR without specifying Disclosure of Patent Information when you select 'Yes' on V.B. The django version doesn't do this.\n\n* You can submit an ipr with mixed type of IETF documentations and other contribution (section IV). There was a discussion about this a while ago and this action was prohibited. We may want to bring this up to people like Russ or Scott Bradner if we want to change this rule. If changed, then we will need to test this with secreatariat's interface to make sure the notification messages are going out to proper group of people.\n\n* There is no Review and Confirm page in django. May be this is intended?\n\nMichael.\n", "created_at" => format_time(changes[8][:time])
+          },
+          {
+            "body" => "_@henrik@levkowetz.com_ _commented_\n\n\n___\nReplying to [comment:5 michael.lee@neustar.biz]:\n> I have following differences:\n> \n> * The cgi version allows you to submit an IPR without specifying Disclosure of Patent Information when you select 'Yes' on V.B. The django version doesn't do this.\n\nI think this should be fixed.\n\n> * You can submit an ipr with mixed type of IETF documentations and other contribution (section IV). There was a discussion about this a while ago and this action was prohibited. We may want to bring this up to people like Russ or Scott Bradner if we want to change this rule. If changed, then we will need to test this with secreatariat's interface to make sure the notification messages are going out to proper group of people.\n\nI had a discussion with past chairs and others about permitting both RFCs and\ndrafts in the same disclosure (after having asked you (Michael) about this),\nand got go-ahead on that.\n\nIs this something different, or the same issue?\n\n> * There is no Review and Confirm page in django. May be this is intended?\n\nNo, but possibly sufficiently minor that we will fix it later.\n\n> Michael.\n", "created_at" => format_time(changes[9][:time])
+          },
+          {
+            "body" => "_@fenner@research.att.com_ _commented_\n\n\n___\nReplying to [comment:5 michael.lee@neustar.biz]:\n> * You can submit an ipr with mixed type of IETF documentations and other contribution (section IV). There was a discussion about this a while ago and this action was prohibited. We may want to bring this up to people like Russ or Scott Bradner if we want to change this rule. If changed, then we will need to test this with secreatariat's interface to make sure the notification messages are going out to proper group of people.\n\nI checked ipr_admin_detail.cgi, command=do_post_it - it uses both ipr_ids and ipr_rfcs and looks up the relevant people for each I-D and RFC individually and adds them all together, so it looks like it already supports it.", "created_at" => format_time(changes[10][:time])
+          },
+          { "body" => "_@henrik@levkowetz.com_ _changed status from `reopened` to `closed`_", "created_at" => format_time(changes[11][:time]) },
+          { "body" => "_@henrik@levkowetz.com_ _changed resolution from `` to `fixed`_", "created_at" => format_time(changes[12][:time]) },
+          { "body" => "_@henrik@levkowetz.com_ _changed component from `` to `admin/`_", "created_at" => format_time(changes[13][:time]) },
+          { "body" => "_removed milestone (was `IPRTool`)_", "created_at" => format_time(changes[14][:time]) },
+          { "body" => "_commented_\n\n\n___\nMilestone IPRTool deleted", "created_at" => format_time(changes[15][:time]) }
+        ]
+      }
+    end
+
     def ticket_compose_hash98(ticket)
       changes = ticket.all_changes
       changes = changes.reject do |c|

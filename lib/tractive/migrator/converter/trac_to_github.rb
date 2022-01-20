@@ -16,6 +16,7 @@ module Migrator
         @client               = GithubApi::Client.new(access_token: args[:cfg]["github"]["token"])
         @wiki_attachments_url = args[:cfg].dig("wiki", "attachments", "url")
         @revmap_file_path     = args[:opts][:revmapfile] || args[:cfg]["revmap_path"]
+        @make_owners_label    = args[:opts]["make-owners-labels"] || args[:cfg]["make_owners_labels"]
         @attachment_options   = {
           url: @attachurl,
           hashed: args[:cfg].dig("ticket", "attachments", "hashed")
@@ -121,6 +122,14 @@ module Migrator
 
         github_assignee = map_assignee(ticket[:owner])
 
+        unless github_assignee.nil? || github_assignee.empty?
+          if @make_owners_label
+            labels.add("name" => "owner:#{github_assignee}")
+          else
+            badges.add("owner:#{github_assignee}")
+          end
+        end
+
         badges     = badges.to_a.compact.sort
         badgetable = badges.map { |i| %(`#{i}`) }.join(" ")
         badgetable += begin
@@ -132,8 +141,6 @@ module Migrator
 
         # compose body
         body = [badgetable, body, footer].join("\n\n___\n")
-
-        labels.add("name" => "owner:#{github_assignee}") unless github_assignee.nil? || github_assignee.empty?
         labels = labels.map { |label| label["name"] }
 
         issue = {

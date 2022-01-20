@@ -36,7 +36,7 @@ Metrics/MethodLength:
   Enabled: false
 
 Metrics/ModuleLength:
-  Max: 150
+  Max: 250
 
 Metrics/ParameterLists:
   Max: 6

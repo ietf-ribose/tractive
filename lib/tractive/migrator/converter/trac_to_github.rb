@@ -104,7 +104,7 @@ module Migrator
 
         keywords = ticket[:keywords]&.split(",") || []
         keywords.each do |keyword|
-          badges.add(@labels_cfg.fetch("keywords", {})[keyword.strip])
+          badges.add(@labels_cfg.fetch("keywords", {})[keyword.strip.gsub(" ", "_")])
         end
 
         # If the field is not set, it will be nil and generate an unprocessable json

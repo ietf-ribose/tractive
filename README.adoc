@@ -519,7 +519,7 @@ milestones:
     `export_script:`:::: output of a script that utilizes `trac-admin` to download 
     all attachments from Trac.
 
-NOTE: To delete the issues, user must have correct access to the repository. For more information, see "https://docs.github.com/en/issues/tracking-your-work-with-issues/deleting-an-issue[deleting an issue]". 
+NOTE: To delete the issues, an organization owner must enable deleting an issue for the organization's repositories, and you must have admin or owner permissions in the repository. For more information, see "https://docs.github.com/en/issues/tracking-your-work-with-issues/deleting-an-issue[deleting an issue]". 
 
 [source,yaml]
 ----

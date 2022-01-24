@@ -506,6 +506,8 @@ milestones:
 ==== Attachments migration configuration
 `ticket | wiki:`:: specifies the options for the tickets or wikis
 
+  `delete_mocked:`::: Whether to delete mocked tickets after migration or not
+
   `attachments:`::: specifies method of obtaining attachments from Trac.
 
     `url:`:::: URL to obtain Trac attachments from
@@ -517,9 +519,12 @@ milestones:
     `export_script:`:::: output of a script that utilizes `trac-admin` to download 
     all attachments from Trac.
 
+NOTE: To delete the issues, user must have correct access to the repository. For more information, see "https://docs.github.com/en/issues/tracking-your-work-with-issues/deleting-an-issue[deleting an issue]". 
+
 [source,yaml]
 ----
 ticket:
+  delete_mocked: true
   attachments:
     url: https://abc.com/raw-attachment/ticket
     hashed: true

@@ -22,7 +22,7 @@ module Http
             minutes = retry_after / 60
             seconds = retry_after % 60
 
-            print "\rRate Limit Exceeded, Will retry in #{minutes} min #{seconds} sec"
+            $logger.info "Rate Limit Exceeded, Will retry in #{minutes} min #{seconds} sec"
             sleep(1)
 
             retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i

@@ -25,7 +25,7 @@ module Http
             $logger.info "Rate Limit Exceeded, Will retry in #{minutes} min #{seconds} sec"
             sleep(1)
 
-            retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i
+            retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i + 5
           end
           retry if retries <= @max_retries
         end

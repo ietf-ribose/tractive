@@ -42,7 +42,8 @@ RSpec.describe Migrator::Engine do
 
   it "should generate correct comment body" do
     comments = test_comments
-    response = Migrator::Engine.new(options_for_migrator).send(:create_update_comment_params, comments[3], comments, 1)
+    comments_map = { 0 => 0, 1 => 1, 2 => 2, 3 => 3 }
+    response = Migrator::Engine.new(options_for_migrator).send(:create_update_comment_params, comments[3], comments, 1, comments_map)
     expect(response).to eq("_@hassanakbar4_ _commented_\n\n\n___\nReplying to [test/repo#1 (comment:1)](https://github.com/test/repo/issues/1#issuecomment-913628459):")
   end
 

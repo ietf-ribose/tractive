@@ -3,7 +3,11 @@
 module Migrator
   module Converter
     class TracToGithub
+      attr_reader :comments_map
+
       def initialize(args)
+        @comments_map = {}
+
         @trac_ticket_base_url = args[:cfg]["trac"]["ticketbaseurl"]
         @attachurl            = args[:opts][:attachurl] || args[:cfg].dig("ticket", "attachments", "url")
         @changeset_base_url   = args[:cfg]["trac"]["changeset_base_url"] || ""
@@ -70,6 +74,15 @@ module Migrator
 
         # replay all changes in chronological order:
         comments = changes.map { |x| ticket_change(@singlepost, x) }.select { |x| x }.to_a
+
+        curr_index = 0
+        changes.each_with_index do |change, index|
+          if change[:field] == "comment"
+            @comments_map[curr_index] = index
+            curr_index += 1
+          end
+        end
+
         if @singlepost
           body += comments.map { |x| x["body"] }.join("\n")
           comments = []

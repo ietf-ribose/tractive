@@ -15,7 +15,7 @@ module Http
           retries += 1
           RestClient::Request.execute(@args, &block)
         rescue RestClient::Forbidden => e
-          retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i
+          retry_after = e.http_headers[:x_ratelimit_reset].to_i - Time.now.to_i + 5
           raise e if retry_after.negative? || retries > @max_retries
 
           while retry_after.positive?

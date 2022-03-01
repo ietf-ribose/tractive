@@ -53,7 +53,8 @@ module Migrator
 
           $logger.info(%{creating issue for trac #{ticket[:id]} "#{ticket[:summary]}" (#{ticket[:reporter]})})
           # API details: https://gist.github.com/jonmagic/5282384165e0f86ef105
-          request = Migrator::Converter::TracToGithub.new(@config).compose(ticket)
+          converter = Migrator::Converter::TracToGithub.new(@config)
+          request = converter.compose(ticket)
 
           response = @client.create_issue(@repo, request)
 
@@ -76,7 +77,7 @@ module Migrator
 
             $logger.info("created issue ##{issue_id} for trac ticket #{ticket[:id]}")
 
-            update_comment_ref(issue_id) if request.to_s.include?("Replying to [comment:")
+            update_comment_ref(issue_id, converter.comments_map) if request.to_s.include?("Replying to [comment:")
 
             # assert correct issue number
             if issue_id != ticket[:id]

@@ -15,7 +15,7 @@ RSpec.describe Http::Client::Request do
     it "should `retry` after request limit reset time when API Limit Exceed" do
       allow_any_instance_of(RestClient::Forbidden)
         .to receive(:http_headers)
-        .and_return(x_ratelimit_reset: Time.now.to_i + 1)
+        .and_return(x_ratelimit_reset: Time.now.to_i - 4)
 
       call_count = 0
       allow(RestClient::Request).to receive(:execute).exactly(2).times do
@@ -23,7 +23,7 @@ RSpec.describe Http::Client::Request do
         call_count == 1 ? raise(RestClient::Forbidden) : { status: 200 }
       end
 
-      retry_text = "Rate Limit Exceeded, Will retry in 0 min 6 sec"
+      retry_text = "Rate Limit Exceeded, Will retry in 0 min 1 sec"
       allow($logger).to receive(:info).with(retry_text)
 
       Http::Client::Request.execute(method: :get, max_retries: 1)

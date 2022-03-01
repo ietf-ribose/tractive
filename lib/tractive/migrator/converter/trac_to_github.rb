@@ -75,12 +75,19 @@ module Migrator
         # replay all changes in chronological order:
         comments = changes.map { |x| ticket_change(@singlepost, x) }.select { |x| x }.to_a
 
+        index = 0
         curr_index = 0
-        changes.each_with_index do |change, index|
-          if change[:field] == "comment"
+        changes.each do |change|
+          kind = change[:field] || "attachment"
+
+          next unless interested_in_change?(kind, change[:newvalue])
+
+          if kind == "comment" || (kind == "attachment" && change[:description] != "")
             @comments_map[curr_index] = index
             curr_index += 1
           end
+
+          index += 1
         end
 
         if @singlepost

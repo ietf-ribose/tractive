@@ -80,9 +80,14 @@ module Migrator
         changes.each do |change|
           kind = change[:field] || "attachment"
 
-          next unless interested_in_change?(kind, change[:newvalue])
+          next if %w[cc reporter version].include?(kind)
 
-          if kind == "comment" || (kind == "attachment" && change[:description] != "")
+          if kind == "comment" && (change[:newvalue].nil? || change[:newvalue].lstrip.empty?)
+            curr_index += 1
+            next
+          end
+
+          if kind == "comment"
             @comments_map[curr_index] = index
             curr_index += 1
           end

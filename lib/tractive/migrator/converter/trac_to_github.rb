@@ -190,11 +190,7 @@ module Migrator
         end
 
         if issue["closed"]
-          issue["closed_at"] = if closed_time
-                                 format_time(closed_time)
-                               else
-                                 format_time(ticket[:closed_at].to_i)
-                               end
+          issue["closed_at"] = format_time(closed_time || ticket[:closed_at].to_i)
         end
 
         {

@@ -63,7 +63,7 @@ module Migrator
       @safetychecks     = safetychecks
       @start_ticket     = (start_ticket || (@last_created_issue + 1)).to_i
       @filter_closed    = filter_closed
-      @delete_mocked_tickets = args[:cfg]["ticket"]["delete_mocked"]
+      @delete_mocked_tickets = args[:cfg]["ticket"]["delete_mocked"] if args[:cfg]["ticket"]
     end
 
     def migrate

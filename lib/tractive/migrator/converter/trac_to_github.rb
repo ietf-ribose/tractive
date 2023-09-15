@@ -189,9 +189,7 @@ module Migrator
           # issue["updated_at"] = format_time(ticket[:changetime])
         end
 
-        if issue["closed"]
-          issue["closed_at"] = format_time(closed_time || ticket[:closed_at].to_i)
-        end
+        issue["closed_at"] = format_time(closed_time || ticket[:closed_at].to_i) if issue["closed"]
 
         {
           "issue" => issue,

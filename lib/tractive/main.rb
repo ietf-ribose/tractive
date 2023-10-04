@@ -18,9 +18,11 @@ module Tractive
       GithubApi::GraphQlClient.add_constants(@cfg["github"]["token"]) unless @opts[:info]
 
       @db = Tractive::Utilities.setup_db!(@opts["trac-database-path"] || @cfg["trac"]["database"])
-    rescue Sequel::DatabaseConnectionError, Sequel::AdapterNotFound, URI::InvalidURIError, Sequel::DatabaseError, StandardError => e
+    rescue Sequel::DatabaseConnectionError, Sequel::AdapterNotFound, URI::InvalidURIError, Sequel::DatabaseError => e
       $logger.error e.message
       exit 1
+    rescue StandardError => e
+      warn_and_exit(e.message, 1)
     end
 
     def run

@@ -176,7 +176,7 @@ module Migrator
 
         if @users.key?(ticket[:owner])
           owner = trac_mail(ticket[:owner])
-          github_owner = @users[owner]["username"]
+          github_owner = extract_github_owner_username(owner)
           $logger.debug("..owner in trac: #{owner}")
           $logger.debug("..assignee in GitHub: #{github_owner}")
           issue["assignee"] = github_owner
@@ -376,6 +376,14 @@ module Migrator
         return "trac:#{ticket[:id]}" unless @trac_ticket_base_url
 
         "[trac:#{ticket[:id]}](#{@trac_ticket_base_url}/#{ticket[:id]})"
+      end
+
+      def extract_github_owner_username(owner)
+        if !owner || !@users[owner]
+          raise StandardError, "Unable to find Github username for #{owner}, this can be set in the config file."
+        end
+
+        @users[owner]["username"]
       end
     end
   end

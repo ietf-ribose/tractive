@@ -26,6 +26,8 @@ module GithubApi
       GithubApi::GraphQlClient.const_set("Schema", GraphQL::Client.load_schema(HttpAdapter))
       GithubApi::GraphQlClient.const_set("Client", GraphQL::Client.new(schema: Schema, execute: HttpAdapter))
       GithubApi::GraphQlClient.const_set("DeleteIssueQuery", Client.parse(DELETE_ISSUE_QUERY))
+    rescue KeyError
+      raise ::StandardError, "Github access token is incorrect or does not have sufficent permissions to access the Github API"
     end
   end
 end

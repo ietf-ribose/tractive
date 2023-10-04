@@ -74,6 +74,9 @@ module Migrator
       else
         migrate_from_db
       end
+    rescue => e
+      $logger.error e.message
+      exit 1
     end
 
     private

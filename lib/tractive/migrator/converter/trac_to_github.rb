@@ -380,7 +380,10 @@ module Migrator
 
       def extract_github_owner_username(owner)
         if !owner || !@users[owner]
-          raise StandardError, "Unable to find Github username for #{owner}, this can be set in the config file."
+          raise(
+            StandardError,
+            "Unable to find Github username for #{owner}, this can be set in the config file."
+          )
         end
 
         @users[owner]["username"]

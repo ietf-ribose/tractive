@@ -8,16 +8,21 @@ module Tractive
       @opts = opts
       @cfg  = YAML.load_file(@opts[:config])
 
+      Tractive::Utilities.setup_logger(output_stream: @opts[:logfile] || $stderr, verbose: @opts[:verbose])
+
+      verify_config!(@cfg, @opts)
+
       @cfg["github"] ||= {}
       @cfg["github"]["token"] = @opts["git-token"] if @opts["git-token"]
 
       GithubApi::GraphQlClient.add_constants(@cfg["github"]["token"]) unless @opts[:info]
 
-      Tractive::Utilities.setup_logger(output_stream: @opts[:logfile] || $stderr, verbose: @opts[:verbose])
       @db = Tractive::Utilities.setup_db!(@opts["trac-database-path"] || @cfg["trac"]["database"])
     rescue Sequel::DatabaseConnectionError, Sequel::AdapterNotFound, URI::InvalidURIError, Sequel::DatabaseError => e
       $logger.error e.message
       exit 1
+    rescue StandardError => e
+      warn_and_exit(e.message, 1)
     end
 
     def run
@@ -55,6 +60,15 @@ module Tractive
     end
 
     private
+
+    def verify_config!(config, options)
+      database_path_missing_error = <<~DATABASE_PATH_MISSING_ERROR
+        Missing path for trac database which can be set using `--trac-database-path` or can
+        be set in config file (see https://github.com/ietf-ribose/tractive#trac-configuration)
+      DATABASE_PATH_MISSING_ERROR
+
+      warn_and_exit(database_path_missing_error, 1) if !options["trac-database-path"] && !(config["trac"] && config["trac"]["database"])
+    end
 
     def verify_options!(options)
       verify_config_options!(options)

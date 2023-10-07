@@ -10,6 +10,7 @@ on:
         default: 'skip'
   push:
     tags: [ v* ]
+    branches: [adding_release_workflow]
 
 jobs:
   release:
